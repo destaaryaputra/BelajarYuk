@@ -1,96 +1,102 @@
 <?php
 
 /**
- * Belajaryuk - Vercel Optimized Entry Point
- * Designed for maximum resilience and deep diagnostics
+ * Belajaryuk - Vercel API Entry Point
+ * High-Performance Class Mapping & Resilient Bootstrapping
  */
 
-// 1. Absolute Visibility
+// 1. Setup Environment & Errors
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-// 2. The "Truth-Teller" Shutdown Handler
+// 2. Fatal Error Diagnostics (JSON Output)
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
         if (!headers_sent()) header('Content-Type: application/json');
         
-        $base = dirname(__DIR__);
-        $searched = $base . '/src/Controllers/AuthController.php';
-        
-        // Scan for the real file to see what Vercel actually sees
-        $realFile = "NOT_FOUND";
-        $dirToScan = $base . '/src/Controllers';
-        if (is_dir($dirToScan)) {
-            $files = scandir($dirToScan);
-            $realFile = "Found in " . basename($dirToScan) . ": " . implode(', ', $files);
-        } elseif (is_dir(strtolower($dirToScan))) {
-            $files = scandir(strtolower($dirToScan));
-            $realFile = "Found in " . basename(strtolower($dirToScan)) . ": " . implode(', ', $files);
+        $root = dirname(__DIR__);
+        $scan = [];
+        if (is_dir($root . '/src')) {
+            $scan = array_diff(scandir($root . '/src'), ['.', '..']);
         }
 
         echo json_encode([
             'success' => false, 
-            'message' => 'Backend Initialization Failed', 
+            'message' => 'Backend Error', 
             'debug' => $error['message'],
             'diagnostics' => [
-                'expected_path' => $searched,
-                'filesystem_check' => $realFile,
-                'cwd' => getcwd(),
-                'base' => $base
+                'root' => $root,
+                'src_content' => $scan,
+                'file' => basename($error['file']),
+                'line' => $error['line']
             ]
         ]);
     }
 });
 
-$base = dirname(__DIR__);
+$root = dirname(__DIR__);
 
-// 3. Ultimate Case-Insensitive Autoloader
-spl_autoload_register(function ($class) use ($base) {
-    if (strpos($class, 'App\\') !== 0) return;
-    
-    $relative = str_replace('App\\', '', $class);
-    $relative = str_replace('\\', '/', $relative);
-    
-    $variations = [
-        $base . '/src/' . $relative . '.php',
-        $base . '/src/' . strtolower($relative) . '.php',
-        strtolower($base . '/src/' . $relative . '.php')
-    ];
-    
-    foreach ($variations as $file) {
-        if (file_exists($file)) {
-            require_once $file;
-            return;
+// 3. Build Case-Insensitive Class Map (The "Fix-Everything" Map)
+$classMap = [];
+function buildMap($dir, &$map, $rootPath) {
+    if (!is_dir($dir)) return;
+    $items = scandir($dir);
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') continue;
+        $path = $dir . '/' . $item;
+        if (is_dir($path)) {
+            buildMap($path, $map, $rootPath);
+        } elseif (substr($item, -4) === '.php') {
+            $relative = str_replace($rootPath . '/src/', '', $path);
+            $className = 'App\\' . str_replace(['/', '.php'], ['\\', ''], $relative);
+            $map[strtolower($className)] = $path;
         }
+    }
+}
+buildMap($root . '/src', $classMap, $root);
+
+// 4. Register the Resilient Autoloader
+spl_autoload_register(function ($class) use ($classMap) {
+    $lower = strtolower($class);
+    if (isset($classMap[$lower])) {
+        require_once $classMap[$lower];
     }
 }, true, true);
 
-// 4. Load Dependencies
-if (file_exists($base . '/vendor/autoload.php')) {
-    require_once $base . '/vendor/autoload.php';
+// 5. Load Composer (Third-party)
+if (file_exists($root . '/vendor/autoload.php')) {
+    require_once $root . '/vendor/autoload.php';
 }
 
-// 5. Load Config (Hard load to ensure availability)
-$configFile = $base . '/src/Config/lingkungan.php';
-if (!file_exists($configFile)) $configFile = $base . '/src/config/lingkungan.php';
+// 6. Load Config (Force load)
+$configPath = $root . '/src/Config/lingkungan.php';
+if (!file_exists($configPath)) $configPath = $root . '/src/config/lingkungan.php';
+if (file_exists($configPath)) require_once $configPath;
 
-if (file_exists($configFile)) {
-    require_once $configFile;
+// 7. Dynamic CORS
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
+header('Access-Control-Allow-Origin: ' . $origin);
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
 }
 
-// 6. Router Dispatch
+// 8. Router
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
 if (strpos($uri, '/api') === 0) {
     require __DIR__ . '/router.php';
     exit;
 }
 
-// 7. Frontend Fallback
-$frontend = $base . '/public/index.php';
+// 9. Frontend
+$frontend = $root . '/public/index.php';
 if (file_exists($frontend)) {
     require $frontend;
 } else {
-    echo "<h2>Belajaryuk Ready</h2><p>Please check your public folder.</p>";
+    echo "<h1>Belajaryuk</h1><p>Application ready.</p>";
 }
