@@ -96,8 +96,8 @@ header('X-XSS-Protection: 1; mode=block');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 
 // CORS untuk API
-$allowedOrigin = $_ENV['APP_URL'] ?? getenv('APP_URL') ?: 'http://localhost/belajaryuk';
-header('Access-Control-Allow-Origin: ' . $allowedOrigin);
+$httpOrigin = $_SERVER['HTTP_ORIGIN'] ?? '*';
+header('Access-Control-Allow-Origin: ' . $httpOrigin);
 header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token');

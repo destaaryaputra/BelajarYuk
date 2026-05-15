@@ -15,16 +15,24 @@ register_shutdown_function(function() {
     if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
         if (!headers_sent()) header('Content-Type: application/json');
         
-        // Debugging info: Check if file actually exists
-        $searchFile = dirname(__DIR__) . '/src/Controllers/AuthController.php';
-        $exists = file_exists($searchFile) ? 'YES' : 'NO';
-        
+        $baseDir = dirname(__DIR__);
+        $srcTree = [];
+        if (is_dir($baseDir . '/src')) {
+            $iter = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($baseDir . '/src', RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+            foreach ($iter as $path => $dir) {
+                $srcTree[] = str_replace($baseDir, '', $path);
+            }
+        }
+
         echo json_encode([
             'success' => false, 
             'message' => 'System Boot Error', 
             'debug' => $error['message'],
-            'file_existence_check' => "{$searchFile} exists: $exists",
-            'hint' => 'Check folder casing (src/Controllers/ vs src/controllers/)'
+            'src_filesystem_snapshot' => $srcTree,
+            'hint' => 'Check if your file is in the list above with the EXACT same casing.'
         ]);
     }
 });
