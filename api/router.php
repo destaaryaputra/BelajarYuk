@@ -1,21 +1,10 @@
 <?php
 
 // API router
-// Load configuration & dependencies (use parent src directory)
-$env_file = __DIR__ . '/../src/config/lingkungan.php';
-if (file_exists($env_file)) {
-    require_once $env_file;
-}
-
-require_once __DIR__ . '/../vendor/autoload.php';
-
 use App\Utils\Response;
 
 // Suppress notices/warnings to keep JSON clean
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING & ~E_DEPRECATED);
-
-// Start session if not already started
-@session_start();
 
 // Parse URL properly
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

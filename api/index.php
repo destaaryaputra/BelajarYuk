@@ -26,33 +26,24 @@ register_shutdown_function(function() {
     }
 });
 
-// Check for vendor folder (Vercel deployment common issue)
-if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
-    header('Content-Type: application/json');
-    http_response_code(500);
-    echo json_encode([
-        'success' => false, 
-        'message' => 'Folder VENDOR tidak ditemukan!', 
-        'solution' => 'Vercel tidak menjalankan composer secara otomatis. Kamu harus menghapus /vendor/ dari .gitignore dan mengunggahnya ke GitHub, atau gunakan build step.'
-    ]);
-    exit;
-}
-
-// Check for database driver
-if (!extension_loaded('pdo_pgsql')) {
-    header('Content-Type: application/json');
-    http_response_code(500);
-    echo json_encode([
-        'success' => false, 
-        'message' => 'Ekstensi PHP pdo_pgsql tidak aktif di Vercel!',
-        'solution' => 'Gunakan runtime vercel-php yang mendukung PostgreSQL atau hubungi support.'
-    ]);
-    exit;
-}
-
 // Load environment first
 require_once __DIR__ . '/../src/config/lingkungan.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+
+// Custom PSR-4 Autoloader Fallback for Vercel
+spl_autoload_register(function ($class) {
+    $prefix = 'App\\';
+    $base_dir = __DIR__ . '/../src/';
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) return;
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    if (file_exists($file)) require $file;
+});
+
+// Load composer if available
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
 
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
