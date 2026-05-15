@@ -38,29 +38,30 @@ spl_autoload_register(function ($class) use ($projectRoot) {
     if (strpos($class, 'App\\') !== 0) return;
     
     static $classMap = null;
-    
     if ($classMap === null) {
         $classMap = [];
-        $srcPath = $projectRoot . '/src';
+        $srcPath = realpath($projectRoot . '/src');
         
-        if (is_dir($srcPath)) {
+        if ($srcPath && is_dir($srcPath)) {
             $directory = new RecursiveDirectoryIterator($srcPath);
             $iterator = new RecursiveIteratorIterator($directory);
             foreach ($iterator as $file) {
                 if ($file->isFile() && $file->getExtension() === 'php') {
-                    // Get class name from file path (src/Controllers/AuthController.php -> App\Controllers\AuthController)
-                    $relativePath = str_replace([$srcPath, '.php'], '', $file->getPathname());
-                    $className = 'App' . str_replace(['/', '\\'], '\\', $relativePath);
+                    $fullPath = realpath($file->getPathname());
+                    // Remove src base path and extension
+                    $relative = str_replace([$srcPath, '.php'], '', $fullPath);
+                    // Normalize separators to \
+                    $relative = str_replace(['/', '\\'], '\\', $relative);
+                    // Remove leading \ if exists
+                    $relative = ltrim($relative, '\\');
                     
-                    // Map both exact name and lowercase version for maximum resilience
-                    $classMap[$className] = $file->getPathname();
-                    $classMap[strtolower($className)] = $file->getPathname();
+                    $className = 'App\\' . $relative;
+                    $classMap[strtolower($className)] = $fullPath;
                 }
             }
         }
     }
     
-    // Lookup in our case-insensitive map
     $lookup = strtolower($class);
     if (isset($classMap[$lookup])) {
         require_once $classMap[$lookup];

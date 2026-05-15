@@ -48,24 +48,31 @@ App.Auth = {
         const username = form.querySelector('#login-username').value;
         const password = form.querySelector('#login-password').value;
 
+        console.log("Proses login dimulai untuk user:", username);
         App.Utils.showLoading(true);
         try {
             const response = await App.Service.API.login(username, password);
+            console.log("Respon API diterima:", response);
             
-            App.Service.API.setToken(response.data.token);
-            localStorage.setItem(App.Config.STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
-            
-            App.Utils.showNotification('Berhasil masuk! Selamat belajar.', 'success');
-            form.reset();
-            
-            App.UI.setupRoleAccess();
+            if (response.success && response.data) {
+                App.Service.API.setToken(response.data.token);
+                localStorage.setItem(App.Config.STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
+                
+                App.Utils.showNotification('Berhasil masuk! Selamat belajar.', 'success');
+                form.reset();
+                
+                App.UI.setupRoleAccess();
 
-            if (response.data.user.role === 'admin') {
-                App.Router.showPage('admin-page');
+                if (response.data.user.role === 'admin') {
+                    App.Router.showPage('admin-page');
+                } else {
+                    App.Router.showPage('dashboard-page');
+                }
             } else {
-                App.Router.showPage('dashboard-page');
+                throw new Error(response.message || 'Login gagal tanpa pesan error.');
             }
         } catch (error) {
+            console.error("Login Error Detail:", error);
             App.Utils.showNotification(error.message, 'error');
         } finally {
             App.Utils.showLoading(false);
