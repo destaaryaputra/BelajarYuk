@@ -1,24 +1,21 @@
 <?php
 
 // API & Frontend router for Vercel
-// Error Handling for Diagnostics
-ini_set('display_errors', '0');
+// Enforce error reporting for boot phase
 error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
-set_error_handler(function($errno, $errstr, $errfile, $errline) {
-    if (!(error_reporting() & $errno)) return;
-    error_log("PHP Error ($errno): $errstr in $errfile on line $errline");
-    return false;
-});
-
+// Global Shutdown Handler for Fatal Errors
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
-        header('Content-Type: application/json');
-        http_response_code(500);
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+            http_response_code(500);
+        }
         echo json_encode([
             'success' => false, 
-            'message' => 'Fatal Server Error', 
+            'message' => 'Fatal Server Error during boot', 
             'debug' => $error['message'],
             'file' => basename($error['file']),
             'line' => $error['line']
@@ -26,25 +23,37 @@ register_shutdown_function(function() {
     }
 });
 
-// Load environment first
-require_once __DIR__ . '/../src/Config/lingkungan.php';
+$baseDir = realpath(__DIR__ . '/..');
 
-// Custom PSR-4 Autoloader for Vercel (Case-Sensitive friendly)
-spl_autoload_register(function ($class) {
+// Custom PSR-4 Autoloader for Vercel
+spl_autoload_register(function ($class) use ($baseDir) {
     $prefix = 'App\\';
-    $base_dir = __DIR__ . '/../src/';
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) return;
-    $relative_class = substr($class, $len);
     
-    // Map App\Controllers\AuthController to src/Controllers/AuthController.php
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-    if (file_exists($file)) require $file;
+    $relative_class = substr($class, $len);
+    $file = $baseDir . '/src/' . str_replace('\\', '/', $relative_class) . '.php';
+    
+    if (file_exists($file)) {
+        require_once $file;
+    }
 });
 
-// Load composer if available
-if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-    require_once __DIR__ . '/../vendor/autoload.php';
+// Load environment
+$envFile = $baseDir . '/src/Config/lingkungan.php';
+if (file_exists($envFile)) {
+    require_once $envFile;
+}
+
+// Load composer
+$composerAutoload = $baseDir . '/vendor/autoload.php';
+if (file_exists($composerAutoload)) {
+    require_once $composerAutoload;
+}
+
+// Re-enforce error reporting if lingkungan.php changed it
+if (defined('ENV') && ENV === 'production') {
+    ini_set('display_errors', '0');
 }
 
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
