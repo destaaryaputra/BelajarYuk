@@ -25,17 +25,25 @@ register_shutdown_function(function() {
 
 $baseDir = realpath(__DIR__ . '/..');
 
-// Custom PSR-4 Autoloader for Vercel
-spl_autoload_register(function ($class) use ($baseDir) {
-    $prefix = 'App\\';
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) return;
+// Custom PSR-4 Autoloader for Vercel (Ultra-Resilient Case Handling)
+spl_autoload_register(function ($class) {
+    if (strpos($class, 'App\\') !== 0) return;
     
-    $relative_class = substr($class, $len);
-    $file = $baseDir . '/src/' . str_replace('\\', '/', $relative_class) . '.php';
+    $relativeClass = str_replace('App\\', '', $class);
+    $path = str_replace('\\', '/', $relativeClass) . '.php';
     
-    if (file_exists($file)) {
-        require_once $file;
+    // Daftar kemungkinan jalur (Huruf Besar vs Huruf Kecil)
+    $possibleFiles = [
+        __DIR__ . '/../src/' . $path,                               // Casing asli (PascalCase)
+        __DIR__ . '/../src/' . strtolower($path),                  // Semua kecil
+        __DIR__ . '/../src/' . ucfirst(strtolower($path)),         // Hanya folder pertama besar
+    ];
+    
+    foreach ($possibleFiles as $file) {
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
     }
 });
 
