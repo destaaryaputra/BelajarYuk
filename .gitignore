@@ -5,7 +5,6 @@
 .env.production.local
 
 # PHP
-/vendor/
 composer.lock
 
 # OS
