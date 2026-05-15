@@ -1,7 +1,6 @@
 <?php
 
 // API & Frontend router for Vercel
-// Enforce error reporting for boot phase
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
@@ -15,7 +14,7 @@ register_shutdown_function(function() {
         }
         echo json_encode([
             'success' => false, 
-            'message' => 'Fatal Server Error during boot', 
+            'message' => 'Fatal Server Error', 
             'debug' => $error['message'],
             'file' => basename($error['file']),
             'line' => $error['line']
@@ -23,64 +22,32 @@ register_shutdown_function(function() {
     }
 });
 
-$baseDir = realpath(__DIR__ . '/..');
+// Load environment first
+require_once dirname(__DIR__) . '/src/Config/lingkungan.php';
 
-// Custom PSR-4 Autoloader for Vercel (Ultra-Resilient Case Handling)
-spl_autoload_register(function ($class) {
-    if (strpos($class, 'App\\') !== 0) return;
-    
-    $relativeClass = str_replace('App\\', '', $class);
-    $path = str_replace('\\', '/', $relativeClass) . '.php';
-    
-    // Daftar kemungkinan jalur (Huruf Besar vs Huruf Kecil)
-    $possibleFiles = [
-        __DIR__ . '/../src/' . $path,                               // Casing asli (PascalCase)
-        __DIR__ . '/../src/' . strtolower($path),                  // Semua kecil
-        __DIR__ . '/../src/' . ucfirst(strtolower($path)),         // Hanya folder pertama besar
-    ];
-    
-    foreach ($possibleFiles as $file) {
-        if (file_exists($file)) {
-            require_once $file;
-            return;
-        }
-    }
-});
-
-// Load environment
-$envFile = $baseDir . '/src/Config/lingkungan.php';
-if (file_exists($envFile)) {
-    require_once $envFile;
-}
-
-// Load composer
-$composerAutoload = $baseDir . '/vendor/autoload.php';
-if (file_exists($composerAutoload)) {
-    require_once $composerAutoload;
+// Use standard Composer Autoloader (It's already mapped App\ -> src/)
+if (file_exists(dirname(__DIR__) . '/vendor/autoload.php')) {
+    require_once dirname(__DIR__) . '/vendor/autoload.php';
 }
 
 // Re-enforce error reporting if lingkungan.php changed it
 if (defined('ENV') && ENV === 'production') {
     ini_set('display_errors', '0');
+    error_reporting(0);
 }
 
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Jika request dimulai dengan /api, gunakan router API
+// API Route Detection
 if (strpos($request_uri, '/api') === 0) {
     require __DIR__ . '/router.php';
     exit;
 }
 
-// Jika bukan API, maka ini adalah request Frontend
-// Sajikan index.html dari public (karena ini SPA biasanya)
-$frontend_index = __DIR__ . '/../public/index.html';
-$frontend_php = __DIR__ . '/../public/index.php';
-
+// Frontend Fallback
+$frontend_php = dirname(__DIR__) . '/public/index.php';
 if (file_exists($frontend_php)) {
     require $frontend_php;
-} elseif (file_exists($frontend_index)) {
-    echo file_get_contents($frontend_index);
 } else {
-    echo "<h2>Frontend Not Found</h2><p>Please check your public/ folder.</p>";
+    echo "<h2>Belajaryuk</h2><p>Halaman utama tidak ditemukan.</p>";
 }
