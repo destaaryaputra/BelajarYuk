@@ -1,94 +1,80 @@
 <?php
 
 /**
- * Ultimate Vercel PHP Entry Point - Belajaryuk
- * Case-Insensitive Class Mapping & Robust Bootstrapping
+ * Vercel PHP Entry Point - Belajaryuk
+ * MANUAL LOADING STRATEGY (Anti-Error Vercel)
  */
 
-// 1. Force absolute error visibility
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-// 2. Fatal Error Diagnostics
+// 1. Filesystem Spy & Error Handler
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
         if (!headers_sent()) header('Content-Type: application/json');
         
+        $base = realpath(__DIR__ . '/..');
+        $files = [];
+        if (is_dir($base . '/src')) {
+            $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($base . '/src'));
+            foreach ($it as $f) {
+                if ($f->isFile()) $files[] = str_replace($base, '', $f->getPathname());
+            }
+        }
+        
         echo json_encode([
             'success' => false, 
             'message' => 'Critical System Failure', 
             'debug' => $error['message'],
-            'file' => basename($error['file']),
-            'line' => $error['line'],
-            'server_os' => PHP_OS,
-            'php_version' => PHP_VERSION
+            'actual_file_tree' => $files, // Ini akan menunjukkan list file asli di Vercel
+            'php_os' => PHP_OS
         ]);
     }
 });
 
-// 3. Project Root Resolution
-$projectRoot = realpath(__DIR__ . '/..');
+$root = realpath(__DIR__ . '/..');
 
-/**
- * 4. The "Ultimate Autoloader"
- * Scans the src folder and maps classes to files regardless of casing
- */
-spl_autoload_register(function ($class) use ($projectRoot) {
+// 2. Load Core Components Manually (Bypass Autoloader for Stability)
+$coreFiles = [
+    '/src/Utils/Response.php',
+    '/src/Utils/Security.php',
+    '/src/Config/lingkungan.php',
+    '/src/Config/Database.php',
+    '/src/Models/User.php',
+    '/src/Services/AuthService.php',
+    '/src/Controllers/AuthController.php',
+    '/src/Controllers/AIController.php',
+    '/src/Controllers/MaterialController.php',
+    '/src/Controllers/ProgressController.php',
+    '/src/Controllers/QuizController.php'
+];
+
+foreach ($coreFiles as $file) {
+    // Coba load dengan casing asli, kalau gagal coba huruf kecil semua
+    $path = $root . $file;
+    if (file_exists($path)) {
+        require_once $path;
+    } else {
+        $lowerPath = $root . strtolower($file);
+        if (file_exists($lowerPath)) require_once $lowerPath;
+    }
+}
+
+// 3. Load Composer for third-party libs
+if (file_exists($root . '/vendor/autoload.php')) {
+    require_once $root . '/vendor/autoload.php';
+}
+
+// 4. Standard Autoloader for remaining classes
+spl_autoload_register(function ($class) use ($root) {
     if (strpos($class, 'App\\') !== 0) return;
-    
-    static $classMap = null;
-    if ($classMap === null) {
-        $classMap = [];
-        $srcPath = realpath($projectRoot . '/src');
-        
-        if ($srcPath && is_dir($srcPath)) {
-            $directory = new RecursiveDirectoryIterator($srcPath);
-            $iterator = new RecursiveIteratorIterator($directory);
-            foreach ($iterator as $file) {
-                if ($file->isFile() && $file->getExtension() === 'php') {
-                    $fullPath = realpath($file->getPathname());
-                    // Remove src base path and extension
-                    $relative = str_replace([$srcPath, '.php'], '', $fullPath);
-                    // Normalize separators to \
-                    $relative = str_replace(['/', '\\'], '\\', $relative);
-                    // Remove leading \ if exists
-                    $relative = ltrim($relative, '\\');
-                    
-                    $className = 'App\\' . $relative;
-                    $classMap[strtolower($className)] = $fullPath;
-                }
-            }
-        }
-    }
-    
-    $lookup = strtolower($class);
-    if (isset($classMap[$lookup])) {
-        require_once $classMap[$lookup];
-    }
-}, true, true);
+    $relative = str_replace(['App\\', '\\'], ['', '/'], $class);
+    $path = $root . '/src/' . $relative . '.php';
+    if (file_exists($path)) require_once $path;
+});
 
-// 5. Load Composer (Third-party libraries)
-if (file_exists($projectRoot . '/vendor/autoload.php')) {
-    require_once $projectRoot . '/vendor/autoload.php';
-}
-
-// 6. Load Config
-if (file_exists($projectRoot . '/src/Config/lingkungan.php')) {
-    require_once $projectRoot . '/src/Config/lingkungan.php';
-} else {
-    // Fallback if casing is different
-    $configFallback = glob($projectRoot . '/src/[Cc]onfig/lingkungan.php');
-    if (!empty($configFallback)) require_once $configFallback[0];
-}
-
-// 7. Production Overrides
-if (defined('ENV') && ENV === 'production') {
-    ini_set('display_errors', '0');
-    error_reporting(0);
-}
-
-// 8. Dynamic CORS (Fixes the CORS suggestion)
+// 5. Dynamic CORS
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
 header('Access-Control-Allow-Origin: ' . $origin);
 header('Access-Control-Allow-Credentials: true');
@@ -100,18 +86,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// 9. API & Frontend Dispatcher
+// 6. Router
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
 if (strpos($uri, '/api') === 0) {
     require __DIR__ . '/router.php';
     exit;
 }
 
-// Default to frontend index
-$frontendIndex = $projectRoot . '/public/index.php';
-if (file_exists($frontendIndex)) {
-    require $frontendIndex;
+// 7. Frontend
+$index = $root . '/public/index.php';
+if (file_exists($index)) {
+    require $index;
 } else {
-    echo "<h2>Belajaryuk</h2><p>Application ready, but frontend not found.</p>";
+    echo "<h2>Belajaryuk</h2><p>Ready.</p>";
 }
