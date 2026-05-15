@@ -1,0 +1,25 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /belajaryuk/
+    
+    # Allow real files and directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Route API requests to api/router.php
+    RewriteRule ^api/(.*)$ api/router.php [QSA,L]
+    
+    # Check if request is in public folder
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/belajaryuk/public/
+    
+    # Redirect root to public/index.php
+    RewriteRule ^(.*)$ public/index.php [L]
+</IfModule>
+
+# Environment variables (for Apache)
+SetEnv APP_ENV development
+SetEnv APP_URL http://localhost/belajaryuk
+SetEnv JWT_SECRET dev-secret-key-change-in-production
+

@@ -1,0 +1,336 @@
+/** CSS art untuk logo, splash, dan empty state tanpa class icon dekoratif. */
+.css-art-empty-box {
+    width: 64px;
+    height: 48px;
+    margin: 0 auto 16px;
+    border: 3px solid #cbd5e1;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    position: relative;
+}
+.css-art-empty-box::before {
+    content: '';
+    position: absolute;
+    top: -14px;
+    left: -3px;
+    width: 30px;
+    height: 12px;
+    border: 3px solid #cbd5e1;
+    border-radius: 4px;
+    transform: skewX(-25deg);
+    transform-origin: bottom left;
+}
+.css-art-empty-box::after {
+    content: '';
+    position: absolute;
+    top: -14px;
+    right: -3px;
+    width: 30px;
+    height: 12px;
+    border: 3px solid #cbd5e1;
+    border-radius: 4px;
+    transform: skewX(25deg);
+    transform-origin: bottom right;
+}
+.css-art-empty-list {
+    width: 48px;
+    height: 60px;
+    margin: 0 auto 16px;
+    border: 3px solid #cbd5e1;
+    border-radius: 8px;
+    position: relative;
+}
+.css-art-empty-list::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    width: 20px;
+    height: 3px;
+    background: #cbd5e1;
+    box-shadow: 0 12px 0 #cbd5e1, 0 24px 0 #cbd5e1;
+    border-radius: 2px;
+}
+.css-art-empty-list::after {
+    content: '';
+    position: absolute;
+    top: 11px;
+    left: 8px;
+    width: 5px;
+    height: 5px;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    box-shadow: 0 12px 0 #cbd5e1, 0 24px 0 #cbd5e1;
+}
+.css-art-trophy {
+    width: 40px;
+    height: 36px;
+    margin: 0 auto 16px;
+    border: 4px solid var(--primary);
+    border-radius: 0 0 20px 20px;
+    position: relative;
+}
+.css-art-trophy::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: -16px;
+    width: 64px;
+    height: 16px;
+    border: 4px solid var(--primary);
+    border-radius: 12px;
+    z-index: -1;
+}
+.css-art-trophy::after {
+    content: '';
+    position: absolute;
+    bottom: -18px;
+    left: 12px;
+    width: 8px;
+    height: 14px;
+    background: var(--primary);
+    box-shadow: 0 12px 0 4px var(--primary);
+}
+.css-art-fail {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    border: 4px solid #ef4444;
+    border-radius: 50%;
+    position: relative;
+}
+.css-art-fail::before,
+.css-art-fail::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 24px;
+    width: 4px;
+    height: 20px;
+    background: #ef4444;
+    border-radius: 2px;
+    transform: rotate(45deg);
+}
+.css-art-fail::after {
+    transform: rotate(-45deg);
+}
+.css-art-logo {
+    width: 76px;
+    height: 54px;
+    margin: 10px auto 20px;
+    position: relative;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    background-image:
+        linear-gradient(to right, transparent 0 47%, #dbeafe 47% 49%, #94a3b8 49% 51%, #dbeafe 51% 53%, transparent 53% 100%),
+        linear-gradient(#dbe3ef 2px, transparent 2px),
+        linear-gradient(#dbe3ef 2px, transparent 2px),
+        linear-gradient(#dbe3ef 2px, transparent 2px),
+        linear-gradient(#dbe3ef 2px, transparent 2px);
+    background-size: 100% 100%, 18px 2px, 16px 2px, 18px 2px, 14px 2px;
+    background-position: center, 11px 16px, 45px 15px, 11px 28px, 45px 27px;
+    background-repeat: no-repeat;
+    box-shadow:
+        0 10px 20px rgba(15, 118, 110, 0.16),
+        inset -3px -3px 0 #e2e8f0,
+        inset 3px 3px 0 rgba(255, 255, 255, 0.9);
+    animation: logoReveal 0.78s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-style: preserve-3d;
+}
+
+/* Global Logo Pages (Artistic Book Style) */
+.css-art-logo::before,
+.css-art-logo::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    width: 31px;
+    height: 42px;
+    background-color: white;
+    background-image:
+        linear-gradient(#cbd5e1 2px, transparent 2px),
+        linear-gradient(#cbd5e1 2px, transparent 2px),
+        linear-gradient(#cbd5e1 2px, transparent 2px);
+    background-size: 16px 2px;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.css-art-logo::before {
+    left: 4px;
+    background-position: 8px 12px, 8px 20px, 8px 28px;
+    border-radius: 4px 9px 9px 4px;
+    transform: perspective(150px) rotateY(15deg);
+    transform-origin: right center;
+    box-shadow: 
+        inset -5px 0 10px rgba(15, 23, 42, 0.07),
+        -1px 2px 0 #f8fafc,
+        -3px 5px 0 #dbe3ef;
+}
+
+.css-art-logo::after {
+    right: 4px;
+    background-position: 7px 12px, 7px 20px, 7px 28px;
+    border-radius: 9px 4px 4px 9px;
+    transform: perspective(150px) rotateY(-15deg);
+    transform-origin: left center;
+    box-shadow: 
+        inset 5px 0 10px rgba(15, 23, 42, 0.07),
+        1px 2px 0 #f8fafc,
+        3px 5px 0 #dbe3ef;
+}
+
+/* Splash Screen Specific Animation Scaling */
+.splash-screen .css-art-logo {
+    transform: scale(1.4);
+    margin-bottom: 32px;
+}
+
+.splash-screen .css-art-logo::before {
+    animation: leftPageSettle 2.2s cubic-bezier(0.2, 0.82, 0.2, 1) forwards 0.2s;
+}
+
+.splash-screen .css-art-logo::after {
+    z-index: 3;
+    animation: sweepBookPagesRightToLeft 2.2s cubic-bezier(0.22, 0.72, 0.16, 1) forwards 0.15s;
+}
+@keyframes sweepBookPagesRightToLeft {
+    0%, 26.8%, 53.6% {
+        transform: perspective(420px) rotateY(-15deg) skewY(0deg) scaleX(1);
+        filter: brightness(1);
+        opacity: 1;
+        box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.06), 1px 2px 0 #f1f5f9, 2px 4px 0 #cbd5e1;
+    }
+    8%, 34.8%, 61.6% {
+        transform: perspective(420px) rotateY(-58deg) skewY(3deg) scaleX(0.96);
+        filter: brightness(1.06);
+        opacity: 1;
+        box-shadow: inset 12px 0 16px rgba(0, 0, 0, 0.08), -7px 6px 12px rgba(15, 23, 42, 0.10);
+    }
+    16%, 42.8%, 69.6% {
+        transform: perspective(420px) rotateY(-118deg) skewY(5deg) scaleX(0.86);
+        filter: brightness(0.96);
+        opacity: 0.96;
+        box-shadow: inset -10px 0 18px rgba(0, 0, 0, 0.12), -16px 8px 18px rgba(15, 23, 42, 0.14);
+    }
+    24%, 50.8%, 77.6% {
+        transform: perspective(420px) rotateY(-172deg) skewY(-2deg) scaleX(0.94);
+        filter: brightness(1.02);
+        opacity: 0.24;
+        box-shadow: inset -4px 0 10px rgba(0, 0, 0, 0.08), -5px 5px 10px rgba(15, 23, 42, 0.08);
+    }
+    25%, 51.8%, 78.6% {
+        transform: perspective(420px) rotateY(-15deg) skewY(0deg) scaleX(1);
+        filter: brightness(1);
+        opacity: 0.86;
+        box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.06), 1px 2px 0 #f1f5f9, 2px 4px 0 #cbd5e1;
+    }
+    82% {
+        transform: perspective(420px) rotateY(-42deg) skewY(2deg) scaleX(0.98);
+        opacity: 1;
+        filter: brightness(1.04);
+    }
+    92% {
+        transform: perspective(420px) rotateY(-140deg) skewY(3deg) scaleX(0.9);
+        opacity: 0.92;
+    }
+    98% {
+        transform: perspective(420px) rotateY(-170deg) skewY(-1deg) scaleX(0.96);
+        opacity: 0.2;
+    }
+    100% {
+        transform: perspective(420px) rotateY(-165deg) skewY(0deg) scaleX(1);
+        filter: brightness(1);
+        opacity: 0;
+        box-shadow: inset -4px 0 10px rgba(0, 0, 0, 0.08), -2px 3px 8px rgba(15, 23, 42, 0.06);
+    }
+}
+@keyframes leftPageSettle {
+    0% {
+        transform: perspective(360px) rotateY(20deg);
+    }
+    45% {
+        transform: perspective(360px) rotateY(8deg) scaleX(1.02);
+    }
+    72% {
+        transform: perspective(360px) rotateY(18deg);
+    }
+    100% {
+        transform: perspective(360px) rotateY(15deg);
+    }
+}
+
+/* Custom CSS Art Icons for Dashboard Stats */
+.css-art-book {
+    width: 24px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-radius: 2px 4px 4px 2px;
+    position: relative;
+}
+.css-art-book::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 3px;
+    width: 12px;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 0 4px 0 currentColor, 0 8px 0 currentColor;
+    opacity: 0.5;
+}
+.css-art-book::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: -2px;
+    width: 6px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+}
+
+.css-art-star {
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 20px solid currentColor;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+.css-art-star::before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 20px solid currentColor;
+    position: absolute;
+    top: 6px;
+    left: -12px;
+}
+
+.css-art-calendar {
+    width: 22px;
+    height: 20px;
+    border: 2px solid currentColor;
+    border-top-width: 5px;
+    border-radius: 3px;
+    position: relative;
+}
+.css-art-calendar::before,
+.css-art-calendar::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    width: 2px;
+    height: 6px;
+    background: currentColor;
+    border-radius: 1px;
+}
+.css-art-calendar::before { left: 4px; }
+.css-art-calendar::after { right: 4px; }

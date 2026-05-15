@@ -1,0 +1,314 @@
+<?php
+
+namespace App\Models;
+
+use App\Config\Database;
+use PDO;
+use Exception;
+use DateTime;
+
+/**
+ * Progress Model
+ * Handle tracking perkembangan belajar user
+ */
+
+class Progress {
+    private ?PDO $db;
+
+    public function __construct() {
+        $this->db = Database::getInstance();
+    }
+
+    /**
+     * Get user learning progress summary
+     */
+    public function getUserProgressSummary(int $user_id): ?array {
+        try {
+            // Simplified summary query
+            $query = "SELECT 
+                        (SELECT COUNT(*)::int FROM progres_materi WHERE user_id = :uid) as materials_completed,
+                        (SELECT COUNT(*)::int FROM materi WHERE status = 'active') as total_materials,
+                        (SELECT COUNT(*)::int FROM hasil_kuis WHERE user_id = :uid2) as quizzes_completed,
+                        (SELECT COALESCE(AVG(percentage), 0)::float FROM hasil_kuis WHERE user_id = :uid3) as average_quiz_score";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                'uid' => $user_id,
+                'uid2' => $user_id,
+                'uid3' => $user_id
+            ]);
+
+            $result = $stmt->fetch();
+            
+            if (!$result) {
+                return [
+                    'materials_completed' => 0,
+                    'total_materials' => 0,
+                    'quizzes_completed' => 0,
+                    'average_quiz_score' => 0,
+                    'completion_percentage' => 0
+                ];
+            }
+            
+            $materials_completed = (int) ($result['materials_completed'] ?? 0);
+            $total_materials = (int) ($result['total_materials'] ?? 0);
+
+            // Calculate completion percentage
+            $completion_percentage = ($total_materials > 0) 
+                ? ($materials_completed / $total_materials) * 100 
+                : 0;
+
+            return [
+                'materials_completed' => $materials_completed,
+                'total_materials' => $total_materials,
+                'quizzes_completed' => (int) ($result['quizzes_completed'] ?? 0),
+                'average_quiz_score' => round((float) ($result['average_quiz_score'] ?? 0), 2),
+                'completion_percentage' => round($completion_percentage, 2)
+            ];
+        } catch (Exception $e) {
+            error_log("Get user progress summary error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get detailed progress per kategori
+     */
+    public function getProgressByCategory(int $user_id): array {
+        try {
+            // Refactored query for better compatibility
+            $query = "SELECT 
+                        m.category,
+                        COUNT(DISTINCT m.id) as total_materials,
+                        COUNT(DISTINCT pm.material_id) as completed_materials,
+                        CASE 
+                            WHEN COUNT(DISTINCT m.id) > 0 
+                            THEN ROUND((COUNT(DISTINCT pm.material_id)::numeric / COUNT(DISTINCT m.id)::numeric) * 100, 2)
+                            ELSE 0 
+                        END as completion_percentage
+                      FROM materi m
+                      LEFT JOIN progres_materi pm ON m.id = pm.material_id AND pm.user_id = :uid
+                      WHERE m.status = 'active'
+                      GROUP BY m.category
+                      ORDER BY m.category";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->execute(['uid' => $user_id]);
+
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log("Get progress by category error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get user's quiz performance
+     */
+    public function getQuizPerformance(int $user_id, int $limit = 10): array {
+        try {
+            $query = "SELECT q.title, hk.score, hk.total_points, hk.percentage, hk.submitted_at, q.passing_score 
+                     FROM hasil_kuis hk
+                     JOIN kuis q ON hk.quiz_id = q.id
+                     WHERE hk.user_id = :uid
+                     ORDER BY hk.submitted_at DESC
+                     LIMIT :limit";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log("Get quiz performance error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get recently completed materials for a user.
+     */
+    public function getCompletedMaterials(int $user_id, int $limit = 10): array {
+        try {
+            $query = "SELECT 
+                        m.id,
+                        m.title,
+                        m.category,
+                        m.thumbnail,
+                        pm.completed_at,
+                        pm.progress_percentage
+                      FROM progres_materi pm
+                      JOIN materi m ON pm.material_id = m.id
+                      WHERE pm.user_id = :uid AND m.status = 'active'
+                      ORDER BY pm.completed_at DESC
+                      LIMIT :limit";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':uid', $user_id, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log("Get completed materials error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get achievements earned by a user.
+     */
+    public function getAchievements(int $user_id): array {
+        try {
+            $query = "SELECT id, name, description, icon, earned_at
+                      FROM pencapaian
+                      WHERE user_id = :uid
+                      ORDER BY earned_at DESC";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->execute(['uid' => $user_id]);
+
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log("Get achievements error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Papan Peringkat (Leaderboard) - Refactored for stability
+     */
+    public function getLeaderboard(int $limit = 10): array {
+        try {
+            $query = "SELECT 
+                        u.id,
+                        u.username, 
+                        u.full_name, 
+                        u.avatar,
+                        COALESCE(utp.total_points, 0) as total_points,
+                        COALESCE(ucm.completed_count, 0) as materials_completed
+                      FROM pengguna u
+                      LEFT JOIN (
+                        SELECT user_id, SUM(max_score) as total_points
+                        FROM (
+                            SELECT user_id, quiz_id, MAX(score) as max_score
+                            FROM hasil_kuis
+                            GROUP BY user_id, quiz_id
+                        ) t
+                        GROUP BY user_id
+                      ) utp ON u.id = utp.user_id
+                      LEFT JOIN (
+                        SELECT user_id, COUNT(*) as completed_count
+                        FROM progres_materi
+                        GROUP BY user_id
+                      ) ucm ON u.id = ucm.user_id
+                      WHERE u.role = 'student' AND u.is_active = TRUE
+                      ORDER BY total_points DESC, materials_completed DESC, u.created_at ASC
+                      LIMIT :limit";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log("Get leaderboard error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get learning streak (consecutive days of activity)
+     */
+    public function getLearningStreak(int $user_id): array {
+        try {
+            $query = "SELECT DISTINCT activity_date 
+                      FROM (
+                          SELECT DATE(completed_at) as activity_date 
+                          FROM progres_materi 
+                          WHERE user_id = :uid1 
+                          UNION
+                          SELECT DATE(submitted_at) as activity_date 
+                          FROM hasil_kuis 
+                          WHERE user_id = :uid2
+                      ) as activity_history
+                      ORDER BY activity_date DESC";
+                      
+            $stmt = $this->db->prepare($query);
+            $stmt->execute(['uid1' => $user_id, 'uid2' => $user_id]);
+            $dates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            if (!$dates) return ['active_days' => 0];
+
+            $streak = 0;
+            $current_date = new DateTime('today');
+            $yesterday = new DateTime('yesterday');
+            
+            $first_activity = new DateTime($dates[0]);
+
+            if ($first_activity != $current_date && $first_activity != $yesterday) {
+                return ['active_days' => 0];
+            }
+
+            $date_to_check = clone $first_activity;
+
+            foreach ($dates as $date_str) {
+                $activity_date = new DateTime($date_str);
+                if ($activity_date == $date_to_check) {
+                    $streak++;
+                    $date_to_check->modify('-1 day');
+                } else {
+                    break;
+                }
+            }
+
+            return ['active_days' => $streak];
+        } catch (Exception $e) {
+            error_log("Get learning streak error: " . $e->getMessage());
+            return ['active_days' => 0];
+        }
+    }
+
+    /**
+     * Update waktu terakhir akses materi
+     */
+    public function updateLastAccessed(int $user_id, int $material_id): bool {
+        try {
+            // Ensure record exists or update it
+            $query = "INSERT INTO progres_materi (user_id, material_id, last_accessed_at, completed_at) 
+                      VALUES (:uid, :mid, NOW(), NULL)
+                      ON CONFLICT (user_id, material_id) 
+                      DO UPDATE SET last_accessed_at = NOW()";
+            
+            $stmt = $this->db->prepare($query);
+            return $stmt->execute(['uid' => $user_id, 'mid' => $material_id]);
+        } catch (Exception $e) {
+            error_log("Update last accessed error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Mendapatkan materi terakhir yang diinteraksi oleh pengguna.
+     */
+    public function getLastViewedMaterial(int $user_id): ?array {
+        try {
+            $query = "SELECT m.id, m.title 
+                      FROM materi m
+                      JOIN progres_materi pm ON m.id = pm.material_id
+                      WHERE pm.user_id = :uid AND m.status = 'active'
+                      ORDER BY pm.last_accessed_at DESC NULLS LAST
+                      LIMIT 1";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->execute(['uid' => $user_id]);
+            $result = $stmt->fetch();
+
+            return $result ?: null;
+        } catch (Exception $e) {
+            error_log("Get last viewed material error: " . $e->getMessage());
+            return null;
+        }
+    }
+}

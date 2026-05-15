@@ -1,0 +1,148 @@
+/** Dark theme overrides. */
+/* ========================
+   FITUR PREMIUM: TEMA GELAP (DARK MODE)
+   ======================== */
+body.dark-theme {
+    --primary: #2fbf9a;
+    --primary-hover: #26a984;
+    --primary-light: rgba(47, 191, 154, 0.2);
+    --accent: #e0a053;
+    --bg-body: #0b1220;
+    --surface: #111827;
+    --surface-muted: #0f172a;
+    --surface-hover: #1f2937;
+    --surface-strong: #020617;
+    --text-main: #f8fafc;
+    --text-muted: #9aa7bd;
+    --border: #304056;
+    --border-strong: #42546f;
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.14);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.14);
+    --info: #74a8e8;
+    --info-soft: rgba(116, 168, 232, 0.16);
+    --success: #46b083;
+    --success-soft: rgba(70, 176, 131, 0.16);
+    --code-bg: #020617;
+    --code-inline-bg: #1e293b;
+    --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 18px 40px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 16px 40px rgba(47, 191, 154, 0.24);
+    --ring: 0 0 0 4px rgba(47, 191, 154, 0.2);
+}
+body.dark-theme { background-image: linear-gradient(180deg, var(--surface-strong) 0%, var(--bg-body) 280px); }
+body.dark-theme nav { background: color-mix(in srgb, var(--surface) 94%, transparent); border-bottom-color: var(--border); }
+body.dark-theme .empty-state.bg-white { background: var(--surface); }
+body.dark-theme .welcome-container { background: linear-gradient(160deg, var(--surface) 0%, var(--surface-strong) 100%); }
+body.dark-theme .welcome-marquee { background: var(--surface); border-color: var(--border); }
+body.dark-theme .ai-chat-header,
+body.dark-theme .ai-chat-input-area,
+body.dark-theme .admin-topbar { background: var(--surface); border-color: var(--border); color: var(--text-main); }
+body.dark-theme .ai-chat-messages,
+body.dark-theme .admin-content { background: var(--bg-body); }
+body.dark-theme .chat-message.ai-message,
+body.dark-theme .ai-typing-indicator { background: var(--surface-hover); }
+body.dark-theme .admin-table th { background: var(--surface-muted); }
+body.dark-theme .admin-table tr:hover td { background: var(--surface-hover); }
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea {
+    background: var(--surface);
+    color: var(--text-main);
+    border-color: var(--border);
+}
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder { color: var(--text-muted); }
+body.dark-theme .material-card,
+body.dark-theme .content-card,
+body.dark-theme .stat-card,
+body.dark-theme .auth-container,
+body.dark-theme .search-bar,
+body.dark-theme .quiz-option-label,
+body.dark-theme .quiz-history-card,
+body.dark-theme .syllabus-item,
+body.dark-theme .pdf-container {
+    background: var(--surface);
+    border-color: var(--border);
+}
+body.dark-theme .material-card-footer,
+body.dark-theme .pdf-header {
+    background: var(--surface-muted);
+}
+body.dark-theme .ql-toolbar.ql-snow {
+    background: var(--surface-muted);
+    border-color: var(--border) !important;
+}
+body.dark-theme .ql-toolbar.ql-snow button,
+body.dark-theme .ql-toolbar.ql-snow .ql-picker-label,
+body.dark-theme .ql-toolbar.ql-snow .ql-picker-item {
+    color: var(--text-main) !important;
+}
+body.dark-theme .ql-toolbar.ql-snow button:hover,
+body.dark-theme .ql-toolbar.ql-snow .ql-picker-label:hover,
+body.dark-theme .ql-toolbar.ql-snow .ql-picker-item:hover {
+    background: var(--surface-hover) !important;
+    color: var(--primary) !important;
+}
+body.dark-theme .ql-toolbar.ql-snow button.ql-active,
+body.dark-theme .ql-toolbar.ql-snow .ql-picker-label.ql-active {
+    background: color-mix(in srgb, var(--primary) 18%, var(--surface-muted)) !important;
+    color: var(--primary) !important;
+}
+body.dark-theme .ql-container.ql-snow,
+body.dark-theme .ql-editor {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-main) !important;
+}
+body.dark-theme button.btn-outline {
+    background: var(--surface);
+    color: var(--text-main);
+    border-color: var(--border);
+}
+body.dark-theme button.btn-outline:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+}
+body.dark-theme .skeleton-box {
+    background: linear-gradient(110deg, #1e293b 8%, #334155 18%, #1e293b 33%);
+    background-size: 200% 100%;
+}
+body.dark-theme.admin-mode {
+    --admin-shell: #0b1220;
+    --admin-sidebar: #020617;
+    --admin-sidebar-hover: #111827;
+    --admin-sidebar-active: rgba(45, 212, 191, 0.14);
+    --admin-card: #111827;
+    --admin-card-muted: #0f172a;
+    --admin-chart-grid: rgba(148, 163, 184, 0.18);
+    --admin-chart-axis: #94a3b8;
+    --admin-chart-axis-strong: #cbd5e1;
+    --admin-info-bg: rgba(14, 165, 233, 0.18);
+    --admin-info-text: #7dd3fc;
+    --admin-accent-bg: rgba(245, 158, 11, 0.18);
+    --admin-accent-text: #fbbf24;
+}
+body.dark-theme .admin-dashboard-hero,
+body.dark-theme .admin-mini-item,
+body.dark-theme .admin-comment-preview {
+    background-color: var(--admin-card);
+}
+body.dark-theme .admin-dashboard-hero {
+    background:
+        linear-gradient(135deg, rgba(45, 212, 191, 0.10), rgba(56, 189, 248, 0.08)),
+        var(--admin-card);
+}
+body.dark-theme .stat-card-info .stat-chip,
+body.dark-theme .admin-course-mark {
+    background: var(--admin-info-bg);
+    color: var(--admin-info-text);
+    border-color: rgba(125, 211, 252, 0.24);
+}
+body.dark-theme .stat-card-accent .stat-chip {
+    background: var(--admin-accent-bg);
+    color: var(--admin-accent-text);
+    border-color: rgba(251, 191, 36, 0.24);
+}
+
