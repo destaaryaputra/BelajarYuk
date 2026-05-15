@@ -88,6 +88,10 @@ class APIService {
                     throw new Error(`${data.message || 'Validasi Gagal'}: ${errorDetails}`);
                 }
 
+                if (data.missing_vars) {
+                    throw new Error(`${data.message} Variabel yang kurang: ${data.missing_vars.join(', ')}`);
+                }
+
                 throw new Error(data.message || 'API Request failed');
             }
 
