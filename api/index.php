@@ -2,57 +2,47 @@
 
 /**
  * Vercel PHP Entry Point - Belajaryuk
- * Designed for Case-Sensitive Linux Environment
+ * Definitive Absolute Path & PSR-4 Autoloader
  */
 
-// 1. Enforce strict error reporting for debugging
+// 1. Strict Error Reporting
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-// 2. Fatal Error Handler (JSON Output)
+// 2. Fatal Error Handler
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
         if (!headers_sent()) header('Content-Type: application/json');
         
-        $baseDir = dirname(__DIR__);
-        $srcTree = [];
-        if (is_dir($baseDir . '/src')) {
-            $iter = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($baseDir . '/src', RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::SELF_FIRST
-            );
-            foreach ($iter as $path => $dir) {
-                $srcTree[] = str_replace($baseDir, '', $path);
-            }
-        }
-
+        $base = realpath(__DIR__ . '/..');
         echo json_encode([
             'success' => false, 
-            'message' => 'System Boot Error', 
+            'message' => 'Fatal Server Error', 
             'debug' => $error['message'],
-            'src_filesystem_snapshot' => $srcTree,
-            'hint' => 'Check if your file is in the list above with the EXACT same casing.'
+            'path' => $error['file'],
+            'line' => $error['line'],
+            'base_dir' => $base
         ]);
     }
 });
 
-// 3. Absolute Path Setup
-$baseDir = dirname(__DIR__);
+// 3. Absolute Base Directory
+$root = realpath(__DIR__ . '/..');
 
-// 4. Custom Robust PSR-4 Autoloader (Force App\ -> src/)
-// This runs before composer to ensure our paths are prioritized
-spl_autoload_register(function ($class) use ($baseDir) {
+// 4. Standardized PSR-4 Autoloader for App\ namespace
+spl_autoload_register(function ($class) use ($root) {
     if (strpos($class, 'App\\') !== 0) return;
     
-    $relativeClass = str_replace('App\\', '', $class);
+    // Convert namespace to path (App\Controllers\AuthController -> Controllers/AuthController.php)
+    $relativeClass = substr($class, 4);
     $path = str_replace('\\', '/', $relativeClass) . '.php';
     
-    // We try both PascalCase and lowercase because Windows/Git casing is tricky
+    // Check in src folder with various casing just in case
     $files = [
-        $baseDir . '/src/' . $path,
-        $baseDir . '/src/' . strtolower($path),
-        $baseDir . '/src/' . preg_replace_callback('/\/([a-z])/', function($m) { return strtoupper($m[0]); }, $path)
+        $root . '/src/' . $path,
+        $root . '/src/' . strtolower($path),
+        $root . '/src/' . ucfirst($path)
     ];
     
     foreach ($files as $file) {
@@ -61,34 +51,32 @@ spl_autoload_register(function ($class) use ($baseDir) {
             return;
         }
     }
-}, true, true); // Prepend to the stack
+});
 
-// 5. Load Composer (Fallback for third party libs like Firebase JWT)
-if (file_exists($baseDir . '/vendor/autoload.php')) {
-    require_once $baseDir . '/vendor/autoload.php';
+// 5. Load Third Party Dependencies (Composer)
+$composer = $root . '/vendor/autoload.php';
+if (file_exists($composer)) {
+    require_once $composer;
 }
 
-// 6. Load Environment Configuration
-require_once $baseDir . '/src/Config/lingkungan.php';
-
-// 7. Re-apply production settings if necessary
-if (defined('ENV') && ENV === 'production') {
-    ini_set('display_errors', '0');
-    error_reporting(0);
+// 6. Load Config
+$config = $root . '/src/Config/lingkungan.php';
+if (file_exists($config)) {
+    require_once $config;
 }
 
-// 8. API & Frontend Routing
-$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// 7. Routing
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-if (strpos($request_uri, '/api') === 0) {
+if (strpos($uri, '/api') === 0) {
     require __DIR__ . '/router.php';
     exit;
 }
 
-// Default to frontend
-$frontend_php = $baseDir . '/public/index.php';
-if (file_exists($frontend_php)) {
-    require $frontend_php;
+// Frontend
+$index = $root . '/public/index.php';
+if (file_exists($index)) {
+    require $index;
 } else {
-    echo "<h2>Belajaryuk</h2><p>Application ready. Frontend index not found.</p>";
+    echo "<h1>Belajaryuk</h1><p>Frontend entry point not found.</p>";
 }
