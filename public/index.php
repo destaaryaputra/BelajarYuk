@@ -6,7 +6,7 @@
  * Backend: API Router (/api)
  */
 
-$env_file = __DIR__ . '/../src/config/lingkungan.php';
+$env_file = __DIR__ . '/../src/Config/lingkungan.php';
 if (file_exists($env_file)) {
     require_once $env_file;
 }

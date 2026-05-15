@@ -27,15 +27,17 @@ register_shutdown_function(function() {
 });
 
 // Load environment first
-require_once __DIR__ . '/../src/config/lingkungan.php';
+require_once __DIR__ . '/../src/Config/lingkungan.php';
 
-// Custom PSR-4 Autoloader Fallback for Vercel
+// Custom PSR-4 Autoloader for Vercel (Case-Sensitive friendly)
 spl_autoload_register(function ($class) {
     $prefix = 'App\\';
     $base_dir = __DIR__ . '/../src/';
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) return;
     $relative_class = substr($class, $len);
+    
+    // Map App\Controllers\AuthController to src/Controllers/AuthController.php
     $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
     if (file_exists($file)) require $file;
 });
