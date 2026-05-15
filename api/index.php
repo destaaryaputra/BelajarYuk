@@ -1,6 +1,31 @@
 <?php
 
 // API & Frontend router for Vercel
+// Error Handling for Diagnostics
+ini_set('display_errors', '0');
+error_reporting(E_ALL);
+
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    if (!(error_reporting() & $errno)) return;
+    error_log("PHP Error ($errno): $errstr in $errfile on line $errline");
+    return false;
+});
+
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Fatal Server Error', 
+            'debug' => $error['message'],
+            'file' => basename($error['file']),
+            'line' => $error['line']
+        ]);
+    }
+});
+
 // Load environment first
 require_once __DIR__ . '/../src/config/lingkungan.php';
 require_once __DIR__ . '/../vendor/autoload.php';

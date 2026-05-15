@@ -22,6 +22,17 @@ if (empty($_SESSION['csrf_token'])) {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <script>
+        // Suppress harmless deprecated warnings from external scripts (Vercel/Sentry/Zustand)
+        (function() {
+            const originalWarn = console.warn;
+            console.warn = function(...args) {
+                const msg = args[0] && typeof args[0] === 'string' ? args[0] : '';
+                if (msg.includes('Default export is deprecated') || msg.includes('zustand')) return;
+                originalWarn.apply(console, args);
+            };
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
     <title>Belajaryuk - Platform Pembelajaran Interaktif</title>
