@@ -82,7 +82,13 @@ class Database {
         } catch (PDOException $e) {
             error_log("Database Connection Error: " . $e->getMessage());
             http_response_code(500);
-            exit(json_encode(['success' => false, 'message' => 'Gagal terhubung ke database. Silakan coba beberapa saat lagi.']));
+            header('Content-Type: application/json');
+            exit(json_encode([
+                'success' => false, 
+                'message' => 'Gagal terhubung ke database Supabase.',
+                'debug' => $e->getMessage(),
+                'dsn_used' => "pgsql:host={$this->host};port={$this->port};dbname={$this->db}"
+            ]));
         }
     }
 
