@@ -10,10 +10,14 @@ ini_set('display_startup_errors', $env === 'development' ? '1' : '0');
 error_reporting($env === 'development' ? E_ALL : 0);
 
 $request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$base_path = '/belajaryuk';
+$base_path = getenv('APP_BASE_PATH') ?: '';
 
-// Remove base path to get relative path
-$path = str_replace($base_path, '', $request_path);
+// Remove base path to get relative path if it exists
+if (!empty($base_path)) {
+    $path = str_replace($base_path, '', $request_path);
+} else {
+    $path = $request_path;
+}
 $path = preg_replace('/\?.*/', '', $path); // Remove query string
 
 // Route API requests to api/router.php

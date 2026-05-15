@@ -21,8 +21,11 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING & ~E_DEPRECATED);
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request_method = $_SERVER['REQUEST_METHOD'];
 
-// Remove base path /belajaryuk and /api to get the actual route
-$request_uri = str_replace('/belajaryuk', '', $request_uri);
+// Remove base path and /api to get the actual route
+$base_path = getenv('APP_BASE_PATH') ?: '';
+if (!empty($base_path)) {
+    $request_uri = str_replace($base_path, '', $request_uri);
+}
 $request_uri = str_replace('/api', '', $request_uri);
 
 // Clean up path

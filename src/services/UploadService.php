@@ -5,6 +5,14 @@ use App\Utils\Security;
 use Exception;
 
 class UploadService {
+    private static function getSupabaseConfig(): array {
+        return [
+            'url' => getenv('SUPABASE_URL'),
+            'key' => getenv('SUPABASE_KEY'),
+            'bucket' => getenv('SUPABASE_STORAGE_BUCKET') ?: 'belajaryuk'
+        ];
+    }
+
     public static function uploadThumbnail(array $file): array {
         try {
             if (($file['size'] ?? 0) > 2 * 1024 * 1024) {
@@ -23,17 +31,9 @@ class UploadService {
                 return ['success' => false, 'message' => 'Hayo, file yang kamu unggah bukan gambar asli ya?'];
             }
 
-            $uploadDir = UPLOADS_PATH . '/thumbnails/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
+            $filename = 'thumbnails/thumb_' . bin2hex(random_bytes(8)) . '.' . $extension;
+            return self::uploadToSupabase($file['tmp_name'], $filename, $mimeType);
 
-            $filename = 'thumb_' . bin2hex(random_bytes(8)) . '.' . $extension;
-            if (!move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
-                return ['success' => false, 'message' => 'Gagal menyimpan file gambar ke server.'];
-            }
-
-            return ['success' => true, 'filename' => $filename];
         } catch (Exception $e) {
             error_log('Thumbnail upload error: ' . $e->getMessage());
             return ['success' => false, 'message' => 'Terjadi kesalahan sistem saat memproses gambar.'];
@@ -47,21 +47,50 @@ class UploadService {
                 return ['success' => false, 'message' => 'File yang diunggah harus berupa dokumen PDF!'];
             }
 
-            $uploadDir = PUBLIC_PATH . '/assets/documents/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-
-            $filename = Security::sanitizeFilename(time() . '_' . ($file['name'] ?? 'document.pdf'));
-            if (!move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
-                return ['success' => false, 'message' => 'Gagal menyimpan dokumen PDF ke server.'];
-            }
-
-            return ['success' => true, 'filename' => $filename];
+            $extension = strtolower(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
+            $filename = 'documents/' . bin2hex(random_bytes(8)) . '_' . time() . '.' . $extension;
+            
+            return self::uploadToSupabase($file['tmp_name'], $filename, $mimeType);
         } catch (Exception $e) {
             error_log('PDF upload error: ' . $e->getMessage());
             return ['success' => false, 'message' => 'Terjadi kesalahan sistem saat memproses dokumen.'];
         }
+    }
+
+    private static function uploadToSupabase(string $filePath, string $storagePath, string $mimeType): array {
+        $config = self::getSupabaseConfig();
+        
+        if (!$config['url'] || !$config['key']) {
+            error_log("CRITICAL: Supabase Storage configuration missing!");
+            return ['success' => false, 'message' => 'Konfigurasi penyimpanan cloud belum siap.'];
+        }
+
+        $url = rtrim($config['url'], '/') . "/storage/v1/object/" . $config['bucket'] . "/" . $storagePath;
+        $fileData = file_get_contents($filePath);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fileData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer " . $config['key'],
+            "apikey: " . $config['key'],
+            "Content-Type: " . $mimeType
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200 || $httpCode === 201) {
+            // Kita kembalikan full URL atau path yang bisa diakses publik
+            $publicUrl = rtrim($config['url'], '/') . "/storage/v1/object/public/" . $config['bucket'] . "/" . $storagePath;
+            return ['success' => true, 'filename' => $publicUrl];
+        }
+
+        error_log("Supabase Storage Error ($httpCode): " . $response);
+        return ['success' => false, 'message' => 'Gagal mengunggah file ke cloud storage.'];
     }
 
     private static function detectMimeType(string $path): string {
