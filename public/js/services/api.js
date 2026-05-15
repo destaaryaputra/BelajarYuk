@@ -63,8 +63,8 @@ class APIService {
             try {
                 data = text ? JSON.parse(text) : {};
             } catch (parseError) {
-                console.error("RESPONS SERVER BUKAN JSON! Berikut isi aslinya:\n\n", text);
-                throw new Error("Server memunculkan pesan error tersembunyi. Silakan periksa Console untuk detailnya.");
+                console.error("DEBUG: Server Response (Bukan JSON):", text);
+                throw new Error("Server error (Bukan JSON). Cek tab Console/Network untuk isi aslinya.");
             }
 
             if (!response.ok) {
