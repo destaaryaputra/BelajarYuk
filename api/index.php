@@ -1,6 +1,10 @@
 <?php
 
 // API & Frontend router for Vercel
+// Load environment first
+require_once __DIR__ . '/../src/config/lingkungan.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Jika request dimulai dengan /api, gunakan router API

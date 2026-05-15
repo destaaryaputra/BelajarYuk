@@ -35,12 +35,8 @@ define('DEBUG', ENV === 'development');
 // Security
 $jwtSecret = $_ENV['JWT_SECRET'] ?? getenv('JWT_SECRET');
 if (!$jwtSecret) {
-    if (ENV === 'production') {
-        error_log('JWT_SECRET is not set');
-        http_response_code(500);
-        exit('Server configuration error.');
-    }
-    $jwtSecret = 'dev-change-me';
+    error_log('WARNING: JWT_SECRET is not set. Using insecure fallback.');
+    $jwtSecret = 'fallback-insecure-secret-change-me';
 }
 define('JWT_SECRET', $jwtSecret);
 define('SESSION_TIMEOUT', 3600); // 1 hour
