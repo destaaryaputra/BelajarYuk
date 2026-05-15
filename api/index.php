@@ -1,22 +1,22 @@
 <?php
 
 /**
- * Belajaryuk - Vercel Ultimate Bootloader
- * Force-loads all application files to bypass casing/autoload issues
+ * BELAJARYUK - MASTER CONTROLLER V1.0 (VERCEL OPTIMIZED)
+ * Perbaikan Total: Autoloading, Routing, & DB Connection
  */
 
-// 1. Error Visibility
+// 1. Monitor Eror Sangat Ketat
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-// 2. Fatal Error Handler with Filesystem Debugging
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
         if (!headers_sent()) header('Content-Type: application/json');
         echo json_encode([
             'success' => false, 
-            'message' => 'Critical Boot Error', 
+            'message' => 'Vercel Engine Error', 
+            'version' => '1.0.Final',
             'debug' => $error['message'],
             'file' => basename($error['file']),
             'line' => $error['line']
@@ -26,36 +26,32 @@ register_shutdown_function(function() {
 
 $root = dirname(__DIR__);
 
-// 3. JURUS SAPU JAGAT: Force-load every PHP file in src/
-// Ini memastikan SEMUA class (Controller, Model, Utils) sudah termuat di awal.
-function forceLoadDir($dir) {
-    if (!is_dir($dir)) return;
-    $items = scandir($dir);
-    foreach ($items as $item) {
-        if ($item === '.' || $item === '..') continue;
-        $path = $dir . DIRECTORY_SEPARATOR . $item;
-        if (is_dir($path)) {
-            forceLoadDir($path);
-        } elseif (substr($item, -4) === '.php') {
+// 2. Autoloader Cerdas (Mencari di semua variasi folder)
+spl_autoload_register(function ($class) use ($root) {
+    if (strpos($class, 'App\\') !== 0) return;
+    $rel = str_replace(['App\\', '\\'], ['', '/'], $class);
+    
+    $paths = [
+        $root . '/src/' . $rel . '.php',
+        $root . '/src/' . strtolower($rel) . '.php',
+        $root . '/src/' . ucfirst($rel) . '.php'
+    ];
+    
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
             require_once $path;
+            return;
         }
     }
-}
+}, true, true);
 
-// Load folders in specific order to avoid dependency issues
-$folders = ['Utils', 'Config', 'Models', 'Services', 'Middlewares', 'Controllers'];
-foreach ($folders as $folder) {
-    // Coba load folder dengan casing besar maupun kecil
-    forceLoadDir($root . '/src/' . $folder);
-    forceLoadDir($root . '/src/' . strtolower($folder));
-}
+// 3. Load Dependencies & Config
+if (file_exists($root . '/vendor/autoload.php')) require_once $root . '/vendor/autoload.php';
+$config = $root . '/src/Config/lingkungan.php';
+if (!file_exists($config)) $config = $root . '/src/config/lingkungan.php';
+if (file_exists($config)) require_once $config;
 
-// 4. Load Third-Party (Composer)
-if (file_exists($root . '/vendor/autoload.php')) {
-    require_once $root . '/vendor/autoload.php';
-}
-
-// 5. Dynamic CORS (Fixes your CORS error)
+// 4. Pengaturan CORS & Security
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
 header('Access-Control-Allow-Origin: ' . $origin);
 header('Access-Control-Allow-Credentials: true');
@@ -67,17 +63,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// 6. Router Dispatch
+// 5. Unified Router (Langsung di sini agar tidak ada require gagal)
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if (strpos($uri, '/api') === 0) {
-    require __DIR__ . '/router.php';
+$uri = str_replace('/api', '', $uri); // Bersihkan /api
+if (empty($uri) || $uri === '/') $uri = '/';
+else $uri = rtrim($uri, '/');
+
+// Jika request adalah API
+if (strpos($_SERVER['REQUEST_URI'], '/api') !== false) {
+    $routes = require __DIR__ . '/routes.php';
+    $method = $_SERVER['REQUEST_METHOD'];
+    $found = false;
+
+    foreach ($routes as $route => $handler) {
+        list($rMethod, $rPath) = explode(' ', $route);
+        if ($method === $rMethod && $uri === rtrim($rPath, '/')) {
+            $found = true;
+            $controllerClass = $handler[0];
+            $action = $handler[1];
+            
+            if (class_exists($controllerClass)) {
+                $instance = new $controllerClass();
+                $instance->$action();
+            } else {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => "Class {$controllerClass} tidak ditemukan di server."]);
+            }
+            break;
+        }
+    }
+
+    if (!$found) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Route API tidak terdaftar.']);
+    }
     exit;
 }
 
-// 7. Frontend Fallback
+// 6. Jalankan Frontend
 $frontend = $root . '/public/index.php';
 if (file_exists($frontend)) {
     require $frontend;
 } else {
-    echo "<h2>Belajaryuk Ready</h2><p>Check public/index.php</p>";
+    echo "<h1>Belajaryuk Ready</h1><p>Versi 1.0.Final</p>";
 }
