@@ -6,7 +6,7 @@
 window.App = window.App || {};
 
 App.Config = {
-    API_BASE_URL: '/belajaryuk/api',
+    API_BASE_URL: '/api',
     STORAGE_KEYS: {
         AUTH_TOKEN: 'belajaryuk_auth_token',
         USER_DATA: 'belajaryuk_user_data',

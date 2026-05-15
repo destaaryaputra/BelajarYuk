@@ -27,8 +27,8 @@ if (empty($_SESSION['csrf_token'])) {
     <title>Belajaryuk - Platform Pembelajaran Interaktif</title>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/belajaryuk/public/assets/css/gaya.css">
-    <link rel="stylesheet" href="/belajaryuk/public/assets/css/responsif.css">
+    <link rel="stylesheet" href="/public/assets/css/gaya.css">
+    <link rel="stylesheet" href="/public/assets/css/responsif.css">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -175,7 +175,7 @@ function renderLeaderboardToDOM(data) {
     data.forEach((user, index) => {
         const isTop3 = index < 3;
         const rankClass = isTop3 ? `rank-${index + 1}` : '';
-        const avatar = user.avatar ? `/belajaryuk/public/uploads/avatars/${user.avatar}` : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.full_name) + '&background=6366f1&color=fff';
+        const avatar = user.avatar ? `/public/uploads/avatars/${user.avatar}` : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.full_name) + '&background=6366f1&color=fff';
 
         html += `
             <tr class="${rankClass}">

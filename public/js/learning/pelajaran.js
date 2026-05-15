@@ -82,7 +82,7 @@ async function viewMaterial(id) {
             const duration = currentCourseData.duration_minutes ? ` • ${currentCourseData.duration_minutes} Menit` : '';
 
             const defaultThumb = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80';
-            const getThumb = (thumb) => thumb ? (thumb.startsWith('http') || thumb.startsWith('/') ? thumb : '/belajaryuk/public/uploads/thumbnails/' + thumb) : defaultThumb;
+            const getThumb = (thumb) => thumb ? (thumb.startsWith('http') || thumb.startsWith('/') ? thumb : '/public/uploads/thumbnails/' + thumb) : defaultThumb;
 
             detailContainer.innerHTML = `
                 <div class="content-card">
@@ -200,7 +200,7 @@ function playLesson(lessonId) {
                 </div>`;
         } else {
             const defaultThumb = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80';
-            const posterUrl = currentCourseData.thumbnail ? (currentCourseData.thumbnail.startsWith('http') || currentCourseData.thumbnail.startsWith('/') ? currentCourseData.thumbnail : '/belajaryuk/public/uploads/thumbnails/' + currentCourseData.thumbnail) : defaultThumb;
+            const posterUrl = currentCourseData.thumbnail ? (currentCourseData.thumbnail.startsWith('http') || currentCourseData.thumbnail.startsWith('/') ? currentCourseData.thumbnail : '/public/uploads/thumbnails/' + currentCourseData.thumbnail) : defaultThumb;
             mediaHtml = `
                 <div class="material-media native-video-wrapper">
                     <video id="lesson-native-player" controls autoplay poster="${posterUrl}">
@@ -216,9 +216,9 @@ function playLesson(lessonId) {
             <div class="pdf-container mt-24">
                 <div class="pdf-header">
                     <span class="pdf-title">Modul Pendamping (PDF)</span>
-                    <a href="/belajaryuk/public/assets/documents/${lesson.document_url}" download class="btn-outline btn-small">Unduh PDF</a>
+                    <a href="/public/assets/documents/${lesson.document_url}" download class="btn-outline btn-small">Unduh PDF</a>
                 </div>
-                <iframe src="/belajaryuk/public/assets/documents/${lesson.document_url}" class="pdf-iframe"></iframe>
+                <iframe src="/public/assets/documents/${lesson.document_url}" class="pdf-iframe"></iframe>
             </div>
         `;
     }

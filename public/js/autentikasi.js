@@ -82,7 +82,7 @@ App.Auth = {
             App.Service.API.clearAuth();
             App.Utils.showNotification('Berhasil keluar.', 'info');
             setTimeout(() => {
-                window.location.href = '/belajaryuk/';
+                window.location.href = '/';
             }, 800);
         }
     },

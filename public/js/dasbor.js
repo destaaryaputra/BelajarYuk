@@ -133,7 +133,7 @@ App.Dashboard = {
         const featured = materials[0];
         const others = materials.slice(1);
         const defaultThumb = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80';
-        const getThumb = (thumb) => thumb ? (thumb.startsWith('http') || thumb.startsWith('/') ? thumb : '/belajaryuk/public/uploads/thumbnails/' + thumb) : defaultThumb;
+        const getThumb = (thumb) => thumb ? (thumb.startsWith('http') || thumb.startsWith('/') ? thumb : '/public/uploads/thumbnails/' + thumb) : defaultThumb;
         
         const diffMap = { 'beginner': 'Pemula', 'intermediate': 'Menengah', 'advanced': 'Mahir' };
         

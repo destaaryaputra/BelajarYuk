@@ -248,7 +248,7 @@ function renderMaterialsList(materials) {
     const getThumbnailUrl = (thumb) => {
         if (!thumb) return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80';
         if (thumb.startsWith('http') || thumb.startsWith('/')) return thumb;
-        return '/belajaryuk/public/uploads/thumbnails/' + thumb;
+        return '/public/uploads/thumbnails/' + thumb;
     };
 
     const diffMap = { 'beginner': 'Pemula', 'intermediate': 'Menengah', 'advanced': 'Mahir' };
