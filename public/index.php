@@ -38,6 +38,14 @@ if (empty($_SESSION['csrf_token'])) {
     <!-- External Libraries -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script>
+        // Suppress harmless deprecated warnings from external scripts
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('Default export is deprecated')) return;
+            originalWarn.apply(console, args);
+        };
+    </script>
 </head>
 <body>
     <!-- Splash Screen -->
