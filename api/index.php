@@ -26,6 +26,30 @@ register_shutdown_function(function() {
     }
 });
 
+// Check for vendor folder (Vercel deployment common issue)
+if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    header('Content-Type: application/json');
+    http_response_code(500);
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Folder VENDOR tidak ditemukan!', 
+        'solution' => 'Vercel tidak menjalankan composer secara otomatis. Kamu harus menghapus /vendor/ dari .gitignore dan mengunggahnya ke GitHub, atau gunakan build step.'
+    ]);
+    exit;
+}
+
+// Check for database driver
+if (!extension_loaded('pdo_pgsql')) {
+    header('Content-Type: application/json');
+    http_response_code(500);
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Ekstensi PHP pdo_pgsql tidak aktif di Vercel!',
+        'solution' => 'Gunakan runtime vercel-php yang mendukung PostgreSQL atau hubungi support.'
+    ]);
+    exit;
+}
+
 // Load environment first
 require_once __DIR__ . '/../src/config/lingkungan.php';
 require_once __DIR__ . '/../vendor/autoload.php';
