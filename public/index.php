@@ -27,8 +27,8 @@ if (empty($_SESSION['csrf_token'])) {
     <title>Belajaryuk - Platform Pembelajaran Interaktif</title>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/public/assets/css/gaya.css">
-    <link rel="stylesheet" href="/public/assets/css/responsif.css">
+    <link rel="stylesheet" href="/assets/css/gaya.css">
+    <link rel="stylesheet" href="/assets/css/responsif.css">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -612,28 +612,28 @@ if (empty($_SESSION['csrf_token'])) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     
     <!-- Application Scripts -->
-    <script src="/public/js/services/api.js" defer></script>
-    <script src="/public/js/autentikasi.js" defer></script>
-    <script src="/public/js/dasbor.js" defer></script>
-    <script src="/public/js/profil.js" defer></script>
-    <script src="/public/js/progres.js" defer></script>
-    <script src="/public/js/admin/dasbor.js" defer></script>
-    <script src="/public/js/admin/daftar-materi.js" defer></script>
-    <script src="/public/js/admin/navigasi.js" defer></script>
-    <script src="/public/js/admin/pengguna.js" defer></script>
-    <script src="/public/js/admin/editor.js" defer></script>
-    <script src="/public/js/admin/form-materi.js" defer></script>
-    <script src="/public/js/admin/episode.js" defer></script>
-    <script src="/public/js/admin/kuis.js" defer></script>
-    <script src="/public/js/admin/aksi-materi.js" defer></script>
-    <script src="/public/js/admin/laporan.js" defer></script>
-    <script src="/public/js/admin/diskusi.js" defer></script>
-    <script src="/public/js/admin/pengaturan.js" defer></script>
-    <script src="/public/js/learning/daftar-materi.js" defer></script>
-    <script src="/public/js/learning/pelajaran.js" defer></script>
-    <script src="/public/js/learning/diskusi.js" defer></script>
-    <script src="/public/js/learning/pengerjaan-kuis.js" defer></script>
-    <script src="/public/js/chat-ai.js" defer></script>
-    <script src="/public/js/aplikasi.js" defer></script>
+    <script src="/js/services/api.js" defer></script>
+    <script src="/js/autentikasi.js" defer></script>
+    <script src="/js/dasbor.js" defer></script>
+    <script src="/js/profil.js" defer></script>
+    <script src="/js/progres.js" defer></script>
+    <script src="/js/admin/dasbor.js" defer></script>
+    <script src="/js/admin/daftar-materi.js" defer></script>
+    <script src="/js/admin/navigasi.js" defer></script>
+    <script src="/js/admin/pengguna.js" defer></script>
+    <script src="/js/admin/editor.js" defer></script>
+    <script src="/js/admin/form-materi.js" defer></script>
+    <script src="/js/admin/episode.js" defer></script>
+    <script src="/js/admin/kuis.js" defer></script>
+    <script src="/js/admin/aksi-materi.js" defer></script>
+    <script src="/js/admin/laporan.js" defer></script>
+    <script src="/js/admin/diskusi.js" defer></script>
+    <script src="/js/admin/pengaturan.js" defer></script>
+    <script src="/js/learning/daftar-materi.js" defer></script>
+    <script src="/js/learning/pelajaran.js" defer></script>
+    <script src="/js/learning/diskusi.js" defer></script>
+    <script src="/js/learning/pengerjaan-kuis.js" defer></script>
+    <script src="/js/chat-ai.js" defer></script>
+    <script src="/js/aplikasi.js" defer></script>
 </body>
 </html>
