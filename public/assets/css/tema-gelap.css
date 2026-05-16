@@ -3,33 +3,33 @@
    FITUR PREMIUM: TEMA GELAP (DARK MODE)
    ======================== */
 body.dark-theme {
-    --primary: #2fbf9a;
-    --primary-hover: #26a984;
-    --primary-light: rgba(47, 191, 154, 0.2);
-    --accent: #e0a053;
-    --bg-body: #0b1220;
-    --surface: #111827;
-    --surface-muted: #0f172a;
-    --surface-hover: #1f2937;
-    --surface-strong: #020617;
-    --text-main: #f8fafc;
-    --text-muted: #9aa7bd;
-    --border: #304056;
-    --border-strong: #42546f;
+    --primary: #2dd4bf; /* Teal yang lebih soft tapi tetap modern */
+    --primary-hover: #14b8a6;
+    --primary-light: rgba(45, 212, 191, 0.12);
+    --accent: #f59e0b;
+    --bg-body: #0f172a; /* Slate 900 - lebih nyaman di mata dibanding pure black/deep blue */
+    --surface: #1e293b; /* Slate 800 */
+    --surface-muted: #1e293b;
+    --surface-hover: #334155; /* Slate 700 */
+    --surface-strong: #020617; /* Slate 950 */
+    --text-main: #f1f5f9; /* Slate 100 - tidak murni putih */
+    --text-muted: #94a3b8; /* Slate 400 */
+    --border: #334155;
+    --border-strong: #475569;
     --danger: #f87171;
-    --danger-soft: rgba(248, 113, 113, 0.14);
+    --danger-soft: rgba(248, 113, 113, 0.1);
     --warning: #fbbf24;
-    --warning-soft: rgba(251, 191, 36, 0.14);
-    --info: #74a8e8;
-    --info-soft: rgba(116, 168, 232, 0.16);
-    --success: #46b083;
-    --success-soft: rgba(70, 176, 131, 0.16);
+    --warning-soft: rgba(251, 191, 36, 0.1);
+    --info: #38bdf8;
+    --info-soft: rgba(56, 189, 248, 0.1);
+    --success: #10b981;
+    --success-soft: rgba(16, 185, 129, 0.1);
     --code-bg: #020617;
     --code-inline-bg: #1e293b;
-    --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 18px 40px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 16px 40px rgba(47, 191, 154, 0.24);
-    --ring: 0 0 0 4px rgba(47, 191, 154, 0.2);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 12px 32px rgba(45, 212, 191, 0.12);
+    --ring: 0 0 0 4px rgba(45, 212, 191, 0.15);
 }
 body.dark-theme { background-image: linear-gradient(180deg, var(--surface-strong) 0%, var(--bg-body) 280px); }
 body.dark-theme nav { background: color-mix(in srgb, var(--surface) 94%, transparent); border-bottom-color: var(--border); }
