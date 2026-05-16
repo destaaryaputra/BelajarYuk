@@ -49,15 +49,35 @@ body {
 }
 
 #app { width: 100%; position: relative; }
-.app-container { min-height: 100vh; display: flex; flex-direction: column; }
+.app-container { 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    width: 100%;
+}
 
-.page { display: none; }
-.page.active { display: block; }
+.page { 
+    display: none; 
+    width: 100%;
+}
+.page.active { 
+    display: block; 
+}
 
-:where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div) {
+body.admin-mode .app-container {
+    flex-direction: row;
+}
+
+body.admin-mode .page.active {
+    display: flex;
+    width: 100%;
+}
+
+:where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div, .page:not(#admin-page):not(#landing-page) > form) {
     max-width: var(--container-width);
     margin: 0 auto;
     padding: 28px 24px;
+    width: 100%;
 }
 
 .content-card {
