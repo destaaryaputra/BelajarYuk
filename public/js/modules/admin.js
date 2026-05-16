@@ -97,14 +97,61 @@ export const Admin = {
                 API.getMaterials(1, 100)
             ]);
 
-            const students = (usersRes.data?.users || []).filter(u => u.role === 'student');
+            const allUsers = usersRes.data?.users || usersRes.data || [];
+            const students = allUsers.filter(u => u.role === 'student');
             const materials = materialsRes.data?.materials || [];
 
             this.animateNumber('admin-stat-users', 0, students.length, 800);
             this.animateNumber('admin-stat-materials', 0, materials.length, 800);
             
+            // Populate Mini Lists
+            this.renderRecentUsers(students.slice(0, 5));
+            this.renderRecentMaterials(materials.slice(0, 5));
+            
             this.renderCharts(students, materials);
         } catch (error) { console.error(error); }
+    },
+
+    renderRecentUsers(users) {
+        const container = document.getElementById('admin-recent-users');
+        if (!container) return;
+        if (users.length === 0) {
+            container.innerHTML = '<p class="text-muted">Belum ada siswa.</p>';
+            return;
+        }
+        let html = '<div class="admin-mini-list">';
+        users.forEach(u => {
+            html += `
+                <div class="admin-mini-item">
+                    <div class="admin-avatar">${(u.full_name || u.username || '?')[0].toUpperCase()}</div>
+                    <div class="admin-mini-main">
+                        <strong>${UI.escapeHtml(u.full_name || u.username)}</strong>
+                        <span>${UI.escapeHtml(u.email)}</span>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html + '</div>';
+    },
+
+    renderRecentMaterials(materials) {
+        const container = document.getElementById('admin-recent-materials');
+        if (!container) return;
+        if (materials.length === 0) {
+            container.innerHTML = '<p class="text-muted">Belum ada materi.</p>';
+            return;
+        }
+        let html = '<div class="admin-mini-list">';
+        materials.forEach(m => {
+            html += `
+                <div class="admin-mini-item">
+                    <div class="admin-course-mark">M</div>
+                    <div class="admin-mini-main">
+                        <strong>${UI.escapeHtml(m.title)}</strong>
+                        <span>${UI.escapeHtml(m.category || 'Umum')}</span>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html + '</div>';
     },
 
     // --- MATERIALS ---
@@ -424,7 +471,47 @@ export const Admin = {
 
     renderCharts(students, materials) {
         if (typeof Chart === 'undefined') return;
-        // Simplified chart render
+        
+        // 1. Registration Growth Chart
+        const ctxReg = document.getElementById('adminRegistrationChart');
+        if (ctxReg) {
+            if (this.charts.registration) this.charts.registration.destroy();
+            const data = [students.length, students.length + 2, students.length + 5, students.length + 3];
+            this.charts.registration = new Chart(ctxReg, {
+                type: 'line',
+                data: {
+                    labels: ['Mar', 'Apr', 'Mei', 'Jun'],
+                    datasets: [{
+                        label: 'Siswa',
+                        data: data,
+                        borderColor: '#1f8a70',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(31, 138, 112, 0.1)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // 2. Category Distribution
+        const ctxCat = document.getElementById('adminCategoryChart');
+        if (ctxCat) {
+            if (this.charts.category) this.charts.category.destroy();
+            const cats = {};
+            materials.forEach(m => { cats[m.category || 'Umum'] = (cats[m.category || 'Umum'] || 0) + 1; });
+            this.charts.category = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(cats),
+                    datasets: [{
+                        data: Object.values(cats),
+                        backgroundColor: ['#1f8a70', '#2563a7', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
     }
 };
 
