@@ -46,6 +46,7 @@ body.admin-mode {
     border: none;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -81,6 +82,10 @@ body.admin-mode {
     border-radius: 10px;
     font-weight: 700;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
 }
 
 .admin-main {
