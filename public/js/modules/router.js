@@ -53,7 +53,7 @@ export const Router = {
 
             // 2. Load page content if not cached
             if (!this.cache[pageId]) {
-                const response = await fetch(this.routes[pageId]);
+                const response = await fetch(`${this.routes[pageId]}?v=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Failed to fetch page: ${pageId}`);
                 this.cache[pageId] = await response.text();
             }
