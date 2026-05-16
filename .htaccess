@@ -6,8 +6,8 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     
-    # Route API requests to api/router.php
-    RewriteRule ^api/(.*)$ api/router.php [QSA,L]
+    # Route API requests to api/index.php
+    RewriteRule ^api/(.*)$ api/index.php [QSA,L]
     
     # Check if request is in public folder
     RewriteCond %{REQUEST_FILENAME} !-f

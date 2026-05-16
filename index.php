@@ -20,10 +20,10 @@ if (!empty($base_path)) {
 }
 $path = preg_replace('/\?.*/', '', $path); // Remove query string
 
-// Route API requests to api/router.php
+// Route API requests to api/index.php
 if (strpos($path, '/api/') === 0) {
     $_GET['_api_request'] = $path;
-    require __DIR__ . '/api/router.php';
+    require __DIR__ . '/api/index.php';
     exit;
 }
 
