@@ -5,20 +5,33 @@
 :root {
     --font-sans: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
     --font-display: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
-    --primary: #1f8a70;
-    --primary-hover: #176f5a;
-    --primary-light: #e8f6f1;
-    --accent: #c9732c;
-    --bg-body: #f4f6f9;
+    
+    /* Brand Colors (Refined for Readability) */
+    --primary: #059669;         /* Emerald 600 - More Vibrant */
+    --primary-hover: #047857;   /* Emerald 700 */
+    --primary-light: #ecfdf5;   /* Emerald 50 - Very clean for bg */
+    --primary-dark: #064e3b;    /* Emerald 900 - For deep text/icons */
+    
+    /* Functional Colors (Still in Green/Teal Family but distinct) */
+    --info: #0d9488;            /* Teal 600 - Distinct enough for info */
+    --info-soft: #f0fdfa;       /* Teal 50 */
+    --success: #16a34a;         /* Green 600 - Standard Success */
+    --success-soft: #f0fdf4;
+    
+    /* UI Backgrounds */
+    --bg-body: #f8fafc;         /* Slate 50 - Very clean */
     --surface: #ffffff;
-    --surface-muted: #f7f9fc;
-    --surface-hover: #eef2f8;
-    --surface-strong: #ffffff;
-    --text-main: #1f2937;
-    --text-muted: #5b6677;
+    --surface-muted: #f1f5f9;   /* Slate 100 */
+    --surface-hover: #e2e8f0;   /* Slate 200 */
+    
+    /* Text (Crucial for Readability) */
+    --text-main: #0f172a;       /* Slate 900 - Almost black for best reading */
+    --text-muted: #475569;      /* Slate 600 - Clear grey */
     --text-on-primary: #ffffff;
-    --border: #d9e1ec;
-    --border-strong: #c1ccdb;
+    
+    /* Borders */
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
     --danger: #dc2626;
     --danger-soft: #fef2f2;
     --warning: #b7791f;
