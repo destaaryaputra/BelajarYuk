@@ -187,7 +187,6 @@ export const MaterialDetail = {
         const materialId = this.state.material.id;
         const embedVideo = this.toEmbedUrl(active.video_url || '');
         const hasQuiz = this.state.quiz && this.state.quiz.id;
-        const commentsBlock = await this.renderComments(materialId);
 
         let mediaHtml = '';
         if (embedVideo) {
@@ -207,6 +206,7 @@ export const MaterialDetail = {
             `;
         }
 
+        // 1. Render core content first (Immediate)
         container.innerHTML = `
             ${mediaHtml}
             <article class="content-card">
@@ -222,9 +222,12 @@ export const MaterialDetail = {
                     ${active.content || '<p class="text-muted">Konten materi belum tersedia.</p>'}
                 </div>
             </article>
-            ${commentsBlock}
+            <div id="comments-section-container" class="mt-24">
+                <div class="content-card"><p class="text-muted">Memuat diskusi...</p></div>
+            </div>
         `;
 
+        // 2. Setup core listeners
         const markBtn = document.getElementById('mark-complete-btn');
         if (markBtn) {
             markBtn.onclick = async () => {
@@ -237,24 +240,41 @@ export const MaterialDetail = {
             };
         }
 
-        const commentForm = document.getElementById('material-comment-form');
-        if (commentForm) {
-            commentForm.onsubmit = async (e) => {
-                e.preventDefault();
-                const textEl = document.getElementById('material-comment-text');
-                const text = textEl?.value.trim();
-                if (!text) return;
-                try {
-                    await API.addComment({ material_id: materialId, comment_text: text });
-                    if (textEl) textEl.value = '';
-                    await this.renderContent();
-                    UI.showNotification('Komentar berhasil dikirim.', 'success');
-                } catch (error) {
-                    UI.showNotification(error.message || 'Gagal mengirim komentar.', 'error');
-                }
-            };
-        }
-
         if (window.lucide) window.lucide.createIcons();
-    }
+
+        // 3. Load comments asynchronously (Non-blocking)
+        this.loadComments(materialId);
+    },
+
+    async loadComments(materialId) {
+        const commentContainer = document.getElementById('comments-section-container');
+        if (!commentContainer) return;
+
+        try {
+            const commentsBlock = await this.renderComments(materialId);
+            commentContainer.innerHTML = commentsBlock;
+
+            const commentForm = document.getElementById('material-comment-form');
+            if (commentForm) {
+                commentForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const textEl = document.getElementById('material-comment-text');
+                    const text = textEl?.value.trim();
+                    if (!text) return;
+                    try {
+                        await API.addComment({ material_id: materialId, comment_text: text });
+                        if (textEl) textEl.value = '';
+                        await this.loadComments(materialId);
+                        UI.showNotification('Komentar berhasil dikirim.', 'success');
+                    } catch (error) {
+                        UI.showNotification(error.message || 'Gagal mengirim komentar.', 'error');
+                    }
+                };
+            }
+            if (window.lucide) window.lucide.createIcons();
+        } catch (error) {
+            console.error('Failed to load comments:', error);
+            commentContainer.innerHTML = '<div class="content-card"><p class="text-muted">Diskusi tidak dapat dimuat.</p></div>';
+        }
+    },
 };
