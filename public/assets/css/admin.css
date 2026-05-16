@@ -25,14 +25,20 @@ body.admin-mode {
 }
 
 .admin-sidebar-nav {
-    flex: 1; padding: 20px 0;
+    flex: 1; padding: 24px 0;
 }
 
 .admin-sidebar-nav button {
-    width: 100%; text-align: left; padding: 14px 24px;
+    width: 100%; text-align: left; padding: 12px 24px;
     background: transparent; color: #94a3b8; border: none;
-    display: flex; align-items: center; gap: 12px;
+    display: flex; align-items: center; gap: 14px;
     font-weight: 600; cursor: pointer; transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.admin-sidebar-nav button i,
+.admin-sidebar-nav button svg {
+    width: 20px; height: 20px; stroke-width: 2px;
 }
 
 .admin-sidebar-nav button:hover { background: var(--admin-sidebar-hover); color: #fff; }
