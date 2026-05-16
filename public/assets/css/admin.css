@@ -49,7 +49,7 @@ body.admin-mode .page > nav {
     background: transparent; color: #94a3b8; border: none;
     box-shadow: none; border-radius: 0; justify-content: flex-start;
     min-height: 48px;
-    padding: 14px 24px; font-size: 0.95rem; font-weight: 500;
+    padding: 14px 24px; font-size: 0.95rem; font-weight: 600; /* Bolder */
     line-height: 1.25;
     border-left: 4px solid transparent; transition: all 0.2s;
     display: flex; align-items: center; gap: 12px;
@@ -60,16 +60,17 @@ body.admin-mode .page > nav {
 .admin-sidebar-nav button svg {
     width: 18px;
     height: 18px;
-    stroke-width: 2px;
+    stroke-width: 2.5px; /* Thicker icons */
 }
 .admin-sidebar-nav button:hover {
-    background-color: var(--admin-sidebar-hover); color: white;
+    background-color: var(--admin-sidebar-hover); color: #fff;
 }
 
 .admin-sidebar-nav button.active {
-    background-color: var(--admin-sidebar-active); color: #5eead4;
+    background-color: var(--admin-sidebar-active); 
+    color: #fff; /* White for best contrast on dark bg */
     border-left-color: var(--primary);
-    font-weight: 600;
+    font-weight: 700;
     box-shadow: inset 3px 0 0 var(--primary);
 }
 
