@@ -39,8 +39,9 @@ export const MaterialDetail = {
             const material = payload.material || {};
             this.state.material = material;
             
-            // UX Fix: Tampilkan SEMUA sub-materi (episode) agar tidak ada yang tersembunyi
-            this.state.subMaterials = Array.isArray(material.sub_materials) ? material.sub_materials : [];
+            // UX Fix: Sembunyikan episode yang tidak punya video sesuai permintaan
+            const rawSubs = Array.isArray(material.sub_materials) ? material.sub_materials : [];
+            this.state.subMaterials = rawSubs.filter(s => s.video_url && s.video_url.trim() !== '');
             
             this.state.quiz = quizRes.data || null;
 
