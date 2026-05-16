@@ -12,11 +12,19 @@
     --primary-light: #ecfdf5;   /* Emerald 50 - Very clean for bg */
     --primary-dark: #064e3b;    /* Emerald 900 - For deep text/icons */
     
-    /* Functional Colors (Still in Green/Teal Family but distinct) */
-    --info: #0d9488;            /* Teal 600 - Distinct enough for info */
-    --info-soft: #f0fdfa;       /* Teal 50 */
-    --success: #16a34a;         /* Green 600 - Standard Success */
-    --success-soft: #f0fdf4;
+    /* Elegant Accents */
+    --accent: #f59e0b;          /* Amber 500 - For achievements/gold */
+    --accent-soft: #fffbeb;     /* Amber 50 */
+    --danger: #e11d48;          /* Rose 600 - Modern Crimson Red */
+    --danger-soft: #fff1f2;     /* Rose 50 */
+    --warning: #ea580c;         /* Orange 600 - For warnings */
+    --warning-soft: #fff7ed;
+    --indigo: #4f46e5;          /* Indigo 600 - For special highlights */
+    --indigo-soft: #eef2ff;
+    
+    /* Functional Colors */
+    --info: #0891b2;            /* Cyan 600 - Refreshing Info */
+    --info-soft: #ecfeff;
     
     /* UI Backgrounds */
     --bg-body: #f8fafc;         /* Slate 50 - Very clean */
@@ -32,14 +40,6 @@
     /* Borders */
     --border: #e2e8f0;
     --border-strong: #cbd5e1;
-    --danger: #dc2626;
-    --danger-soft: #fef2f2;
-    --warning: #b7791f;
-    --warning-soft: #fbf2df;
-    --info: #0d9488;
-    --info-soft: #f0fdfa;
-    --success: #2e7d5b;
-    --success-soft: #e5f4ec;
     --code-bg: #0f172a;
     --code-inline-bg: #f1f5f9;
     --radius-md: 12px;
