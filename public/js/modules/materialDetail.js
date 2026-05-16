@@ -203,15 +203,15 @@ export const MaterialDetail = {
         let mediaHtml = '';
         if (embedVideo) {
             mediaHtml += `
-                <div class="pdf-container mb-16">
-                    <div class="pdf-header"><span class="pdf-title"><i data-lucide="video"></i> Video Pembelajaran</span></div>
-                    <iframe class="pdf-iframe" src="${UI.escapeHtml(embedVideo)}" title="Video materi" allowfullscreen loading="lazy"></iframe>
+                <div class="pdf-container mb-24">
+                    <div class="pdf-header"><span class="pdf-title"><i data-lucide="play-circle"></i> Video Pembelajaran</span></div>
+                    <iframe class="pdf-iframe" src="${UI.escapeHtml(embedVideo)}" title="Video materi" allowfullscreen allow="autoplay; encrypted-media" loading="lazy"></iframe>
                 </div>
             `;
         }
         if (active.document_url) {
             mediaHtml += `
-                <div class="pdf-container mb-16">
+                <div class="pdf-container mb-24">
                     <div class="pdf-header"><span class="pdf-title"><i data-lucide="file-text"></i> Dokumen PDF</span></div>
                     <iframe class="pdf-iframe" src="/public/uploads/documents/${UI.escapeHtml(active.document_url)}" title="Dokumen materi" loading="lazy"></iframe>
                 </div>
@@ -219,17 +219,17 @@ export const MaterialDetail = {
         }
 
         container.innerHTML = `
+            ${mediaHtml}
             <article class="content-card">
                 <div class="header-section mb-16">
                     <h1>${UI.escapeHtml(active.title || 'Materi')}</h1>
-                    <p>${UI.escapeHtml(this.state.material.description || '')}</p>
+                    <p>${UI.escapeHtml(this.state.material.description || active.content?.substring(0, 120) + '...' || '')}</p>
                 </div>
                 <div class="action-buttons">
                     <button type="button" id="mark-complete-btn"><i data-lucide="check-circle-2"></i> Tandai Selesai</button>
                     ${hasQuiz ? '<button type="button" class="btn-outline" disabled><i data-lucide="clipboard-check"></i> Kuis tersedia</button>' : ''}
                 </div>
-                ${mediaHtml}
-                <div class="content-card mt-16">
+                <div class="mt-24">
                     ${active.content || '<p class="text-muted">Konten materi belum tersedia.</p>'}
                 </div>
             </article>
