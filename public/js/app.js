@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(`📄 Page Loaded: ${e.detail.pageId}`);
         const pageId = e.detail.pageId;
 
+        // Ensure theme icons are correct for the new page
+        UI.updateThemeIcons();
+
         // Auth Handlers
         if (pageId === 'login-page') {
             document.getElementById('login-form')?.addEventListener('submit', Auth.handleLogin);

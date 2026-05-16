@@ -11,7 +11,16 @@ export const UI = {
                 const pageId = navBtn.getAttribute('data-page');
                 window.location.hash = pageId;
             }
+
+            // Theme Toggle Listener
+            const themeBtn = e.target.closest('[data-action="toggle-theme"]');
+            if (themeBtn) {
+                this.toggleTheme();
+            }
         });
+
+        // Initialize Theme
+        this.applyTheme();
 
         // Initialize Scroll Reveal Observer
         this.initScrollReveal();
@@ -19,6 +28,37 @@ export const UI = {
         // Update Header Visibility on Route Change
         this.updateHeaderVisibility();
         window.addEventListener('hashchange', () => this.updateHeaderVisibility());
+    },
+
+    applyTheme() {
+        const savedTheme = localStorage.getItem('belajaryuk_theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+        this.updateThemeIcons();
+    },
+
+    toggleTheme() {
+        const isDark = document.body.classList.toggle('dark-theme');
+        localStorage.setItem('belajaryuk_theme', isDark ? 'dark' : 'light');
+        this.updateThemeIcons();
+        
+        // Notification for feedback
+        this.showNotification(`Mode ${isDark ? 'Gelap' : 'Terang'} diaktifkan`, 'info');
+    },
+
+    updateThemeIcons() {
+        const isDark = document.body.classList.contains('dark-theme');
+        document.querySelectorAll('[data-action="toggle-theme"] i').forEach(icon => {
+            if (isDark) {
+                icon.setAttribute('data-lucide', 'sun');
+            } else {
+                icon.setAttribute('data-lucide', 'moon');
+            }
+        });
+        if (window.lucide) window.lucide.createIcons();
     },
 
     updateHeaderVisibility() {
