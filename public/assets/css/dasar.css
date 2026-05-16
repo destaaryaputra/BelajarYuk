@@ -78,6 +78,15 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 #app { max-width: 100%; margin: 0; padding: 0; position: relative; z-index: 0; }
+.app-container {
+    min-height: calc(100vh - 82px);
+    display: flex;
+    flex-direction: column;
+}
+body.admin-mode .app-container {
+    height: 100vh;
+    min-height: 100vh;
+}
 .page {
     display: none;
     position: relative;
