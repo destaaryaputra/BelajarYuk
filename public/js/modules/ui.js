@@ -15,6 +15,37 @@ export const UI = {
 
         // Initialize Scroll Reveal Observer
         this.initScrollReveal();
+
+        // Update Header Visibility on Route Change
+        this.updateHeaderVisibility();
+        window.addEventListener('hashchange', () => this.updateHeaderVisibility());
+    },
+
+    updateHeaderVisibility() {
+        const globalNav = document.getElementById('global-nav');
+        if (!globalNav) return;
+
+        const hash = window.location.hash.replace('#', '') || 'landing-page';
+        const isPublicPage = ['landing-page', 'login-page', 'register-page'].includes(hash);
+        const isAdminPage = hash === 'admin-page';
+        
+        // Cek apakah user sudah login dari localStorage
+        const isLoggedIn = !!localStorage.getItem('belajaryuk_auth_token');
+
+        // Navigasi siswa hanya muncul jika sudah login, bukan di halaman publik, dan bukan di panel admin
+        if (isLoggedIn && !isPublicPage && !isAdminPage) {
+            globalNav.classList.remove('d-none');
+            document.body.classList.remove('admin-mode');
+        } else {
+            globalNav.classList.add('d-none');
+            
+            // Tambahkan admin-mode class ke body jika di halaman admin
+            if (isAdminPage) {
+                document.body.classList.add('admin-mode');
+            } else {
+                document.body.classList.remove('admin-mode');
+            }
+        }
     },
 
     initScrollReveal() {
