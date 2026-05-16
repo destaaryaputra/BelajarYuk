@@ -213,34 +213,22 @@ export const MaterialDetail = {
             `;
         }
 
-        // 1. Render core content first (Cinema Mode Layout)
+        // 1. Render core content first (Immediate)
         container.innerHTML = `
             ${mediaHtml}
-            
-            <div class="content-card-main">
-                <div class="header-section">
+            <article class="content-card">
+                <div class="header-section mb-16">
                     <h1>${UI.escapeHtml(active.title || 'Materi')}</h1>
-                    <p class="mb-24">${UI.escapeHtml(this.state.material.description || active.content?.substring(0, 120) + '...' || '')}</p>
+                    <p>${UI.escapeHtml(this.state.material.description || active.content?.substring(0, 120) + '...' || '')}</p>
                 </div>
-                
                 <div class="action-buttons">
-                    <button type="button" id="mark-complete-btn" class="btn-p">
-                        <i data-lucide="check-circle-2"></i> Tandai Selesai
-                    </button>
-                    ${hasQuiz ? `
-                        <button type="button" class="btn-outline">
-                            <i data-lucide="clipboard-check"></i> Kerjakan Kuis
-                        </button>
-                    ` : ''}
+                    <button type="button" id="mark-complete-btn"><i data-lucide="check-circle-2"></i> Tandai Selesai</button>
+                    ${hasQuiz ? '<button type="button" class="btn-outline" disabled><i data-lucide="clipboard-check"></i> Kuis tersedia</button>' : ''}
                 </div>
-
-                <hr class="mb-24" style="opacity: 0.1;">
-
-                <div class="material-body-text">
+                <div class="mt-24">
                     ${active.content || '<p class="text-muted">Konten materi belum tersedia.</p>'}
                 </div>
-            </div>
-
+            </article>
             <div id="comments-section-container" class="mt-24">
                 <div class="content-card"><p class="text-muted">Memuat diskusi...</p></div>
             </div>
