@@ -54,23 +54,19 @@ class User {
      */
     public function login($username, $password) {
         try {
-            error_log("Attempting login for username: " . $username);
             $query = "SELECT id, username, email, full_name, password, role FROM pengguna WHERE username = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$username]);
 
             if ($stmt->rowCount() === 0) {
-                error_log("Login failed: Username not found: " . $username);
                 return ['success' => false, 'message' => 'Username atau password salah.'];
             }
 
             $user = $stmt->fetch();
 
             if (!Security::verifyPassword($password, $user['password'])) {
-                error_log("Login failed: Password mismatch for user: " . $username);
                 return ['success' => false, 'message' => 'Username atau password salah.'];
             }
-            error_log("Login success for user: " . $username);
 
             // Generate JWT token
             $token = Security::generateJWT([
