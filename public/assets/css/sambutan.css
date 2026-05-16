@@ -61,18 +61,13 @@
 .mb-0 { margin-bottom: 0 !important; }
 .mb-8 { margin-bottom: 8px; }
 .mb-12 { margin-bottom: 12px; }
-.mb-16 { margin-bottom: 16px; }
 .mb-24 { margin-bottom: 18px; }
 .mb-32 { margin-bottom: 22px; }
 .mr-8 { margin-right: 8px; }
 
 .gap-8 { gap: 8px; }
-.gap-12 { gap: 12px; }
 .gap-16 { gap: 16px; }
-.d-flex { display: flex; }
-.align-center { align-items: center; }
 .align-start { align-items: flex-start; }
-.justify-between { justify-content: space-between; }
 .justify-center { justify-content: center; }
 .flex-wrap { flex-wrap: wrap; }
 
