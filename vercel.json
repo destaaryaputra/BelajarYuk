@@ -8,6 +8,8 @@
   "routes": [
     { "src": "/assets/(.*)", "dest": "/public/assets/$1" },
     { "src": "/js/(.*)", "dest": "/public/js/$1" },
+    { "src": "/pages/(.*)", "dest": "/public/pages/$1" },
+    { "src": "/components/(.*)", "dest": "/public/components/$1" },
     { "src": "/uploads/(.*)", "dest": "/public/uploads/$1" },
     { "src": "/public/assets/(.*)", "dest": "/public/assets/$1" },
     { "src": "/public/js/(.*)", "dest": "/public/js/$1" },
