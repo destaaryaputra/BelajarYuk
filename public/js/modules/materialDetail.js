@@ -199,6 +199,12 @@ export const MaterialDetail = {
         const embedVideo = this.toEmbedUrl(active.video_url || '');
         const hasQuiz = this.state.quiz && this.state.quiz.id;
 
+        // Determine if there's a next episode
+        const currentIndex = this.state.subMaterials.findIndex(s => String(s.id) === String(this.state.activeItemId));
+        const nextEpisode = (currentIndex !== -1 && currentIndex < this.state.subMaterials.length - 1) 
+            ? this.state.subMaterials[currentIndex + 1] 
+            : null;
+
         let mediaHtml = '';
         if (embedVideo) {
             mediaHtml += `
@@ -217,28 +223,45 @@ export const MaterialDetail = {
             `;
         }
 
-        // 1. Render core content first (Immediate)
+        // 1. Render core content with NEW SEQUENCE: Title -> Video -> Content -> Actions
         container.innerHTML = `
-            ${mediaHtml}
             <article class="content-card">
-                <div class="header-section mb-16">
+                <div class="header-section mb-24">
                     <h1>${UI.escapeHtml(active.title || 'Materi')}</h1>
-                    <p>${UI.escapeHtml(this.state.material.description || active.content?.substring(0, 120) + '...' || '')}</p>
+                    <p class="text-muted">${UI.escapeHtml(this.state.material.description || '')}</p>
                 </div>
-                <div class="action-buttons">
-                    <button type="button" id="mark-complete-btn"><i data-lucide="check-circle-2"></i> Tandai Selesai</button>
-                    ${hasQuiz ? '<button type="button" class="btn-outline" disabled><i data-lucide="clipboard-check"></i> Kuis tersedia</button>' : ''}
-                </div>
-                <div class="mt-24">
+                
+                ${mediaHtml}
+
+                <div class="mt-24 mb-24">
                     ${active.content || '<p class="text-muted">Konten materi belum tersedia.</p>'}
                 </div>
+
+                <div class="action-buttons pt-24 border-top">
+                    <button type="button" id="mark-complete-btn" class="btn-primary">
+                        <i data-lucide="check-circle-2"></i> Tandai Selesai
+                    </button>
+                    
+                    ${nextEpisode ? `
+                        <button type="button" id="next-material-btn" class="btn-outline">
+                            Lanjut Materi: ${UI.escapeHtml(nextEpisode.title)} <i data-lucide="arrow-right"></i>
+                        </button>
+                    ` : ''}
+
+                    ${hasQuiz ? `
+                        <button type="button" class="btn-accent" onclick="window.location.hash='quiz-page'">
+                            <i data-lucide="clipboard-check"></i> Kerjakan Kuis
+                        </button>
+                    ` : ''}
+                </div>
             </article>
+
             <div id="comments-section-container" class="mt-24">
                 <div class="content-card"><p class="text-muted">Memuat diskusi...</p></div>
             </div>
         `;
 
-        // 2. Setup core listeners
+        // 2. Setup listeners
         const markBtn = document.getElementById('mark-complete-btn');
         if (markBtn) {
             markBtn.onclick = async () => {
@@ -251,9 +274,17 @@ export const MaterialDetail = {
             };
         }
 
+        const nextBtn = document.getElementById('next-material-btn');
+        if (nextBtn && nextEpisode) {
+            nextBtn.onclick = () => {
+                this.selectItem(String(nextEpisode.id));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+        }
+
         if (window.lucide) window.lucide.createIcons();
 
-        // 3. Load comments asynchronously (Non-blocking)
+        // 3. Load comments
         this.loadComments(materialId);
     },
 
