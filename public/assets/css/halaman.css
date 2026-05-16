@@ -494,11 +494,11 @@
 }
 
 #material-detail article.content-card {
-    text-align: center; /* Judul dan teks jadi ke tengah */
+    text-align: left; /* Judul dan teks kembali ke kiri */
 }
 
 #material-detail .action-buttons {
-    justify-content: center; /* Tombol ke tengah */
+    justify-content: flex-start; /* Tombol kembali ke kiri */
 }
 
 #course-syllabus {
