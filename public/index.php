@@ -14,7 +14,10 @@ $basePath = (strpos($_SERVER['REQUEST_URI'], '/public/') !== false) ? '' : '';
 $scriptName = $_SERVER['SCRIPT_NAME']; // e.g. /belajaryuk/public/index.php
 $publicDir = dirname($scriptName);     // e.g. /belajaryuk/public
 
+// Fix: Jika di root, dirname mengembalikan '/' atau '\' yang memicu ERR_NAME_NOT_RESOLVED (//assets)
+$assetPath = rtrim($publicDir, '/\\');
+
 $output = str_replace('{{CSRF_TOKEN}}', get_csrf_token(), $layout);
-$output = str_replace('{{ASSET_PATH}}', $publicDir, $output);
+$output = str_replace('{{ASSET_PATH}}', $assetPath, $output);
 
 echo $output;
