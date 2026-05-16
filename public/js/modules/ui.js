@@ -16,8 +16,8 @@ export const UI = {
 
     hideSplash() {
         const splash = document.getElementById('splash-screen');
-        if (splash) splash.classList.add('fade-out');
-        setTimeout(() => splash?.remove(), 500);
+        if (splash) splash.classList.add('hidden');
+        setTimeout(() => splash?.remove(), 800);
     },
 
     showLoading() {

@@ -53,7 +53,10 @@ export const Router = {
 
         try {
             // 1. Hide all pages
-            document.querySelectorAll('.page').forEach(p => p.classList.add('d-none'));
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.add('d-none');
+                p.classList.remove('active');
+            });
 
             // 2. Load page content if not cached
             if (!this.cache[pageId]) {
@@ -67,6 +70,7 @@ export const Router = {
             if (container) {
                 container.innerHTML = this.cache[pageId];
                 container.classList.remove('d-none');
+                container.classList.add('active'); // Senior Fix: Add active class for display: block
                 
                 // Re-initialize icons for new content
                 if (window.lucide) window.lucide.createIcons();
