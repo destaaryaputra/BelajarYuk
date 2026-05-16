@@ -12,19 +12,19 @@ import { Admin } from './modules/admin.js';
 import { AIChat } from './modules/chat.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Belajaryuk Bootstrapping...');
+    
     // 1. Initialize UI
     UI.init();
 
     // 2. Initialize Router
     Router.init();
-    
-    // 3. Initialize AI Chat
-    AIChat.init();
-    
-    // 4. Setup Global Page Event Handlers
+
+    // 3. Setup Global Page Event Handlers
     window.addEventListener('page-loaded', (e) => {
+        console.log(`📄 Page Loaded: ${e.detail.pageId}`);
         const pageId = e.detail.pageId;
-        
+
         // Auth Handlers
         if (pageId === 'login-page') {
             document.getElementById('login-form')?.addEventListener('submit', Auth.handleLogin);
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Admin Handlers
         if (pageId === 'admin-page') {
             Admin.load();
-            
+
             // Attach Admin Sidebar Listeners
             document.querySelectorAll('.admin-sidebar-nav button').forEach(btn => {
                 btn.onclick = () => {
@@ -61,8 +61,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // 4. Initial Load
-    await Router.handleInitialRoute();
-    
-    // 5. Hide splash after app ready
-    setTimeout(() => UI.hideSplash(), 500);
+    try {
+        await Router.handleInitialRoute();
+    } catch (err) {
+        console.error('❌ Failed to load initial route:', err);
+    } finally {
+        // 5. Always hide splash to prevent white screen lock
+        setTimeout(() => {
+            UI.hideSplash();
+            console.log('✅ Bootstrapping Finished');
+        }, 800);
+    }
 });
+
