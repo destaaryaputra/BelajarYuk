@@ -477,9 +477,18 @@
 
 .learning-detail-layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 1fr 320px; /* Konten di Kiri, Daftar Episode di Kanan */
     gap: 24px;
     align-items: start;
+}
+
+#material-detail {
+    min-height: 340px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    padding: 24px;
+    order: 1; /* Pastikan konten utama tetap di urutan pertama */
 }
 
 #course-syllabus {
@@ -491,115 +500,19 @@
     border-radius: var(--radius-lg);
     background: var(--surface);
     border: 1px solid var(--border);
+    order: 2; /* Sidebar di kanan */
 }
 
-.syllabus-header h3 {
-    font-size: 1.15rem;
-    margin-bottom: 4px;
-}
+@media (max-width: 1024px) {
+    .learning-detail-layout {
+        grid-template-columns: 1fr;
+    }
 
-.syllabus-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.syllabus-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--text-main);
-    text-align: left;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    width: 100%;
-}
-
-.syllabus-item:hover {
-    background: var(--surface-hover);
-    border-color: var(--border);
-}
-
-.syllabus-item.active {
-    background: var(--primary-light);
-    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
-    color: var(--primary);
-}
-
-.syllabus-index {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface-muted);
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    flex-shrink: 0;
-}
-
-.syllabus-item.active .syllabus-index {
-    background: var(--primary);
-    color: white;
-}
-
-.syllabus-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.syllabus-title {
-    font-size: 0.92rem;
-    font-weight: 600;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.active-play-icon {
-    width: 16px;
-    height: 16px;
-    color: var(--primary);
-}
-
-.btn-back-material {
-    background: var(--surface);
-    color: var(--text-main);
-    border: 1px solid var(--border);
-}
-
-.btn-back-material:hover {
-    border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
-}
-
-.material-detail-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    gap: 16px;
-}
-
-.toolbar-info {
-    font-size: 0.95rem;
-}
-
-.toolbar-info strong {
-    color: var(--primary);
-}
-
-#material-detail {
-    min-height: 340px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    padding: 24px;
+    #course-syllabus {
+        position: static;
+        max-height: none;
+        order: 2; /* Di mobile, daftar episode muncul di bawah konten video */
+    }
 }
 
 .auth-overlay {
