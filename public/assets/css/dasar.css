@@ -1,24 +1,29 @@
 /** 
- * Belajaryuk - Core Design System (Original Restore)
+ * Belajaryuk - Core Design System (TRUE ORIGINAL RESTORE)
  */
 
 :root {
     --font-sans: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
     --font-display: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+    
     --primary: #1f8a70;
     --primary-hover: #176f5a;
     --primary-light: #e8f6f1;
     --accent: #c9732c;
+    
     --bg-body: #f4f6f9;
     --surface: #ffffff;
     --surface-muted: #f7f9fc;
     --surface-hover: #eef2f8;
     --surface-strong: #ffffff;
+    
     --text-main: #1f2937;
     --text-muted: #5b6677;
     --text-on-primary: #ffffff;
+    
     --border: #d9e1ec;
     --border-strong: #c1ccdb;
+    
     --danger: #dc2626;
     --danger-soft: #fef2f2;
     --warning: #b7791f;
@@ -27,18 +32,23 @@
     --info-soft: #e8f2fb;
     --success: #2e7d5b;
     --success-soft: #e5f4ec;
+    
     --radius-md: 12px;
     --radius-lg: 16px;
     --radius-xl: 22px;
     --radius-pill: 999px;
+    
     --container-width: 1160px;
     --control-height: 46px;
+    
     --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.08);
     --shadow-md: 0 10px 26px -12px rgba(15, 23, 42, 0.18);
     --shadow-glow: 0 14px 28px rgba(31, 138, 112, 0.18);
     --shadow-lg: 0 24px 40px -20px rgba(15, 23, 42, 0.3);
+    --shadow-xl: 0 30px 56px -24px rgba(15, 23, 42, 0.35);
 }
 
+/* --- Essential Structural Bridge (DO NOT REMOVE) --- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: var(--font-sans);
@@ -49,29 +59,13 @@ body {
 }
 
 #app { width: 100%; position: relative; }
-.app-container { 
-    min-height: 100vh; 
-    display: flex; 
-    flex-direction: column; 
-    width: 100%;
-}
+.app-container { min-height: 100vh; display: flex; flex-direction: column; width: 100%; }
 
-.page { 
-    display: none; 
-    width: 100%;
-}
-.page.active { 
-    display: block; 
-}
+.page { display: none; width: 100%; }
+.page.active { display: block; }
 
-body.admin-mode .app-container {
-    flex-direction: row;
-}
-
-body.admin-mode .page.active {
-    display: flex;
-    width: 100%;
-}
+body.admin-mode .app-container { flex-direction: row; }
+body.admin-mode .page.active { display: flex; }
 
 :where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div, .page:not(#admin-page):not(#landing-page) > form) {
     max-width: var(--container-width);
@@ -80,6 +74,7 @@ body.admin-mode .page.active {
     width: 100%;
 }
 
+/* --- Base Component Styles (Original Look) --- */
 .content-card {
     background: var(--surface);
     padding: 22px;
@@ -100,14 +95,11 @@ button, .btn-p {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
+    text-decoration: none;
 }
-
 button:hover, .btn-p:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
-.text-gradient {
-    background: linear-gradient(135deg, var(--primary) 0%, #10b981 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; color: var(--text-main); margin-bottom: 1rem; }
+p { color: var(--text-muted); margin-bottom: 1rem; }
 
 .d-none { display: none !important; }
