@@ -37,5 +37,11 @@ export const UI = {
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);
+    },
+
+    escapeHtml(value) {
+        const div = document.createElement('div');
+        div.textContent = value == null ? '' : String(value);
+        return div.innerHTML;
     }
 };
