@@ -486,6 +486,19 @@
 #material-detail {
     grid-area: video;
     min-height: 400px;
+    max-width: 900px; /* Batasi lebar agar enak dibaca */
+    width: 100%;
+    margin: 0 auto; /* Tengah-tengah kolom */
+    display: flex;
+    flex-direction: column;
+}
+
+#material-detail article.content-card {
+    text-align: center; /* Judul dan teks jadi ke tengah */
+}
+
+#material-detail .action-buttons {
+    justify-content: center; /* Tombol ke tengah */
 }
 
 #course-syllabus {
