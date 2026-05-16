@@ -477,17 +477,14 @@
 
 .learning-detail-layout {
     display: grid;
-    grid-template-columns: 1fr 300px; /* Konten di Kiri, Daftar Episode di Kanan */
+    grid-template-columns: 1fr 320px; /* Video di Kiri (Dominan), Daftar Episode di Kanan (Wajar) */
     gap: 24px;
     align-items: start;
 }
 
 #material-detail {
-    min-height: 340px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    padding: 24px;
+    min-height: 400px;
+    /* Clean container: background & border handled by inner .content-card/pdf-container */
 }
 
 #course-syllabus {
@@ -495,10 +492,7 @@
     top: 90px;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
-    padding: 20px;
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    border: 1px solid var(--border);
+    /* Aside as a sidebar, styles partially inherited from .content-card */
 }
 
 .syllabus-header h3 {
@@ -574,17 +568,6 @@
     width: 16px;
     height: 16px;
     color: var(--primary);
-}
-
-@media (max-width: 1024px) {
-    .learning-detail-layout {
-        grid-template-columns: 1fr;
-    }
-
-    #course-syllabus {
-        position: static;
-        max-height: none;
-    }
 }
 
 .auth-overlay {
