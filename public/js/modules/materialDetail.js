@@ -223,9 +223,12 @@ export const MaterialDetail = {
         }
 
         // 1. Render core content with NEW SEQUENCE: Title -> Video -> Content -> Actions
+        const showComments = !!embedVideo;
+        
         container.innerHTML = `
             <article class="content-card">
                 <div class="header-section mb-24">
+                    <span class="section-eyebrow">${embedVideo ? 'Video Pembelajaran' : 'Pengenalan Materi'}</span>
                     <h1>${UI.escapeHtml(active.title || 'Materi')}</h1>
                     <p class="text-muted">${UI.escapeHtml(this.state.material.description || '')}</p>
                 </div>
@@ -243,7 +246,7 @@ export const MaterialDetail = {
                     
                     ${nextEpisode ? `
                         <button type="button" id="next-material-btn" class="btn-outline">
-                            Lanjut Materi: ${UI.escapeHtml(nextEpisode.title)} <i data-lucide="arrow-right"></i>
+                            Lanjut ke Episode Berikutnya <i data-lucide="arrow-right"></i>
                         </button>
                     ` : ''}
 
@@ -255,9 +258,11 @@ export const MaterialDetail = {
                 </div>
             </article>
 
-            <div id="comments-section-container" class="mt-24">
-                <div class="content-card"><p class="text-muted">Memuat diskusi...</p></div>
-            </div>
+            ${showComments ? `
+                <div id="comments-section-container" class="mt-24">
+                    <div class="content-card"><p class="text-muted">Memuat diskusi...</p></div>
+                </div>
+            ` : ''}
         `;
 
         // 2. Setup listeners
@@ -283,8 +288,10 @@ export const MaterialDetail = {
 
         if (window.lucide) window.lucide.createIcons();
 
-        // 3. Load comments
-        this.loadComments(materialId);
+        // 3. Load comments only if needed
+        if (showComments) {
+            this.loadComments(materialId);
+        }
     },
 
     async loadComments(materialId) {
