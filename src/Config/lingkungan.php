@@ -9,22 +9,27 @@ $baseDir = dirname(dirname(__DIR__));
 $envFile = $baseDir . DIRECTORY_SEPARATOR . '.env';
 
 if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $content = file_get_contents($envFile);
+    // Remove BOM if exists
+    $content = str_replace("\xEF\xBB\xBF", "", $content);
+    
+    $lines = explode("\n", str_replace("\r", "", $content));
     foreach ($lines as $line) {
         $line = trim($line);
         if (empty($line) || strpos($line, '#') === 0) continue;
         
-        $parts = explode('=', $line, 2);
-        if (count($parts) === 2) {
-            $name = trim($parts[0]);
-            $value = trim($parts[1]);
+        // Regex untuk menangkap key=value, mengabaikan komentar di belakang
+        if (preg_match('/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/', $line, $matches)) {
+            $name = trim($matches[1]);
+            $value = trim($matches[2]);
             
-            // Remove quotes if present
-            if (preg_match('/^["\'](.*)["\']$/', $value, $matches)) {
-                $value = $matches[1];
+            // Hapus kutipan jika ada
+            $value = preg_replace('/^["\'](.*)["\']$/', '$1', $value);
+            // Hapus komentar inline
+            if (strpos($value, '#') !== false) {
+                $value = trim(explode('#', $value)[0]);
             }
             
-            // Overwrite existing env vars
             putenv("{$name}={$value}");
             $_ENV[$name] = $value;
             $_SERVER[$name] = $value;

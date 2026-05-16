@@ -71,7 +71,9 @@ class Database {
     private function connect() {
         try {
             // Supabase Pooler memerlukan sslmode=require untuk identifikasi tenant (SNI)
-            $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->db};sslmode=require";
+            // Pastikan tidak ada spasi di sekitar DB Name
+            $dbName = trim($this->db);
+            $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$dbName};sslmode=require";
             
             return new PDO(
                 $dsn,
@@ -86,20 +88,27 @@ class Database {
             );
         } catch (PDOException $e) {
             error_log("Database Connection Error: " . $e->getMessage());
-            http_response_code(500);
-            header('Content-Type: application/json');
+            if (!headers_sent()) {
+                http_response_code(500);
+                header('Content-Type: application/json');
+            }
             
-            // Sertakan DB_NAME dalam debug untuk memastikan variabel terbaca
+            // SUPER DEBUG: Tampilkan semua status variabel
             exit(json_encode([
                 'success' => false, 
                 'message' => 'Gagal terhubung ke database Supabase.',
-                'debug' => $e->getMessage(),
-                'dsn_attempted' => "pgsql:host={$this->host};port={$this->port};dbname={$this->db}",
-                'check' => [
-                    'db_name_set' => !empty($this->db),
-                    'db_user_set' => !empty($this->user)
+                'debug_message' => $e->getMessage(),
+                'version' => 'SUPER-DIAGNOSTIC-V2',
+                'env_status' => [
+                    'DB_HOST' => $this->host ? 'LOADED' : 'MISSING',
+                    'DB_NAME' => $this->db ? "LOADED ('{$this->db}')" : 'MISSING',
+                    'DB_USER' => $this->user ? 'LOADED' : 'MISSING',
+                    'DB_PORT' => $this->port,
+                    'SSL_MODE' => 'require'
                 ],
-                'tip' => 'Pastikan DB_PASS benar dan sslmode=require didukung oleh driver PDO PGSQL kamu.'
+                'dsn_generated' => "pgsql:host={$this->host};port={$this->port};dbname={$this->db};sslmode=require",
+                'php_version' => PHP_VERSION,
+                'pdo_drivers' => PDO::getAvailableDrivers()
             ]));
         }
     }
