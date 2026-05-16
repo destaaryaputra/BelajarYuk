@@ -38,10 +38,14 @@ export const MaterialDetail = {
             const payload = detailRes.data || {};
             const material = payload.material || {};
             this.state.material = material;
-            this.state.subMaterials = Array.isArray(material.sub_materials) ? material.sub_materials : [];
+            
+            // UX Fix: Filter sub-materi agar hanya yang memiliki video yang ditampilkan
+            const rawSubs = Array.isArray(material.sub_materials) ? material.sub_materials : [];
+            this.state.subMaterials = rawSubs.filter(s => s.video_url && s.video_url.trim() !== '');
+            
             this.state.quiz = quizRes.data || null;
 
-            // Senior UX Fix: Jika materi utama tidak punya video tapi ada episode (sub-materi),
+            // Senior UX Fix: Jika materi utama tidak punya video tapi ada episode (sub-materi) yang valid,
             // otomatis pilih episode pertama agar user langsung melihat video.
             if (!material.video_url && this.state.subMaterials.length > 0) {
                 this.state.activeItemId = String(this.state.subMaterials[0].id);
