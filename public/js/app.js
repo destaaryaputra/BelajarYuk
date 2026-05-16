@@ -19,8 +19,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 2. Initialize Router
     Router.init();
+    
+    // 3. Initialize AI Chat
+    AIChat.init();
 
-    // 3. Setup Global Page Event Handlers
+    // 4. Setup Global Page Event Handlers
     window.addEventListener('page-loaded', (e) => {
         console.log(`📄 Page Loaded: ${e.detail.pageId}`);
         const pageId = e.detail.pageId;
@@ -60,17 +63,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 4. Initial Load
+    // 5. Initial Load
     try {
         await Router.handleInitialRoute();
+        console.log('✨ Initial Route Ready');
     } catch (err) {
         console.error('❌ Failed to load initial route:', err);
     } finally {
-        // 5. Always hide splash to prevent white screen lock
+        // 6. Always hide splash to prevent white screen lock
+        // Reduced delay for better UX
         setTimeout(() => {
             UI.hideSplash();
             console.log('✅ Bootstrapping Finished');
-        }, 800);
+        }, 400);
     }
 });
 
