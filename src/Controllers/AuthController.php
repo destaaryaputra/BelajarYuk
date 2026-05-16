@@ -55,13 +55,14 @@ class AuthController {
 
             $result = $this->authService->login($username, $password);
             
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
+            // Simpan ke session (Session sudah di-start oleh router/index)
             $_SESSION['auth_token'] = $result['token'];
             $_SESSION['user'] = $result['user'];
             
-            Response::success($result['message'], ['token' => $result['token'], 'user' => $result['user']], 200);
+            Response::success($result['message'], [
+                'token' => $result['token'], 
+                'user' => $result['user']
+            ], 200);
         } catch (Exception $e) {
             $code = $e->getCode();
             Response::error($e->getMessage(), null, is_numeric($code) && $code >= 400 ? $code : 401);
