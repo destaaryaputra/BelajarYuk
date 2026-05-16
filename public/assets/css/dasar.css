@@ -4,54 +4,72 @@
  */
 
 :root {
-    /* --- Modern Color Palette --- */
-    --primary: #10b981;         /* Emerald 500 - Vibrant & Fresh */
-    --primary-hover: #059669;   /* Emerald 600 */
-    --primary-light: #ecfdf5;   /* Emerald 50 */
-    --primary-dark: #064e3b;    /* Emerald 900 */
+    /* --- Modern Fluid Sizing System --- */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     
-    --secondary: #6366f1;       /* Indigo 500 - For special highlights */
-    --accent: #f59e0b;          /* Amber 500 - For Gamification/Gold */
+    /* Typography Scale (Fluid) */
+    --text-xs: clamp(0.7rem, 0.05vw + 0.65rem, 0.75rem);
+    --text-sm: clamp(0.8rem, 0.1vw + 0.75rem, 0.875rem);
+    --text-base: clamp(0.95rem, 0.15vw + 0.85rem, 1.05rem);
+    --text-lg: clamp(1.1rem, 0.2vw + 1rem, 1.25rem);
+    --text-xl: clamp(1.35rem, 0.3vw + 1.2rem, 1.6rem);
+    --text-2xl: clamp(1.75rem, 0.5vw + 1.5rem, 2.2rem);
+    --text-3xl: clamp(2.2rem, 0.8vw + 1.8rem, 3.2rem);
+    --text-4xl: clamp(2.8rem, 1.2vw + 2.2rem, 4.8rem);
+
+    /* Standardized Spacing (Consistent Rhythm) */
+    --space-1: 0.25rem; /* 4px */
+    --space-2: 0.5rem;  /* 8px */
+    --space-3: 0.75rem; /* 12px */
+    --space-4: 1rem;    /* 16px */
+    --space-6: 1.5rem;  /* 24px */
+    --space-8: 2rem;    /* 32px */
+    --space-12: 3rem;   /* 48px */
+    --space-16: 4rem;   /* 64px */
     
-    /* --- Neutral Palette (The "Neat" Secret) --- */
-    --bg-body: #f8fafc;         /* Slate 50 */
+    /* Brand Colors */
+    --primary: #10b981;
+    --primary-hover: #059669;
+    --primary-light: #ecfdf5;
+    --primary-dark: #064e3b;
+    
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --bg-body: #f8fafc;
     --surface: #ffffff;
-    --surface-muted: #f1f5f9;   /* Slate 100 */
-    --surface-hover: #e2e8f0;   /* Slate 200 */
     
-    /* --- Typography Colors --- */
-    --text-main: #0f172a;       /* Slate 900 - Crisp Readability */
-    --text-muted: #64748b;      /* Slate 500 */
-    --text-on-primary: #ffffff;
-    
-    /* --- Structural --- */
-    --border: rgba(226, 232, 240, 0.8);
-    --border-strong: #cbd5e1;
     --radius-md: 12px;
     --radius-lg: 18px;
     --radius-xl: 32px;
-    --radius-pill: 999px;
     
-    /* --- Depth (The "Good" Secret) --- */
-    --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0 0 25px rgba(16, 185, 129, 0.15);
-    
-    --container-width: 1240px;
-    --control-height: 52px;
-    --font-sans: 'Inter', system-ui, sans-serif;
+    --container-width: 1200px;
+    --control-height: clamp(46px, 1vw + 40px, 54px);
 }
 
-/* --- Global Resets & Smoothing --- */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
 body {
     font-family: var(--font-sans);
+    font-size: var(--text-base);
     background-color: var(--bg-body);
     color: var(--text-main);
     line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    font-size: 16px;
+    padding-bottom: var(--space-8);
+}
+
+h1 { font-size: var(--text-3xl); margin-bottom: var(--space-6); font-weight: 900; }
+h2 { font-size: var(--text-2xl); margin-bottom: var(--space-4); font-weight: 800; }
+h3 { font-size: var(--text-xl); margin-bottom: var(--space-3); font-weight: 700; }
+p { margin-bottom: var(--space-4); }
+
+.content-card {
+    padding: var(--space-8);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-6);
+}
+
+button, .btn-p {
+    padding: var(--space-3) var(--space-8);
+    font-size: var(--text-base);
+    min-height: var(--control-height);
 }
 
 /* --- Modular Layout Structure --- */
