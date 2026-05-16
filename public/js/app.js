@@ -9,6 +9,8 @@ import { Auth } from './modules/auth.js';
 import { Dashboard } from './modules/dashboard.js';
 import { Materials } from './modules/materials.js';
 import { Admin } from './modules/admin.js';
+import { Profile } from './modules/profile.js';
+import { Progress } from './modules/progress.js';
 import { AIChat } from './modules/chat.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -42,6 +44,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (pageId === 'materials-page') {
             Materials.load();
+        }
+        if (pageId === 'profile-page') {
+            Profile.load();
+        }
+        if (pageId === 'progress-page') {
+            Progress.load();
         }
 
         // Admin Handlers

@@ -115,11 +115,23 @@ class APIService {
     
     // --- Progress & Materials ---
     getDashboardData() { return this.get('/progress/dashboard'); }
+    getProgressSummary() { return this.get('/progress/summary'); }
+    getProgressByCategories() { return this.get('/progress/categories'); }
+    getLeaderboard() { return this.get('/progress/leaderboard'); }
+    getQuizPerformance() { return this.get('/progress/quiz-performance'); }
+    
     getMaterials(page = 1, limit = 10, category = null) {
         let endpoint = `/materials?page=${page}&limit=${limit}`;
         if (category) endpoint += `&category=${encodeURIComponent(category)}`;
         return this.get(endpoint);
     }
+    getMaterialDetail(id) { return this.get(`/materials/detail?id=${id}`); }
+    
+    // --- Quiz API ---
+    getQuiz(materialId) { return this.get(`/quiz?material_id=${materialId}`); }
+    getQuizQuestions(quizId) { return this.get(`/quiz/questions?quiz_id=${quizId}`); }
+    submitQuiz(data) { return this.post('/quiz/submit', data); }
+    getUserQuizResults() { return this.get('/quiz/results'); }
 }
 
 export const API = new APIService(Config.API_BASE_URL);
