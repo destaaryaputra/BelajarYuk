@@ -89,10 +89,12 @@
 }
 
 .nav-brand-logo span {
-    color: var(--text-main);
+    font-size: 1.5rem;
     font-weight: 800;
-    font-size: 1.4rem;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #064e3b 0%, #1f8a70 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .btn-ghost {
