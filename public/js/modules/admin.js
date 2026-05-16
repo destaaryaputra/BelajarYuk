@@ -734,6 +734,48 @@ export const Admin = {
         });
     },
 
+    buildRegistrationTrend(students, monthCount = 6) {
+        const now = new Date();
+        const monthBuckets = [];
+        for (let i = monthCount - 1; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            monthBuckets.push({
+                key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+                date: d,
+                label: d.toLocaleString('id-ID', { month: 'short', year: '2-digit' })
+            });
+        }
+
+        const counts = Object.fromEntries(monthBuckets.map(b => [b.key, 0]));
+        const rangeStart = monthBuckets[0]?.date || new Date(now.getFullYear(), now.getMonth(), 1);
+        let baselineTotal = 0;
+
+        students.forEach(student => {
+            if (!student.created_at) return;
+            const createdAt = new Date(student.created_at);
+            if (Number.isNaN(createdAt.getTime())) return;
+
+            if (createdAt < rangeStart) {
+                baselineTotal++;
+                return;
+            }
+
+            const key = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
+            if (key in counts) counts[key]++;
+        });
+
+        const labels = monthBuckets.map(b => b.label);
+        const monthlyCounts = monthBuckets.map(b => counts[b.key] || 0);
+        const cumulativeCounts = [];
+        let runningTotal = baselineTotal;
+        monthlyCounts.forEach(value => {
+            runningTotal += value;
+            cumulativeCounts.push(runningTotal);
+        });
+
+        return { labels, monthlyCounts, cumulativeCounts };
+    },
+
     renderCharts(students, materials) {
         if (typeof Chart === 'undefined') return;
         
@@ -741,21 +783,67 @@ export const Admin = {
         const ctxReg = document.getElementById('adminRegistrationChart');
         if (ctxReg) {
             if (this.charts.registration) this.charts.registration.destroy();
-            const data = [students.length, students.length + 2, students.length + 5, students.length + 3];
+            const trend = this.buildRegistrationTrend(students, 6);
             this.charts.registration = new Chart(ctxReg, {
-                type: 'line',
+                type: 'bar',
                 data: {
-                    labels: ['Mar', 'Apr', 'Mei', 'Jun'],
-                    datasets: [{
-                        label: 'Siswa',
-                        data: data,
-                        borderColor: '#1f8a70',
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: 'rgba(31, 138, 112, 0.1)'
-                    }]
+                    labels: trend.labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Siswa Baru',
+                            data: trend.monthlyCounts,
+                            backgroundColor: 'rgba(37, 99, 167, 0.75)',
+                            borderRadius: 8,
+                            maxBarThickness: 28
+                        },
+                        {
+                            type: 'line',
+                            label: 'Total Siswa',
+                            data: trend.cumulativeCounts,
+                            borderColor: '#1f8a70',
+                            backgroundColor: '#1f8a70',
+                            pointRadius: 3,
+                            pointHoverRadius: 4,
+                            tension: 0.28
+                        }
+                    ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, animation: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            align: 'start',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 10,
+                                boxHeight: 10,
+                                padding: 12,
+                                font: { size: 11 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                stepSize: 1
+                            }
+                        }
+                    }
+                },
             });
         }
 
