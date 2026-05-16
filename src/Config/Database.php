@@ -68,7 +68,7 @@ class Database {
 
     private function connect() {
         try {
-            // Supabase often requires SSL in production
+            // Supabase Pooler memerlukan sslmode=require untuk identifikasi tenant (SNI)
             $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->db};sslmode=require";
             
             return new PDO(
@@ -79,29 +79,26 @@ class Database {
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
-                    PDO::ATTR_TIMEOUT => 5, // 5 seconds timeout
+                    PDO::ATTR_TIMEOUT => 5,
                 ]
             );
         } catch (PDOException $e) {
-            // Fallback: try without explicit sslmode if the driver doesn't support it well
-            try {
-                $dsnFallback = "pgsql:host={$this->host};port={$this->port};dbname={$this->db}";
-                return new PDO($dsnFallback, $this->user, $this->password, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_TIMEOUT => 5
-                ]);
-            } catch (PDOException $e2) {
-                error_log("Database Connection Error: " . $e2->getMessage());
-                http_response_code(500);
-                header('Content-Type: application/json');
-                exit(json_encode([
-                    'success' => false, 
-                    'message' => 'Gagal terhubung ke database Supabase.',
-                    'debug' => $e2->getMessage(),
-                    'dsn_attempted' => "pgsql:host={$this->host};port={$this->port};dbname={$this->db}",
-                    'tip' => 'Pastikan DB_PASS benar dan IP Vercel tidak diblokir oleh Supabase (cek Network Restrictions di Supabase).'
-                ]));
-            }
+            error_log("Database Connection Error: " . $e->getMessage());
+            http_response_code(500);
+            header('Content-Type: application/json');
+            
+            // Sertakan DB_NAME dalam debug untuk memastikan variabel terbaca
+            exit(json_encode([
+                'success' => false, 
+                'message' => 'Gagal terhubung ke database Supabase.',
+                'debug' => $e->getMessage(),
+                'dsn_attempted' => "pgsql:host={$this->host};port={$this->port};dbname={$this->db}",
+                'check' => [
+                    'db_name_set' => !empty($this->db),
+                    'db_user_set' => !empty($this->user)
+                ],
+                'tip' => 'Pastikan DB_PASS benar dan sslmode=require didukung oleh driver PDO PGSQL kamu.'
+            ]));
         }
     }
 
