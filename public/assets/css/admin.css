@@ -12,8 +12,8 @@ body.admin-mode {
     --admin-chart-grid: rgba(148, 163, 184, 0.22);
     --admin-chart-axis: #64748b;
     --admin-chart-axis-strong: #334155;
-    --admin-info-bg: #e0f2fe;
-    --admin-info-text: #0369a1;
+    --admin-info-bg: #f0fdfa;
+    --admin-info-text: #0d9488;
     --admin-accent-bg: #fef3c7;
     --admin-accent-text: #b45309;
     background-color: var(--admin-shell); margin: 0; overflow: hidden; 
@@ -168,7 +168,7 @@ body.admin-mode .page > nav {
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     background:
-        linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(14, 165, 233, 0.06)),
+        linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(13, 148, 136, 0.06)),
         var(--admin-card);
     box-shadow: var(--shadow-sm);
 }
