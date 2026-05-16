@@ -1,198 +1,172 @@
-/* 
- * Belajaryuk - Gaya Responsif Terpadu
- * Standard: Senior Architect (Lean, Clean, Zero Redundancy)
+/*
+ * Belajaryuk - Responsive styles
  */
 
-/* ==========================================================================
-   TABLET OPTIMIZATION (max-width: 1024px)
-   ========================================================================== */
 @media (max-width: 1024px) {
-    .learning-detail-layout {
-        flex-direction: column;
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
     .featured-course-card {
         grid-template-columns: 1fr;
     }
+
     .featured-course-media {
-        min-height: 200px;
+        min-height: 220px;
+    }
+
+    .learning-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    #material-detail {
+        min-height: 260px;
     }
 }
 
-/* ==========================================================================
-   MOBILE OPTIMIZATION (max-width: 768px)
-   ========================================================================== */
 @media (max-width: 768px) {
     :root {
         font-size: 15px;
-        --control-height: 46px;
     }
 
-    /* Container Page Constraints */
     :where(.page:not(#admin-page) > div, .page:not(#admin-page) > form, .page:not(#admin-page) > main) {
-        padding-left: var(--container-padding);
-        padding-right: var(--container-padding);
         max-width: 100%;
         overflow-x: hidden;
+        padding-top: 28px;
+        padding-bottom: 28px;
     }
 
-    /* Compact Sticky Header System */
-    nav {
-        display: flex !important;
-        flex-direction: column !important;
-        padding: 0 !important;
-        margin-bottom: 20px !important;
-        position: sticky !important;
-        top: 0;
-        z-index: 1000;
-        background: var(--surface);
-        border-bottom: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
     }
 
-    .nav-top-bar {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        width: 100% !important;
-        padding: 10px 16px !important;
-        border-bottom: 1px solid rgba(0,0,0,0.04) !important;
-    }
-
-    .nav-bottom-bar {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: space-around !important;
-        width: 100% !important;
-        background: var(--surface-muted) !important;
-        overflow-x: auto !important;
-        scrollbar-width: none;
-    }
-    .nav-bottom-bar::-webkit-scrollbar { display: none; }
-
-    nav button {
-        flex: 1 !important;
-        min-width: 70px !important;
-        min-height: 56px !important;
-        border-radius: 0 !important;
-        border: none !important;
-        border-bottom: 3px solid transparent !important;
-        background: transparent !important;
-        font-size: 0.72rem !important;
-        padding: 6px 2px !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-        color: var(--text-muted) !important;
-    }
-
-    nav button i, nav button svg { width: 20px !important; height: 20px !important; }
-
-    nav button.nav-active {
-        color: var(--primary) !important;
-        border-bottom-color: var(--primary) !important;
-        background: rgba(15, 118, 110, 0.05) !important;
-    }
-
-    /* Adaptive Material Cards: List View */
-    #materials-list, .dashboard-material-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-    }
-
-    .material-card {
-        flex-direction: row !important;
-        min-height: 120px !important;
-        align-items: stretch !important;
-    }
-
-    .material-card .img-wrapper {
-        width: 110px !important;
-        height: auto !important;
-        border-bottom: none !important;
-        border-right: 1px solid var(--border) !important;
-        flex-shrink: 0 !important;
-    }
-
-    .material-card-content { padding: 12px 14px !important; justify-content: center !important; }
-    .material-card h3 { font-size: 0.95rem !important; min-height: 0 !important; margin-bottom: 4px !important; }
-    .material-card p, .material-card-footer { display: none !important; }
-
-    /* Adaptive Profile Page (Centered) */
-    .profile-header {
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        gap: 10px !important;
-        padding: 12px !important;
-    }
-
-    .profile-header .avatar {
-        margin-top: 0 !important;
-        width: 72px !important;
-        height: 72px !important;
-        border-width: 3px !important;
-    }
-
-    .profile-actions-top {
-        margin-left: 0 !important;
+    .dashboard-header button {
         width: 100%;
     }
 
-    .profile-actions {
-        flex-direction: column !important;
-        gap: 8px !important;
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 
-    .profile-actions button { width: 100% !important; margin-left: 0 !important; }
-    .profile-grid {
-        grid-template-columns: 1fr !important;
-    }
-    .profile-field {
-        gap: 4px !important;
-        padding: 8px 0 !important;
+    #materials-list,
+    .dashboard-material-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 
-    /* Admin Mobile Tweaks */
-    .admin-sidebar-nav {
+    .material-card {
         flex-direction: row;
-        overflow-x: auto;
-        padding: 10px 8px;
+        min-height: 120px;
+    }
+
+    .material-card .img-wrapper {
+        width: 112px;
+        height: auto;
+        flex-shrink: 0;
+    }
+
+    .material-card-content {
+        padding: 12px 12px 8px;
+    }
+
+    .material-card-content p {
+        display: none;
+    }
+
+    .material-card-footer {
+        padding: 8px 12px 12px;
+    }
+
+    .featured-course-copy {
+        padding: 20px;
+    }
+
+    .category-tabs-scroll {
+        margin-bottom: 10px;
+    }
+
+    .profile-header-main {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .profile-details-grid,
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-overlay {
+        min-height: calc(100vh - 20px);
+        padding-top: 14px;
+    }
+
+    .auth-card {
+        padding: 22px 16px;
+        border-radius: var(--radius-lg);
+    }
+
+    .material-detail-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-bar {
+        padding: 10px;
         gap: 8px;
+    }
+
+    .search-input-wrapper,
+    .custom-dropdown {
+        min-width: 100%;
+        width: 100%;
+    }
+
+    .notification-toast {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        top: 12px;
     }
 }
 
-/* ==========================================================================
-   SMALL MOBILE OPTIMIZATION (max-width: 480px)
-   ========================================================================== */
 @media (max-width: 480px) {
     :root {
         font-size: 14px;
     }
 
     .content-card {
-        padding: 16px !important;
-        margin-bottom: 16px !important;
+        padding: 16px;
     }
 
     .dashboard-header h1 {
-        font-size: 1.4rem !important;
+        font-size: 1.55rem;
     }
-    
-    .dashboard-header .section-eyebrow { display: none; }
-    
-    .stats-grid {
-        grid-template-columns: 1fr !important;
-        gap: 12px;
+
+    .section-eyebrow {
+        display: none;
+    }
+
+    .material-card .img-wrapper {
+        width: 96px;
+    }
+
+    .quiz-history-grid {
+        grid-template-columns: 1fr;
     }
 }
 
-/* ==========================================================================
-   GLOBAL OVERFLOW SAFETY
-   ========================================================================== */
-html, body {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
 }
-*, *::before, *::after {
-    box-sizing: border-box !important;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }

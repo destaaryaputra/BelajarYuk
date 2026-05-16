@@ -58,6 +58,7 @@ body.dark-theme .material-card,
 body.dark-theme .content-card,
 body.dark-theme .stat-card,
 body.dark-theme .auth-container,
+body.dark-theme .auth-card,
 body.dark-theme .search-bar,
 body.dark-theme .quiz-option-label,
 body.dark-theme .quiz-history-card,
@@ -69,6 +70,32 @@ body.dark-theme .pdf-container {
 body.dark-theme .material-card-footer,
 body.dark-theme .pdf-header {
     background: var(--surface-muted);
+}
+body.dark-theme .featured-course-card {
+    background: linear-gradient(140deg, var(--surface) 0%, color-mix(in srgb, var(--primary-light) 22%, var(--surface)) 100%);
+}
+body.dark-theme .category-tab {
+    background: var(--surface);
+    border-color: var(--border);
+}
+body.dark-theme .category-tab.active {
+    background: color-mix(in srgb, var(--primary-light) 45%, var(--surface));
+    border-color: color-mix(in srgb, var(--primary) 38%, var(--border));
+}
+body.dark-theme .rank-gold {
+    color: #ffd66b;
+    background: rgba(245, 158, 11, 0.22);
+    border-color: rgba(245, 158, 11, 0.4);
+}
+body.dark-theme .rank-silver {
+    color: #dbe7f6;
+    background: rgba(148, 163, 184, 0.26);
+    border-color: rgba(148, 163, 184, 0.45);
+}
+body.dark-theme .rank-bronze {
+    color: #fdba74;
+    background: rgba(251, 146, 60, 0.18);
+    border-color: rgba(251, 146, 60, 0.36);
 }
 body.dark-theme .ql-toolbar.ql-snow {
     background: var(--surface-muted);
@@ -145,4 +172,3 @@ body.dark-theme .stat-card-accent .stat-chip {
     color: var(--admin-accent-text);
     border-color: rgba(251, 191, 36, 0.24);
 }
-
