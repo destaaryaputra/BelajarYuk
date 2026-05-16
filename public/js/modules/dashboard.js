@@ -6,6 +6,8 @@ import { API, Config } from './api.js';
 import { UI } from './ui.js';
 
 export const Dashboard = {
+    rafHandles: {},
+
     async load() {
         const contentContainer = document.getElementById('dynamic-dashboard-content');
         if (!contentContainer) return;
@@ -117,6 +119,10 @@ export const Dashboard = {
     animateNumber(id, start, end, duration) {
         const obj = document.getElementById(id);
         if (!obj) return;
+
+        if (this.rafHandles[id]) {
+            window.cancelAnimationFrame(this.rafHandles[id]);
+        }
         
         let startTimestamp = null;
         const step = (timestamp) => {
@@ -124,10 +130,12 @@ export const Dashboard = {
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
             obj.innerHTML = Math.floor(progress * (end - start) + start);
             if (progress < 1) {
-                window.requestAnimationFrame(step);
+                this.rafHandles[id] = window.requestAnimationFrame(step);
+            } else {
+                delete this.rafHandles[id];
             }
         };
-        window.requestAnimationFrame(step);
+        this.rafHandles[id] = window.requestAnimationFrame(step);
     },
 
     renderRecentMaterials(materials) {

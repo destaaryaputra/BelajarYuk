@@ -94,3 +94,28 @@ body.admin-mode {
     padding: 32px; 
     overflow-y: auto; 
 }
+
+.admin-tab-content {
+    width: 100%;
+}
+
+.admin-priority-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.chart-card {
+    min-height: 320px;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: 240px !important;
+}
+
+@media (max-width: 1024px) {
+    .admin-priority-grid {
+        grid-template-columns: 1fr;
+    }
+}

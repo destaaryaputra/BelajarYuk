@@ -16,6 +16,7 @@ export const Admin = {
         submatQuill: null
     },
     currentSubMaterials: [],
+    rafHandles: {},
 
     async load() {
         const userData = localStorage.getItem(Config.STORAGE_KEYS.USER_DATA);
@@ -49,6 +50,10 @@ export const Admin = {
             document.getElementById(`btn-tab-${t}`)?.classList.remove('active');
             document.getElementById(`admin-tab-${t}`)?.classList.add('d-none');
         });
+
+        if (tabId !== 'dashboard') {
+            this.destroyCharts();
+        }
         
         document.getElementById(`btn-tab-${tabId}`)?.classList.add('active');
         document.getElementById(`admin-tab-${tabId}`)?.classList.remove('d-none');
@@ -100,13 +105,21 @@ export const Admin = {
             const allUsers = usersRes.data?.users || usersRes.data || [];
             const students = allUsers.filter(u => u.role === 'student');
             const materials = materialsRes.data?.materials || [];
+            const studentsThisMonth = students.filter(u => {
+                if (!u.created_at) return false;
+                const joined = new Date(u.created_at);
+                const now = new Date();
+                return joined.getFullYear() === now.getFullYear() && joined.getMonth() === now.getMonth();
+            }).length;
 
             this.animateNumber('admin-stat-users', 0, students.length, 800);
             this.animateNumber('admin-stat-materials', 0, materials.length, 800);
+            this.animateNumber('admin-stat-recent', 0, studentsThisMonth, 800);
             
             // Populate Mini Lists
             this.renderRecentUsers(students.slice(0, 5));
             this.renderRecentMaterials(materials.slice(0, 5));
+            await this.renderRecentComments();
             
             this.renderCharts(students, materials);
         } catch (error) { console.error(error); }
@@ -152,6 +165,38 @@ export const Admin = {
                 </div>`;
         });
         container.innerHTML = html + '</div>';
+    },
+
+    async renderRecentComments() {
+        const container = document.getElementById('admin-recent-comments');
+        if (!container) return;
+
+        try {
+            const res = await API.getAllCommentsAdmin(5);
+            const comments = res.data || [];
+            if (comments.length === 0) {
+                container.innerHTML = '<p class="text-muted">Belum ada diskusi terbaru.</p>';
+                return;
+            }
+
+            let html = '<div class="admin-mini-list">';
+            comments.forEach(c => {
+                const author = c.full_name || c.username || 'Siswa';
+                const initial = (author && author[0] ? author[0] : '?').toUpperCase();
+                html += `
+                    <div class="admin-mini-item">
+                        <div class="admin-avatar">${UI.escapeHtml(initial)}</div>
+                        <div class="admin-mini-main">
+                            <strong>${UI.escapeHtml(author)}</strong>
+                            <span>${UI.escapeHtml(c.comment_text || '').slice(0, 80)}</span>
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML = html + '</div>';
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = '<p class="text-muted">Gagal memuat diskusi terbaru.</p>';
+        }
     },
 
     // --- MATERIALS ---
@@ -409,6 +454,7 @@ export const Admin = {
             const res = await API.getAllCommentsAdmin(50);
             const comments = res.data || [];
             const container = document.getElementById('admin-tab-diskusi');
+            if (!container) return;
             let html = '<div class="content-card"><h3>Moderasi Forum</h3><table class="admin-table"><thead><tr><th>Siswa</th><th>Komentar</th><th>Aksi</th></tr></thead><tbody>';
             if (comments.length === 0) html += '<tr><td colspan="3" class="text-center">Kosong.</td></tr>';
             else {
@@ -419,6 +465,87 @@ export const Admin = {
             }
             container.innerHTML = html + '</tbody></table></div>';
         } catch (error) { console.error(error); }
+    },
+
+    async loadReports() {
+        const container = document.getElementById('admin-tab-laporan');
+        if (!container) return;
+
+        container.innerHTML = '<div class="content-card"><div class="skeleton-box" style="height: 220px;"></div></div>';
+        try {
+            const res = await API.getAdminQuizReport();
+            const data = res.data || {};
+            const summary = data.summary || {};
+            const perQuiz = data.per_quiz || [];
+            const recent = data.recent_results || [];
+
+            let html = `
+                <div class="stats-grid mb-16">
+                    <div class="stat-card"><h3>Total Percobaan</h3><div class="value">${Number(summary.total_attempts || 0)}</div></div>
+                    <div class="stat-card"><h3>Rata-rata Nilai</h3><div class="value">${Math.round(Number(summary.avg_score || 0))}%</div></div>
+                    <div class="stat-card"><h3>Nilai Tertinggi</h3><div class="value">${Math.round(Number(summary.highest_score || 0))}%</div></div>
+                </div>
+                <div class="content-card">
+                    <h3>Performa per Kuis</h3>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>Kuis</th><th>Materi</th><th>Percobaan</th><th>Rata-rata</th><th>Lulus</th></tr></thead>
+                            <tbody>
+            `;
+
+            if (perQuiz.length === 0) {
+                html += '<tr><td colspan="5" class="text-center">Belum ada data kuis.</td></tr>';
+            } else {
+                perQuiz.forEach(row => {
+                    html += `
+                        <tr>
+                            <td>${UI.escapeHtml(row.quiz_title || '-')}</td>
+                            <td>${UI.escapeHtml(row.material_title || '-')}</td>
+                            <td>${Number(row.attempts || 0)}</td>
+                            <td>${Math.round(Number(row.avg_score || 0))}%</td>
+                            <td>${Number(row.passed_count || 0)}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <h3>Hasil Kuis Terbaru</h3>
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead><tr><th>Siswa</th><th>Kuis</th><th>Materi</th><th>Skor</th><th>Waktu</th></tr></thead>
+                            <tbody>
+            `;
+
+            if (recent.length === 0) {
+                html += '<tr><td colspan="5" class="text-center">Belum ada hasil kuis.</td></tr>';
+            } else {
+                recent.slice(0, 20).forEach(row => {
+                    const name = row.full_name || row.username || 'Siswa';
+                    const time = row.submitted_at ? new Date(row.submitted_at).toLocaleString('id-ID') : '-';
+                    html += `
+                        <tr>
+                            <td>${UI.escapeHtml(name)}</td>
+                            <td>${UI.escapeHtml(row.quiz_title || '-')}</td>
+                            <td>${UI.escapeHtml(row.material_title || '-')}</td>
+                            <td>${Math.round(Number(row.percentage || 0))}%</td>
+                            <td>${time}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            html += '</tbody></table></div></div>';
+            container.innerHTML = html;
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = '<div class="content-card"><p class="text-danger">Gagal memuat laporan kuis.</p></div>';
+        }
     },
 
     async handleDeleteComment(id) {
@@ -459,14 +586,33 @@ export const Admin = {
     animateNumber(id, start, end, duration) {
         const obj = document.getElementById(id);
         if (!obj) return;
+
+        if (this.rafHandles[id]) {
+            window.cancelAnimationFrame(this.rafHandles[id]);
+        }
         let startTimestamp = null;
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
             obj.innerHTML = Math.floor(progress * (end - start) + start);
-            if (progress < 1) window.requestAnimationFrame(step);
+            if (progress < 1) {
+                this.rafHandles[id] = window.requestAnimationFrame(step);
+            } else {
+                delete this.rafHandles[id];
+            }
         };
-        window.requestAnimationFrame(step);
+        this.rafHandles[id] = window.requestAnimationFrame(step);
+    },
+
+    destroyCharts() {
+        if (this.charts.registration) {
+            this.charts.registration.destroy();
+            this.charts.registration = null;
+        }
+        if (this.charts.category) {
+            this.charts.category.destroy();
+            this.charts.category = null;
+        }
     },
 
     renderCharts(students, materials) {
@@ -490,7 +636,7 @@ export const Admin = {
                         backgroundColor: 'rgba(31, 138, 112, 0.1)'
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { responsive: true, maintainAspectRatio: false, animation: false }
             });
         }
 
@@ -500,6 +646,9 @@ export const Admin = {
             if (this.charts.category) this.charts.category.destroy();
             const cats = {};
             materials.forEach(m => { cats[m.category || 'Umum'] = (cats[m.category || 'Umum'] || 0) + 1; });
+            if (Object.keys(cats).length === 0) {
+                cats['Belum ada materi'] = 1;
+            }
             this.charts.category = new Chart(ctxCat, {
                 type: 'doughnut',
                 data: {
@@ -509,7 +658,7 @@ export const Admin = {
                         backgroundColor: ['#1f8a70', '#2563a7', '#f59e0b', '#ef4444']
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { responsive: true, maintainAspectRatio: false, animation: false }
             });
         }
     }

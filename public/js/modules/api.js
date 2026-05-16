@@ -112,6 +112,7 @@ class APIService {
     login(username, password) { return this.post('/auth/login', { username, password }); }
     logout() { return this.post('/auth/logout', {}); }
     getCurrentUser() { return this.get('/auth/current-user'); }
+    getAllUsers() { return this.get('/auth/users'); }
     
     // --- Progress & Materials ---
     getDashboardData() { return this.get('/progress/dashboard'); }
@@ -119,6 +120,7 @@ class APIService {
     getProgressByCategories() { return this.get('/progress/categories'); }
     getLeaderboard() { return this.get('/progress/leaderboard'); }
     getQuizPerformance() { return this.get('/progress/quiz-performance'); }
+    trackProgress(materialId) { return this.post('/progress/track', { material_id: materialId }); }
     
     getMaterials(page = 1, limit = 10, category = null) {
         let endpoint = `/materials?page=${page}&limit=${limit}`;
@@ -126,12 +128,25 @@ class APIService {
         return this.get(endpoint);
     }
     getMaterialDetail(id) { return this.get(`/materials/detail?id=${id}`); }
+    getSubMaterialsAdmin(materialId) { return this.get(`/materials/sub?material_id=${materialId}`); }
+    deleteMaterial(materialId) { return this.post('/materials/delete', { material_id: materialId }); }
+    deleteSubMaterial(id) { return this.post('/materials/sub/delete', { id }); }
+    markMaterialCompleted(materialId) { return this.post('/materials/mark-completed', { material_id: materialId }); }
+    getComments(materialId) { return this.get(`/materials/comments?material_id=${materialId}`); }
+    addComment(payload) { return this.post('/materials/comments/add', payload); }
+    getAllCommentsAdmin(limit = 100) { return this.get(`/materials/comments/admin?limit=${limit}`); }
     
     // --- Quiz API ---
     getQuiz(materialId) { return this.get(`/quiz?material_id=${materialId}`); }
     getQuizQuestions(quizId) { return this.get(`/quiz/questions?quiz_id=${quizId}`); }
     submitQuiz(data) { return this.post('/quiz/submit', data); }
     getUserQuizResults() { return this.get('/quiz/results'); }
+    getAdminQuizReport() { return this.get('/quiz/admin-report'); }
+
+    // --- AI Chat API ---
+    getAIHistory(limit = 12) { return this.get(`/ai/history?limit=${limit}`); }
+    clearAIHistory() { return this.post('/ai/clear-history', {}); }
+    chatAI(history) { return this.post('/ai/chat', { history }); }
 }
 
 export const API = new APIService(Config.API_BASE_URL);

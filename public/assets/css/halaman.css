@@ -458,6 +458,62 @@
     gap: 10px;
 }
 
+.syllabus-dropdown {
+    position: relative;
+    min-width: min(420px, 100%);
+}
+
+.syllabus-dropdown-trigger {
+    width: 100%;
+    justify-content: space-between;
+    background: var(--surface);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+}
+
+.syllabus-dropdown-trigger:hover {
+    border-color: color-mix(in srgb, var(--primary) 26%, var(--border));
+}
+
+.syllabus-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: 8px;
+    display: none;
+    z-index: 30;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.syllabus-dropdown.show .syllabus-dropdown-menu {
+    display: block;
+}
+
+.syllabus-dropdown-item {
+    width: 100%;
+    justify-content: flex-start;
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid transparent;
+    box-shadow: none;
+    padding: 9px 10px;
+    min-height: 38px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+}
+
+.syllabus-dropdown-item:hover,
+.syllabus-dropdown-item.active {
+    background: var(--surface-hover);
+    border-color: var(--border);
+}
+
 .btn-back-material {
     background: var(--surface);
     color: var(--text-main);
@@ -473,6 +529,52 @@
     grid-template-columns: minmax(0, 290px) minmax(0, 1fr);
     gap: 16px;
     align-items: start;
+}
+
+.syllabus-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.syllabus-item {
+    width: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    box-shadow: none;
+    min-height: 42px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+}
+
+.syllabus-item:hover {
+    background: var(--surface-hover);
+    border-color: color-mix(in srgb, var(--primary) 26%, var(--border));
+}
+
+.syllabus-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 26%, var(--border));
+}
+
+.syllabus-index {
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--text-main);
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
 }
 
 #material-detail {

@@ -1,0 +1,271 @@
+/**
+ * Belajaryuk - Material Detail Module
+ */
+
+import { API } from './api.js';
+import { UI } from './ui.js';
+
+export const MaterialDetail = {
+    state: {
+        material: null,
+        subMaterials: [],
+        activeItemId: 'main',
+        quiz: null
+    },
+    dropdownBound: false,
+
+    async load() {
+        const detailContainer = document.getElementById('material-detail');
+        const syllabusContainer = document.getElementById('course-syllabus');
+        if (!detailContainer || !syllabusContainer) return;
+
+        const materialId = localStorage.getItem('active_material_id');
+        if (!materialId) {
+            detailContainer.innerHTML = '<div class="empty-state"><h3>Materi belum dipilih</h3><p>Silakan kembali ke daftar materi lalu pilih modul terlebih dahulu.</p></div>';
+            syllabusContainer.innerHTML = '<p class="text-muted">Daftar episode belum tersedia.</p>';
+            return;
+        }
+
+        detailContainer.innerHTML = '<div class="skeleton-box" style="height: 260px;"></div>';
+        syllabusContainer.innerHTML = '<div class="skeleton-box" style="height: 220px;"></div>';
+
+        try {
+            const [detailRes, quizRes] = await Promise.all([
+                API.getMaterialDetail(materialId),
+                API.getQuiz(materialId).catch(() => ({ data: null }))
+            ]);
+
+            const payload = detailRes.data || {};
+            const material = payload.material || {};
+            this.state.material = material;
+            this.state.subMaterials = Array.isArray(material.sub_materials) ? material.sub_materials : [];
+            this.state.activeItemId = 'main';
+            this.state.quiz = quizRes.data || null;
+
+            this.renderSyllabus();
+            this.renderContent();
+            this.bindDropdown();
+
+            API.trackProgress(materialId).catch(() => {});
+        } catch (error) {
+            console.error('Material detail load error:', error);
+            detailContainer.innerHTML = '<p class="text-danger">Gagal memuat detail materi.</p>';
+            syllabusContainer.innerHTML = '<p class="text-muted">Tidak dapat memuat episode.</p>';
+        }
+    },
+
+    renderSyllabus() {
+        const container = document.getElementById('course-syllabus');
+        const dropdownMenu = document.getElementById('syllabus-dropdown-items');
+        const currentLabel = document.getElementById('current-episode-title');
+        if (!container || !dropdownMenu || !currentLabel || !this.state.material) return;
+
+        const items = [{ id: 'main', title: this.state.material.title || 'Materi Utama' }]
+            .concat(this.state.subMaterials.map((s, idx) => ({
+                id: String(s.id),
+                title: s.title || `Episode ${idx + 1}`
+            })));
+
+        const activeTitle = items.find(i => i.id === this.state.activeItemId)?.title || items[0].title;
+        currentLabel.textContent = activeTitle;
+
+        container.innerHTML = `
+            <h3 class="mb-16">Daftar Episode</h3>
+            <div class="syllabus-list">
+                ${items.map((item, idx) => `
+                    <button type="button" class="syllabus-item ${this.state.activeItemId === item.id ? 'active' : ''}" data-syllabus-id="${item.id}">
+                        <span class="syllabus-index">${idx + 1}</span>
+                        <span>${UI.escapeHtml(item.title)}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+
+        dropdownMenu.innerHTML = items.map(item => `
+            <button type="button" class="syllabus-dropdown-item ${this.state.activeItemId === item.id ? 'active' : ''}" data-syllabus-id="${item.id}">
+                ${UI.escapeHtml(item.title)}
+            </button>
+        `).join('');
+
+        container.querySelectorAll('[data-syllabus-id]').forEach(btn => {
+            btn.addEventListener('click', () => this.selectItem(btn.getAttribute('data-syllabus-id')));
+        });
+        dropdownMenu.querySelectorAll('[data-syllabus-id]').forEach(btn => {
+            btn.addEventListener('click', () => this.selectItem(btn.getAttribute('data-syllabus-id')));
+        });
+    },
+
+    bindDropdown() {
+        const wrapper = document.getElementById('syllabusDropdown');
+        const trigger = document.getElementById('syllabusDropdownTrigger');
+        if (!wrapper || !trigger) return;
+
+        trigger.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            wrapper.classList.toggle('show');
+        };
+
+        if (!this.dropdownBound) {
+            document.addEventListener('click', (e) => {
+                const currentWrapper = document.getElementById('syllabusDropdown');
+                if (!currentWrapper) return;
+                if (!currentWrapper.contains(e.target)) {
+                    currentWrapper.classList.remove('show');
+                }
+            });
+            this.dropdownBound = true;
+        }
+    },
+
+    selectItem(itemId) {
+        this.state.activeItemId = itemId;
+        this.renderSyllabus();
+        this.renderContent();
+        document.getElementById('syllabusDropdown')?.classList.remove('show');
+    },
+
+    getActiveItem() {
+        if (this.state.activeItemId === 'main') {
+            return {
+                title: this.state.material.title || 'Materi',
+                content: this.state.material.content || '',
+                video_url: this.state.material.video_url || '',
+                document_url: '',
+                isMain: true
+            };
+        }
+        const selected = this.state.subMaterials.find(s => String(s.id) === String(this.state.activeItemId));
+        return selected || {
+            title: this.state.material.title || 'Materi',
+            content: this.state.material.content || '',
+            video_url: this.state.material.video_url || '',
+            document_url: '',
+            isMain: true
+        };
+    },
+
+    toEmbedUrl(url) {
+        if (!url) return '';
+        if (url.includes('youtube.com/watch?v=')) {
+            const id = url.split('v=')[1]?.split('&')[0];
+            return id ? `https://www.youtube.com/embed/${id}` : url;
+        }
+        if (url.includes('youtu.be/')) {
+            const id = url.split('youtu.be/')[1]?.split('?')[0];
+            return id ? `https://www.youtube.com/embed/${id}` : url;
+        }
+        return url;
+    },
+
+    async renderComments(materialId) {
+        try {
+            const commentsRes = await API.getComments(materialId);
+            const comments = commentsRes.data || [];
+            const listHtml = comments.length === 0
+                ? '<p class="text-muted">Belum ada diskusi untuk materi ini.</p>'
+                : comments.map(c => `
+                    <div class="quiz-history-card">
+                        <div>
+                            <h4 class="quiz-history-title">${UI.escapeHtml(c.full_name || c.username || 'Siswa')}</h4>
+                            <p class="mb-0">${UI.escapeHtml(c.comment_text || '')}</p>
+                        </div>
+                        <span class="qhc-date">${c.created_at ? new Date(c.created_at).toLocaleString('id-ID') : '-'}</span>
+                    </div>
+                `).join('');
+
+            return `
+                <div class="content-card discussion-card">
+                    <h3 class="discussion-title"><i data-lucide="messages-square"></i> Diskusi Materi</h3>
+                    <form id="material-comment-form" class="comment-form">
+                        <textarea id="material-comment-text" class="comment-textarea" placeholder="Tulis pertanyaan atau insight kamu..." required></textarea>
+                        <button type="submit" class="btn-send"><i data-lucide="send"></i></button>
+                    </form>
+                    <div class="comments-list">${listHtml}</div>
+                </div>
+            `;
+        } catch (error) {
+            console.error(error);
+            return '<div class="content-card discussion-card"><p class="text-muted">Diskusi belum tersedia.</p></div>';
+        }
+    },
+
+    async renderContent() {
+        const container = document.getElementById('material-detail');
+        if (!container || !this.state.material) return;
+
+        const active = this.getActiveItem();
+        const materialId = this.state.material.id;
+        const embedVideo = this.toEmbedUrl(active.video_url || '');
+        const hasQuiz = this.state.quiz && this.state.quiz.id;
+        const commentsBlock = await this.renderComments(materialId);
+
+        let mediaHtml = '';
+        if (embedVideo) {
+            mediaHtml += `
+                <div class="pdf-container mb-16">
+                    <div class="pdf-header"><span class="pdf-title"><i data-lucide="video"></i> Video Pembelajaran</span></div>
+                    <iframe class="pdf-iframe" src="${UI.escapeHtml(embedVideo)}" title="Video materi" allowfullscreen loading="lazy"></iframe>
+                </div>
+            `;
+        }
+        if (active.document_url) {
+            mediaHtml += `
+                <div class="pdf-container mb-16">
+                    <div class="pdf-header"><span class="pdf-title"><i data-lucide="file-text"></i> Dokumen PDF</span></div>
+                    <iframe class="pdf-iframe" src="/public/uploads/documents/${UI.escapeHtml(active.document_url)}" title="Dokumen materi" loading="lazy"></iframe>
+                </div>
+            `;
+        }
+
+        container.innerHTML = `
+            <article class="content-card">
+                <div class="header-section mb-16">
+                    <h1>${UI.escapeHtml(active.title || 'Materi')}</h1>
+                    <p>${UI.escapeHtml(this.state.material.description || '')}</p>
+                </div>
+                <div class="action-buttons">
+                    <button type="button" id="mark-complete-btn"><i data-lucide="check-circle-2"></i> Tandai Selesai</button>
+                    ${hasQuiz ? '<button type="button" class="btn-outline" disabled><i data-lucide="clipboard-check"></i> Kuis tersedia</button>' : ''}
+                </div>
+                ${mediaHtml}
+                <div class="content-card mt-16">
+                    ${active.content || '<p class="text-muted">Konten materi belum tersedia.</p>'}
+                </div>
+            </article>
+            ${commentsBlock}
+        `;
+
+        const markBtn = document.getElementById('mark-complete-btn');
+        if (markBtn) {
+            markBtn.onclick = async () => {
+                try {
+                    await API.markMaterialCompleted(materialId);
+                    UI.showNotification('Materi ditandai selesai.', 'success');
+                } catch (error) {
+                    UI.showNotification(error.message || 'Gagal menandai materi.', 'error');
+                }
+            };
+        }
+
+        const commentForm = document.getElementById('material-comment-form');
+        if (commentForm) {
+            commentForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const textEl = document.getElementById('material-comment-text');
+                const text = textEl?.value.trim();
+                if (!text) return;
+                try {
+                    await API.addComment({ material_id: materialId, comment_text: text });
+                    if (textEl) textEl.value = '';
+                    await this.renderContent();
+                    UI.showNotification('Komentar berhasil dikirim.', 'success');
+                } catch (error) {
+                    UI.showNotification(error.message || 'Gagal mengirim komentar.', 'error');
+                }
+            };
+        }
+
+        if (window.lucide) window.lucide.createIcons();
+    }
+};

@@ -12,6 +12,7 @@ import { Admin } from './modules/admin.js';
 import { Profile } from './modules/profile.js';
 import { Progress } from './modules/progress.js';
 import { AIChat } from './modules/chat.js';
+import { MaterialDetail } from './modules/materialDetail.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Belajaryuk Bootstrapping...');
@@ -45,6 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (pageId === 'materials-page') {
             Materials.load();
         }
+        if (pageId === 'material-detail-page') {
+            MaterialDetail.load();
+        }
         if (pageId === 'profile-page') {
             Profile.load();
         }
@@ -67,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Global Logout Buttons
         document.querySelectorAll('[data-action="logout"]').forEach(btn => {
-            btn.addEventListener('click', () => Auth.handleLogout());
+            btn.onclick = () => Auth.handleLogout();
         });
     });
 
@@ -86,4 +90,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 400);
     }
 });
-

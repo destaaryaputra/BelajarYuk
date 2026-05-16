@@ -69,12 +69,14 @@ export const Progress = {
 
         let html = '<div class="category-progress-list">';
         categories.forEach(cat => {
-            const percentage = Math.round((cat.completed / cat.total) * 100);
+            const total = Number(cat.total || 0);
+            const completed = Number(cat.completed || 0);
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             html += `
                 <div class="category-progress-item mb-16">
                     <div class="d-flex justify-between mb-8">
                         <strong>${UI.escapeHtml(cat.category)}</strong>
-                        <span>${cat.completed}/${cat.total} (${percentage}%)</span>
+                        <span>${completed}/${total} (${percentage}%)</span>
                     </div>
                     <div class="progress-bar-bg">
                         <div class="progress-bar-fill" style="width: ${percentage}%"></div>
@@ -136,8 +138,13 @@ export const Progress = {
 
         let html = '<div class="quiz-history-grid">';
         results.forEach(res => {
-            const date = new Date(res.completed_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-            const isPassed = res.score >= (res.passing_score || 60);
+            const attemptedAt = res.completed_at || res.submitted_at;
+            const title = res.quiz_title || res.title || 'Kuis';
+            const scoreValue = Number(res.percentage ?? res.score ?? 0);
+            const date = attemptedAt
+                ? new Date(attemptedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+                : '-';
+            const isPassed = scoreValue >= Number(res.passing_score || 60);
             
             html += `
                 <div class="quiz-history-card">
@@ -145,8 +152,8 @@ export const Progress = {
                         <span class="badge ${isPassed ? 'badge-success' : 'badge-danger'}">${isPassed ? 'Lulus' : 'Gagal'}</span>
                         <span class="qhc-date">${date}</span>
                     </div>
-                    <h4>${UI.escapeHtml(res.quiz_title)}</h4>
-                    <div class="qhc-score">${Math.round(res.score)}%</div>
+                    <h4>${UI.escapeHtml(title)}</h4>
+                    <div class="qhc-score">${Math.round(scoreValue)}%</div>
                 </div>
             `;
         });
