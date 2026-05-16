@@ -68,44 +68,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// 5. Unified Router (Langsung di sini agar tidak ada require gagal)
+// 5. Unified Router (Vercel & XAMPP Friendly)
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Deteksi base path secara otomatis
-$script_name = $_SERVER['SCRIPT_NAME']; // e.g. /api/index.php atau /belajaryuk/api/index.php
-$base_dir = dirname($script_name);
+// Deteksi apakah ini request API
+// Di Vercel, /api/login biasanya masuk ke sini dengan $uri = /api/login atau di-rewrite
+$isApiRequest = (strpos($uri, '/api') === 0);
 
-// Bersihkan uri dari base_dir
-if (strpos($uri, $base_dir) === 0) {
-    $uri = substr($uri, strlen($base_dir));
-}
-
-// Tambahan fallback jika masih ada /api di depan
-if (strpos($uri, '/api') === 0) {
-    $uri = substr($uri, 4);
-}
-
-// Clean up path
-if (empty($uri) || $uri === '/') $uri = '/';
-else $uri = rtrim($uri, '/');
-
-// DEBUG: Log URI yang diterima (Hanya muncul jika gagal)
-$debug_info = [
-    'requested_uri' => $_SERVER['REQUEST_URI'],
-    'cleaned_uri' => $uri,
-    'method' => $method,
-    'base_dir' => $base_dir
-];
-
-// Jika request adalah API (Bisa dideteksi dari URI atau REQUEST_URI)
-if (strpos($_SERVER['REQUEST_URI'], '/api') !== false || $base_dir !== '') {
+if ($isApiRequest) {
     $routes = require __DIR__ . '/routes.php';
-    $found = false;
+    
+    // Bersihkan URI untuk pencocokan route
+    // /api/auth/login -> /auth/login
+    $cleanUri = str_replace('/api', '', $uri);
+    if (empty($cleanUri)) $cleanUri = '/';
+    $cleanUri = rtrim($cleanUri, '/') ?: '/';
 
+    $found = false;
     foreach ($routes as $route => $handler) {
         list($rMethod, $rPath) = explode(' ', $route);
-        if ($method === $rMethod && $uri === rtrim($rPath, '/')) {
+        if ($method === $rMethod && $cleanUri === rtrim($rPath, '/')) {
             $found = true;
             $controllerClass = $handler[0];
             $action = $handler[1];
@@ -115,7 +98,7 @@ if (strpos($_SERVER['REQUEST_URI'], '/api') !== false || $base_dir !== '') {
                 $instance->$action();
             } else {
                 header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'message' => "Class {$controllerClass} tidak ditemukan di server."]);
+                echo json_encode(['success' => false, 'message' => "Class {$controllerClass} tidak ditemukan."]);
             }
             break;
         }
@@ -123,19 +106,25 @@ if (strpos($_SERVER['REQUEST_URI'], '/api') !== false || $base_dir !== '') {
 
     if (!$found) {
         http_response_code(404);
+        header('Content-Type: application/json');
         echo json_encode([
             'success' => false, 
             'message' => 'Route API tidak terdaftar.',
-            'debug' => $debug_info
+            'debug' => [
+                'uri' => $uri,
+                'clean' => $cleanUri,
+                'method' => $method
+            ]
         ]);
     }
     exit;
 }
 
-// 6. Jalankan Frontend
+// 6. Jalankan Frontend (SPA Fallback)
+// Jika bukan API, maka tampilkan halaman utama
 $frontend = $root . '/public/index.php';
 if (file_exists($frontend)) {
     require $frontend;
 } else {
-    echo "<h1>Belajaryuk Ready</h1><p>Versi 1.0.Final</p>";
+    echo "<h1>Belajaryuk Ready</h1><p>Versi 1.1.Vercel</p>";
 }
