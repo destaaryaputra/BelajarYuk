@@ -36,23 +36,28 @@ if (session_status() === PHP_SESSION_NONE) {
 
 use App\Utils\Response;
 
-// Parse URL properly
+// Parse URL properly - Support subfolder installation (XAMPP/Vercel)
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request_method = $_SERVER['REQUEST_METHOD'];
 
-// Remove base path and /api to get the actual route
-$base_path = getenv('APP_BASE_PATH') ?: '';
-if (!empty($base_path)) {
-    $request_uri = str_replace($base_path, '', $request_uri);
+// Deteksi base path secara otomatis
+$script_name = $_SERVER['SCRIPT_NAME']; // e.g. /belajaryuk/api/router.php
+$base_dir = dirname($script_name);     // e.g. /belajaryuk/api
+
+// Bersihkan request_uri dari base_dir
+if (strpos($request_uri, $base_dir) === 0) {
+    $request_uri = substr($request_uri, strlen($base_dir));
 }
-$request_uri = str_replace('/api', '', $request_uri);
+
+// Tambahan fallback jika masih ada /api di depan (untuk Vercel/Production)
+if (strpos($request_uri, '/api') === 0) {
+    $request_uri = substr($request_uri, 4);
+}
 
 // Clean up path
 if (empty($request_uri) || $request_uri === '/') {
     $request_uri = '/';
 } else {
-    // Remove query string and extra slashes
-    $request_uri = strtok($request_uri, '?');
     $request_uri = rtrim($request_uri, '/') ?: '/';
 }
 

@@ -5,8 +5,18 @@
 
 window.App = window.App || {};
 
+// Auto-detect API Base URL based on current location
+// If in /belajaryuk/, API should be /belajaryuk/api
+const getApiBaseUrl = () => {
+    let path = window.location.pathname;
+    // Remove index.php or other common entry points from path
+    path = path.replace(/\/(index|api)\.(php|html?)$/i, '');
+    const base = path.split('/api')[0].replace(/\/$/, '');
+    return (base === '' ? '' : base) + '/api';
+};
+
 App.Config = {
-    API_BASE_URL: '/api',
+    API_BASE_URL: getApiBaseUrl(),
     STORAGE_KEYS: {
         AUTH_TOKEN: 'belajaryuk_auth_token',
         USER_DATA: 'belajaryuk_user_data',

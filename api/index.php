@@ -70,14 +70,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // 5. Unified Router (Langsung di sini agar tidak ada require gagal)
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = str_replace('/api', '', $uri); // Bersihkan /api
+$method = $_SERVER['REQUEST_METHOD'];
+
+// Deteksi base path secara otomatis
+$script_name = $_SERVER['SCRIPT_NAME']; // e.g. /api/index.php atau /belajaryuk/api/index.php
+$base_dir = dirname($script_name);
+
+// Bersihkan uri dari base_dir
+if (strpos($uri, $base_dir) === 0) {
+    $uri = substr($uri, strlen($base_dir));
+}
+
+// Tambahan fallback jika masih ada /api di depan
+if (strpos($uri, '/api') === 0) {
+    $uri = substr($uri, 4);
+}
+
+// Clean up path
 if (empty($uri) || $uri === '/') $uri = '/';
 else $uri = rtrim($uri, '/');
 
-// Jika request adalah API
-if (strpos($_SERVER['REQUEST_URI'], '/api') !== false) {
+// Jika request adalah API (Bisa dideteksi dari URI atau REQUEST_URI)
+if (strpos($_SERVER['REQUEST_URI'], '/api') !== false || $base_dir !== '') {
     $routes = require __DIR__ . '/routes.php';
-    $method = $_SERVER['REQUEST_METHOD'];
     $found = false;
 
     foreach ($routes as $route => $handler) {
