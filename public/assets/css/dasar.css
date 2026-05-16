@@ -49,7 +49,7 @@
     --shadow-xl: 0 30px 56px -24px rgba(15, 23, 42, 0.35);
 }
 
-/* --- Essential Structural Bridge (DO NOT REMOVE) --- */
+/* --- Essential Structural Bridge --- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: var(--font-sans);
@@ -57,17 +57,33 @@ body {
     color: var(--text-main);
     line-height: 1.65;
     font-size: 16px;
+    min-height: 100vh;
 }
 
-#app { width: 100%; position: relative; }
-.app-container { min-height: 100vh; display: flex; flex-direction: column; width: 100%; }
+#app { width: 100%; position: relative; min-height: 100vh; }
+.app-container { 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    width: 100%;
+}
 
-.page { display: none; width: 100%; }
-.page.active { display: block; }
+/* Page Management */
+.page { 
+    display: none; 
+    width: 100%;
+    animation: fadeIn 0.3s ease-out;
+}
+.page.active { 
+    display: block; 
+}
 
-body.admin-mode .app-container { flex-direction: row; }
-body.admin-mode .page.active { display: flex; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
+/* Global Content Constraint */
 :where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div, .page:not(#admin-page):not(#landing-page) > form) {
     max-width: var(--container-width);
     margin: 0 auto;
@@ -78,11 +94,12 @@ body.admin-mode .page.active { display: flex; }
 /* --- Base Component Styles (Original Look) --- */
 .content-card {
     background: var(--surface);
-    padding: 22px;
+    padding: 32px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border);
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    width: 100%;
 }
 
 button, .btn-p {
@@ -92,24 +109,44 @@ button, .btn-p {
     background: var(--primary);
     color: #ffffff;
     border: none;
-    padding: 11px 26px; border-radius: var(--radius-md);
+    padding: 11px 32px; border-radius: var(--radius-md);
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
+    font-size: 1rem;
 }
-button:hover, .btn-p:hover { background: var(--primary-hover); transform: translateY(-1px); }
+button:hover, .btn-p:hover { 
+    background: var(--primary-hover); 
+    transform: translateY(-2px); 
+    box-shadow: var(--shadow-glow);
+}
+button:active, .btn-p:active { transform: translateY(0); }
 
-h1, h2, h3 { font-family: var(--font-display); font-weight: 800; color: var(--text-main); margin-bottom: 1.2rem; line-height: 1.15; }
+button.btn-outline {
+    background: transparent; border: 2px solid var(--border-strong);
+    color: var(--text-main);
+}
+
+/* --- Typography --- */
+h1, h2, h3 { font-family: var(--font-display); font-weight: 800; color: var(--text-main); margin-bottom: 1.5rem; line-height: 1.15; }
 h1 { font-size: 2.8rem; }
 h2 { font-size: 2.1rem; }
 h3 { font-size: 1.5rem; }
-p { color: var(--text-muted); margin-bottom: 1rem; font-size: 1rem; line-height: 1.7; }
+p { color: var(--text-muted); margin-bottom: 1.2rem; font-size: 1.05rem; line-height: 1.7; }
 
+/* --- Global Utilities --- */
 .d-none { display: none !important; }
-.mb-16 { margin-bottom: 16px; }
-.mt-24 { margin-top: 24px; }
-.d-flex { display: flex; }
-.gap-12 { gap: 12px; }
-.justify-between { justify-content: space-between; }
-.align-center { align-items: center; }
+.d-flex { display: flex !important; }
+.flex-column { flex-direction: column !important; }
+.align-center { align-items: center !important; }
+.justify-between { justify-content: space-between !important; }
+.gap-8 { gap: 8px !important; }
+.gap-12 { gap: 12px !important; }
+.gap-16 { gap: 16px !important; }
+.mb-16 { margin-bottom: 16px !important; }
+.mb-32 { margin-bottom: 32px !important; }
+.mt-24 { margin-top: 24px !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+.w-full { width: 100% !important; }

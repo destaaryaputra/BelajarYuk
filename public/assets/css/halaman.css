@@ -1,12 +1,6 @@
 /** 
- * Belajaryuk - Student Area (Original Design Restore)
+ * Belajaryuk - Student Area Styles
  */
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
 
 .stat-card {
     background: white;
@@ -69,6 +63,18 @@
     margin-bottom: 12px;
 }
 
-@media (max-width: 768px) {
-    .stats-grid { grid-template-columns: 1fr; }
+/* Specific Page Overrides */
+.category-progress-list {
+    padding: 10px 0;
+}
+.progress-bar-bg {
+    background: var(--surface-muted);
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    background: var(--primary);
+    height: 100%;
+    transition: width 0.5s;
 }
