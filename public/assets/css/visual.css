@@ -334,3 +334,36 @@
 }
 .css-art-calendar::before { left: 4px; }
 .css-art-calendar::after { right: 4px; }
+
+/* --- Refactor: Replacement for inline styles --- */
+.p-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.play-icon-large {
+    width: 64px;
+    height: 64px;
+    color: white;
+}
+
+.mb-16 { margin-bottom: 16px; }
+.d-flex { display: flex; }
+.gap-12 { gap: 12px; }
+.justify-between { justify-content: space-between; }
+.align-center { align-items: center; }
+
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 18px; height: 18px; }
+.mt-24 { margin-top: 24px; }
+
+.ai-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}

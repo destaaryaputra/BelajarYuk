@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// 5. Unified Router (Vercel & XAMPP Friendly)
+// 6. Unified Router (Vercel & XAMPP Friendly)
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -120,7 +120,7 @@ if ($isApiRequest) {
     exit;
 }
 
-// 6. Jalankan Frontend (SPA Fallback)
+// 7. Jalankan Frontend (SPA Fallback)
 // Jika bukan API, maka tampilkan halaman utama
 $frontend = $root . '/public/index.php';
 if (file_exists($frontend)) {

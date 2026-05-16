@@ -6,7 +6,7 @@ function switchAdminTab(tabId) {
         const btn = document.getElementById(`btn-tab-${t}`);
         const view = document.getElementById(`admin-tab-${t}`);
         if (btn) btn.classList.remove('active');
-        if (view) view.style.display = 'none';
+        if (view) view.classList.add('d-none');
     });
     
     const activeBtn = document.getElementById(`btn-tab-${tabId}`);
@@ -19,7 +19,7 @@ function switchAdminTab(tabId) {
         activeView.className = 'admin-tab-content';
         document.querySelector('.admin-content').appendChild(activeView);
     }
-    activeView.style.display = 'block';
+    activeView.classList.remove('d-none');
     
     const titles = {
         'dashboard': 'Ringkasan & Analitik',
@@ -34,10 +34,16 @@ function switchAdminTab(tabId) {
     if (tabId === 'dashboard') {
         loadAdminDashboard();
     } else if (tabId === 'materi') {
-        if (document.getElementById('admin-list-view')) document.getElementById('admin-list-view').style.display = 'block';
-        if (document.getElementById('admin-form-view')) document.getElementById('admin-form-view').style.display = 'none';
-        if (document.getElementById('admin-submaterial-view')) document.getElementById('admin-submaterial-view').style.display = 'none';
-        if (document.getElementById('admin-quiz-view')) document.getElementById('admin-quiz-view').style.display = 'none';
+        const listView = document.getElementById('admin-list-view');
+        const formView = document.getElementById('admin-form-view');
+        const subView = document.getElementById('admin-submaterial-view');
+        const quizView = document.getElementById('admin-quiz-view');
+
+        if (listView) listView.classList.remove('d-none');
+        if (formView) formView.classList.add('d-none');
+        if (subView) subView.classList.add('d-none');
+        if (quizView) quizView.classList.add('d-none');
+        
         loadAdminMaterials();
     } else if (tabId === 'pengguna') {
         loadAdminUsers();
@@ -49,9 +55,9 @@ function switchAdminTab(tabId) {
         loadAdminSettings();
     } else {
         activeView.innerHTML = `
-            <div class="empty-state bg-white" style="margin-top: 24px; padding: 64px 20px; border-radius: var(--radius-xl);">
+            <div class="empty-state bg-white mt-24" style="padding: 64px 20px; border-radius: var(--radius-xl);">
                 <div class="css-art-empty-box" style="transform: scale(1.5); margin-bottom: 30px;"></div>
-                <h3 style="margin-top: 16px;">Tab Tidak Dikenal</h3>
+                <h3 class="mt-24">Tab Tidak Dikenal</h3>
                 <p>Panel ini tidak terdaftar dalam konfigurasi admin.</p>
             </div>
         `;
