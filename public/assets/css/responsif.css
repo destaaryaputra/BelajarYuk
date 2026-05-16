@@ -29,8 +29,8 @@
 
     /* Container Page Constraints */
     :where(.page:not(#admin-page) > div, .page:not(#admin-page) > form, .page:not(#admin-page) > main) {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
+        padding-left: var(--container-padding);
+        padding-right: var(--container-padding);
         max-width: 100%;
         overflow-x: hidden;
     }
