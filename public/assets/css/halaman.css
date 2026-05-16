@@ -478,17 +478,18 @@
 .learning-detail-layout {
     display: grid;
     grid-template-columns: 1fr 320px;
+    grid-template-areas: "video syllabus";
     gap: 24px;
     align-items: start;
 }
 
 #material-detail {
-    grid-column: 1; /* Video WAJIB di kiri */
+    grid-area: video;
     min-height: 400px;
 }
 
 #course-syllabus {
-    grid-column: 2; /* Daftar Episode WAJIB di kanan */
+    grid-area: syllabus;
     position: sticky;
     top: 90px;
     max-height: calc(100vh - 120px);
