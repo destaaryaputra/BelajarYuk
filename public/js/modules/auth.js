@@ -95,3 +95,9 @@ export const Auth = {
         return !!localStorage.getItem(Config.STORAGE_KEYS.AUTH_TOKEN);
     }
 };
+
+// Global Exposure
+window.Auth = Auth;
+window.handleLogin = (e) => Auth.handleLogin(e);
+window.handleRegister = (e) => Auth.handleRegister(e);
+window.handleLogout = () => Auth.handleLogout();

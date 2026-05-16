@@ -148,12 +148,20 @@ class Security {
      * Verify CSRF token
      */
     public static function verifyCSRFToken(string $token): bool {
-        // Jika di Vercel/Production, kita berikan toleransi jika session baru saja di-start
-        if (!isset($_SESSION['csrf_token'])) {
-            error_log("CSRF Debug: No session token found during verification.");
-            return false;
+        $sessionToken = $_SESSION['csrf_token'] ?? null;
+        $cookieToken = $_COOKIE['csrf_token'] ?? null;
+        
+        // Match against session if available, otherwise fallback to cookie (Double Submit)
+        if ($sessionToken && hash_equals($sessionToken, $token)) {
+            return true;
         }
-        return hash_equals($_SESSION['csrf_token'], $token);
+        
+        if ($cookieToken && hash_equals($cookieToken, $token)) {
+            return true;
+        }
+
+        error_log("CSRF Failure: Provided token doesn't match session ($sessionToken) or cookie ($cookieToken)");
+        return false;
     }
 
     /**

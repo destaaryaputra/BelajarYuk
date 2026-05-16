@@ -56,6 +56,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Sync CSRF Cookie with Session
+if (isset($_SESSION['csrf_token'])) {
+    if (!isset($_COOKIE['csrf_token']) || $_COOKIE['csrf_token'] !== $_SESSION['csrf_token']) {
+        setcookie('csrf_token', $_SESSION['csrf_token'], [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => false,
+            'samesite' => 'Lax'
+        ]);
+    }
+}
+
 // 5. Pengaturan CORS & Security
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
 header('Access-Control-Allow-Origin: ' . $origin);
