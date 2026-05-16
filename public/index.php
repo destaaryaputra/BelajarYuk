@@ -425,9 +425,12 @@ if (empty($_SESSION['csrf_token'])) {
                             <i data-lucide="settings"></i> Pengaturan
                         </button>
                     </div>
-                    <button type="button" class="btn-outline" style="margin: 16px;" data-action="logout">
-                        <i data-lucide="log-out"></i> Keluar
-                    </button>
+                    <div class="admin-sidebar-footer">
+                        <button type="button" class="btn-logout-admin" data-action="logout">
+                            <i data-lucide="log-out"></i> 
+                            <span>Keluar Panel</span>
+                        </button>
+                    </div>
                 </aside>
 
                 <main class="admin-main">
