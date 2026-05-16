@@ -480,7 +480,7 @@
 .badge-video { background: var(--danger-soft); color: var(--danger); }
 .badge-pdf { background: var(--info-soft); color: var(--info); }
 
-.btn-small { min-height: var(--control-height-sm); padding: 6px 12px; font-size: 0.8rem; }
+.btn-small { min-height: var(--control-height-sm); padding: 8px 12px; font-size: 0.8rem; }
 .btn-outline-warning { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 35%, var(--surface)); background: var(--surface); }
 .btn-outline-warning:hover { background: var(--warning-soft); border-color: color-mix(in srgb, var(--warning) 55%, var(--surface)); }
 .btn-outline-info { color: var(--info); border-color: color-mix(in srgb, var(--info) 35%, var(--surface)); background: var(--surface); }

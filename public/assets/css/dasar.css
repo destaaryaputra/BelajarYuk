@@ -41,6 +41,7 @@
     --container-width: 1160px;
     --container-padding: clamp(1.25rem, 3.5vw, 2.5rem); /* Dynamic responsive margin */
     --control-height: 46px;
+    --control-height-sm: 36px;
     
     --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.08);
     --shadow-md: 0 10px 26px -12px rgba(15, 23, 42, 0.18);
@@ -106,26 +107,73 @@ button, .btn-p {
     display: inline-flex; align-items: center; justify-content: center;
     gap: 10px;
     min-height: var(--control-height);
-    background: var(--primary);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 96%, white 4%), var(--primary));
     color: #ffffff;
-    border: none;
-    padding: 11px 32px; border-radius: var(--radius-md);
+    border: 1px solid color-mix(in srgb, var(--primary) 75%, #0b3d31 25%);
+    padding: 11px 24px; border-radius: var(--radius-md);
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    box-shadow: 0 8px 18px -12px color-mix(in srgb, var(--primary) 60%, transparent);
+}
+button svg,
+button i,
+.btn-p svg,
+.btn-p i {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.2px;
+    flex-shrink: 0;
+    display: inline-block;
 }
 button:hover, .btn-p:hover { 
     background: var(--primary-hover); 
     transform: translateY(-2px); 
-    box-shadow: var(--shadow-glow);
+    box-shadow: 0 14px 24px -16px color-mix(in srgb, var(--primary) 72%, transparent), var(--shadow-glow);
 }
 button:active, .btn-p:active { transform: translateY(0); }
+button:focus-visible, .btn-p:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-light) 78%, transparent), 0 0 0 5px color-mix(in srgb, var(--primary) 32%, transparent);
+}
+button:disabled, .btn-p:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
 
 button.btn-outline {
-    background: transparent; border: 2px solid var(--border-strong);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
     color: var(--text-main);
+    box-shadow: none;
+}
+button.btn-outline:hover {
+    background: var(--surface-hover);
+    border-color: color-mix(in srgb, var(--primary) 28%, var(--border));
+    color: var(--text-main);
+    box-shadow: 0 10px 20px -16px rgba(15, 23, 42, 0.42);
+}
+
+.btn-small {
+    min-height: var(--control-height-sm);
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+}
+
+.btn-icon {
+    width: 17px;
+    height: 17px;
+    transition: transform 0.2s ease;
+}
+button:hover .btn-icon,
+.btn-p:hover .btn-icon {
+    transform: translateX(2px);
 }
 
 /* --- Typography --- */
