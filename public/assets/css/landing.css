@@ -79,41 +79,36 @@
     height: 82px;
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.86);
-    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.95); /* More opaque for text contrast */
+    backdrop-filter: blur(16px);
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
 }
 
-.header-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.nav-brand-logo span {
+    color: var(--text-main);
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
 }
 
 .btn-ghost {
     background: transparent;
-    color: var(--lp-text);
+    color: var(--text-muted);
     padding: 10px 20px;
     border-radius: 12px;
-    font-weight: 700;
+    font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .btn-ghost:hover {
-    background: var(--lp-primary-light);
-    color: var(--lp-primary);
+    background: var(--surface-muted);
+    color: var(--primary);
 }
 
 .btn-small {

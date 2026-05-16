@@ -6,9 +6,9 @@
     --font-sans: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
     --font-display: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
     
-    /* Brand Colors (Refined for Readability) */
-    --primary: #059669;         /* Emerald 600 - More Vibrant */
-    --primary-hover: #047857;   /* Emerald 700 */
+    /* Brand Colors (Refined for Readability & Contrast) */
+    --primary: #047857;         /* Emerald 700 - Better contrast with white text */
+    --primary-hover: #065f46;   /* Emerald 800 */
     --primary-light: #ecfdf5;   /* Emerald 50 - Very clean for bg */
     --primary-dark: #064e3b;    /* Emerald 900 - For deep text/icons */
     
@@ -141,28 +141,48 @@ h1, h2, h3, p { overflow-wrap: break-word; }
 }
 .content-card:hover { box-shadow: var(--shadow-md); }
 
-button {
+button, .btn-p {
     display: inline-flex; justify-content: center; align-items: center;
     gap: 10px;
     min-height: var(--control-height);
     background: var(--primary);
-    color: var(--text-on-primary); border: none;
-    padding: 11px 22px; border-radius: var(--radius-md);
+    color: #ffffff; /* Explicit white for best contrast */
+    border: none;
+    padding: 12px 28px; border-radius: var(--radius-md);
     font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: 1rem;
+    font-weight: 800; /* Extra bold for maximum legibility */
+    font-size: 1.05rem;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 8px 18px -10px rgba(15, 23, 42, 0.34);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 20px -10px rgba(4, 120, 87, 0.4);
+    text-decoration: none;
 }
-button:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-glow); }
-button:active { transform: translateY(0); }
 
-button.btn-outline {
-    background: transparent; border: 2px solid var(--border);
+button:hover, .btn-p:hover { 
+    background: var(--primary-hover); 
+    transform: translateY(-2px); 
+    box-shadow: var(--shadow-glow); 
+}
+
+button:active, .btn-p:active { transform: translateY(0); }
+
+button.btn-outline, .btn-outline {
+    background: transparent; border: 2px solid var(--border-strong);
     color: var(--text-main); box-shadow: none;
 }
-button.btn-outline:hover { background: var(--surface-muted); border-color: var(--border-strong); transform: translateY(-2px); }
+button.btn-outline:hover, .btn-outline:hover { 
+    background: var(--surface-muted); 
+    border-color: var(--primary); 
+    color: var(--primary);
+}
+
+button.btn-dark, .btn-dark {
+    background: var(--text-main);
+    color: white;
+}
+button.btn-dark:hover, .btn-dark:hover {
+    background: #000;
+}
 
 button.btn-full { width: 100%; }
 button.btn-danger {
