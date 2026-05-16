@@ -105,8 +105,25 @@ nav button svg {
 .nav-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-left: auto;
+}
+
+.nav-menu-main {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    margin: 0 4px;
+}
+
+.mobile-only {
+    display: none;
 }
 
 @media (max-width: 768px) {
@@ -123,10 +140,26 @@ nav button svg {
         font-size: 1rem;
     }
 
-    .nav-bottom-bar {
-        padding: 2px 6px 8px;
+    .nav-menu-main {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        padding: 8px 12px;
         justify-content: space-between;
         gap: 4px;
+        z-index: 100;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    }
+
+    .nav-divider {
+        display: none;
+    }
+
+    .nav-bottom-bar {
+        display: none;
     }
 
     nav button {

@@ -38,7 +38,7 @@ export const UI = {
             document.body.classList.remove('admin-mode');
 
             // Update active state in student navigation
-            const navButtons = globalNav.querySelectorAll('.nav-bottom-bar button');
+            const navButtons = globalNav.querySelectorAll('.nav-menu-main button');
             navButtons.forEach(btn => {
                 const btnPage = btn.getAttribute('data-page');
                 if (btnPage === hash) {
