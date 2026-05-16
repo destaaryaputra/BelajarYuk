@@ -1,0 +1,29 @@
+<div id="ai-chat-window" class="ai-chat-window">
+    <div class="ai-chat-header">
+        <div class="ai-header-info">
+            <span>Asisten AI</span>
+        </div>
+        <div class="ai-header-actions">
+            <button onclick="clearAIChat()" class="ai-close-btn" title="Hapus Riwayat Obrolan">
+                <i data-lucide="rotate-ccw" class="icon-sm"></i>
+            </button>
+            <button onclick="toggleAIChat()" class="ai-close-btn" title="Tutup Chat">
+                <i data-lucide="x" class="icon-md"></i>
+            </button>
+        </div>
+    </div>
+    <div id="ai-chat-messages" class="ai-chat-messages">
+        <div class="chat-message ai-message">
+            Halo! Saya Asisten AI Belajaryuk. Ada yang membuatmu bingung saat belajar? Tanyakan saja padaku!
+        </div>
+    </div>
+    <div class="ai-chat-input-area">
+        <input type="text" id="ai-chat-input" placeholder="Ketik pertanyaanmu..." onkeypress="handleAIChatInput(event)">
+        <button onclick="sendAIChatMessage()">
+            Kirim
+        </button>
+    </div>
+</div>
+<button id="ai-chat-toggle" class="ai-chat-toggle" onclick="toggleAIChat()" title="Tanya AI">
+    <i data-lucide="sparkles"></i>
+</button>

@@ -1,0 +1,194 @@
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-brand">
+            <div class="nav-logo-wrapper">
+                <div class="css-art-logo"></div>
+            </div>
+            <span>Belajaryuk</span>
+        </div>
+        <div class="admin-sidebar-nav">
+            <button id="btn-tab-dashboard" type="button" class="active" onclick="switchAdminTab('dashboard')">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </button>
+            <button id="btn-tab-materi" type="button" onclick="switchAdminTab('materi')">
+                <i data-lucide="book-open"></i> Materi
+            </button>
+            <button id="btn-tab-pengguna" type="button" onclick="switchAdminTab('pengguna')">
+                <i data-lucide="users"></i> Siswa
+            </button>
+            <button id="btn-tab-laporan" type="button" onclick="switchAdminTab('laporan')">
+                <i data-lucide="file-bar-chart"></i> Laporan
+            </button>
+            <button id="btn-tab-diskusi" type="button" onclick="switchAdminTab('diskusi')">
+                <i data-lucide="message-square"></i> Diskusi
+            </button>
+            <button id="btn-tab-pengaturan" type="button" onclick="switchAdminTab('pengaturan')">
+                <i data-lucide="settings"></i> Pengaturan
+            </button>
+        </div>
+        <div class="admin-sidebar-footer">
+            <button type="button" class="btn-logout-admin" data-action="logout">
+                <i data-lucide="log-out"></i> 
+                <span>Keluar Panel</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <h2 id="admin-page-title">Panel Admin</h2>
+            <div class="admin-topbar-actions">
+                <span id="admin-user-name">Admin</span>
+            </div>
+        </header>
+        <div class="admin-content">
+            <div id="admin-tab-dashboard" class="admin-tab-content">
+                <div class="admin-dashboard-hero">
+                    <div>
+                        <p class="admin-eyebrow">Kontrol Operasional</p>
+                        <h3>Ringkasan Belajaryuk</h3>
+                        <p>Pantau siswa, materi, nilai, dan diskusi dari satu tempat.</p>
+                    </div>
+                    <div id="admin-quick-actions" class="admin-quick-actions"></div>
+                </div>
+                <div class="stats-grid admin-primary-metrics">
+                    <div class="stat-card stat-card-info"><h3>Total Siswa</h3><div class="value" id="admin-stat-users">--</div></div>
+                    <div class="stat-card stat-card-primary"><h3>Total Kursus</h3><div class="value" id="admin-stat-materials">--</div></div>
+                    <div class="stat-card stat-card-accent"><h3>Siswa Baru Bulan Ini</h3><div class="value" id="admin-stat-recent">--</div></div>
+                </div>
+                <div class="admin-priority-grid">
+                    <div class="content-card chart-card chart-card-main">
+                        <h3>Pertumbuhan Siswa</h3>
+                        <canvas id="adminRegistrationChart"></canvas>
+                    </div>
+                    <div class="content-card chart-card chart-card-main">
+                        <h3>Kategori Materi</h3>
+                        <canvas id="adminCategoryChart"></canvas>
+                    </div>
+                </div>
+                <div id="admin-dashboard-insights" class="stats-grid"></div>
+                <div class="admin-dashboard-grid admin-secondary-grid">
+                    <div class="content-card">
+                        <h3>Siswa Terbaru</h3>
+                        <div id="admin-recent-users"></div>
+                    </div>
+                    <div class="content-card">
+                        <h3>Materi Terbaru</h3>
+                        <div id="admin-recent-materials"></div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <div class="d-flex justify-between align-center mb-16">
+                        <h3>Diskusi Terbaru</h3>
+                        <button type="button" class="btn-outline btn-small" onclick="switchAdminTab('diskusi')">Moderasi</button>
+                    </div>
+                    <div id="admin-recent-comments"></div>
+                </div>
+            </div>
+
+            <div id="admin-tab-materi" class="admin-tab-content d-none">
+                <div id="admin-list-view">
+                    <div class="d-flex justify-between align-center mb-16">
+                        <h3>Daftar Materi</h3>
+                        <button type="button" onclick="toggleAdminForm(true)">Tambah Materi</button>
+                    </div>
+                    <div id="admin-materials-table"></div>
+                </div>
+
+                <div id="admin-form-view" class="d-none">
+                    <div class="content-card">
+                        <h3 id="admin-form-title">Tambah Materi Baru</h3>
+                        <form id="create-material-form" onsubmit="handleSaveMaterial(event)">
+                            <input type="hidden" id="mat-id">
+                            <div><label for="mat-title">Judul</label><input type="text" id="mat-title" required></div>
+                            <div><label for="mat-category">Kategori</label><input type="text" id="mat-category" required></div>
+                            <div><label for="mat-difficulty">Level</label><select id="mat-difficulty"><option value="beginner">Pemula</option><option value="intermediate">Menengah</option><option value="advanced">Mahir</option></select></div>
+                            <div><label for="mat-duration">Durasi Menit</label><input type="number" id="mat-duration" min="0" value="0"></div>
+                            <div><label for="mat-video">Video URL</label><input type="url" id="mat-video"></div>
+                            <div><label for="mat-desc">Deskripsi</label><textarea id="mat-desc" required></textarea></div>
+                            <div><label>Konten</label><div id="mat-content-editor"></div><textarea id="mat-content" class="d-none"></textarea></div>
+                            <div><label for="mat-thumbnail">Thumbnail</label><input type="file" id="mat-thumbnail" accept="image/*"></div>
+                            <div class="d-flex gap-12">
+                                <button type="submit">Simpan</button>
+                                <button type="button" class="btn-outline" onclick="toggleAdminForm(false)">Batal</button>
+                                <button type="button" class="btn-outline" onclick="generateCourseWithAI()">Generate AI</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="admin-submaterial-view" class="d-none">
+                    <div class="content-card">
+                        <div class="d-flex justify-between align-center mb-16">
+                            <h3 id="admin-submat-title">Kelola Episode</h3>
+                            <div class="d-flex gap-12">
+                                <button type="button" onclick="toggleSubMaterialForm(true)">Tambah Episode</button>
+                                <button type="button" class="btn-outline" onclick="toggleSubMaterialView(false)">Kembali</button>
+                            </div>
+                        </div>
+                        <div id="admin-submaterials-table"></div>
+                        <div id="admin-submaterial-form-container" class="d-none mt-24">
+                            <h3 id="admin-submat-form-title">Form Episode Baru</h3>
+                            <form id="create-submaterial-form" onsubmit="handleSaveSubMaterial(event)">
+                                <input type="hidden" id="submat-id">
+                                <input type="hidden" id="submat-material-id">
+                                <div><label for="submat-title">Judul Episode</label><input type="text" id="submat-title" required></div>
+                                <div><label for="submat-video">Video URL</label><input type="url" id="submat-video"></div>
+                                <div><label>Konten Episode</label><div id="submat-content-editor"></div><textarea id="submat-content" class="d-none"></textarea></div>
+                                <div><label for="submat-pdf">PDF</label><input type="file" id="submat-pdf" accept="application/pdf"></div>
+                                <button type="submit">Simpan Episode</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="admin-quiz-view" class="d-none">
+                    <div class="content-card">
+                        <div class="d-flex justify-between align-center mb-16">
+                            <h3 id="admin-quiz-title">Kuis</h3>
+                            <button type="button" class="btn-outline" onclick="toggleQuizView(false)">Kembali</button>
+                        </div>
+                        <input type="hidden" id="quiz-material-id">
+                        <div id="admin-quiz-setup">
+                            <form id="create-quiz-form" onsubmit="handleCreateQuiz(event)">
+                                <div><label for="quiz-title">Judul Kuis</label><input type="text" id="quiz-title" required></div>
+                                <div><label for="quiz-desc">Deskripsi</label><textarea id="quiz-desc"></textarea></div>
+                                <div><label for="quiz-passing">Passing Score</label><input type="number" id="quiz-passing" value="60" min="0" max="100"></div>
+                                <div><label for="quiz-time">Batas Waktu Menit</label><input type="number" id="quiz-time" value="0" min="0"></div>
+                                <button type="submit">Buat Kuis</button>
+                            </form>
+                        </div>
+                        <div id="admin-quiz-manage" class="d-none">
+                            <h3 id="active-quiz-title"></h3>
+                            <p id="active-quiz-info"></p>
+                            <input type="hidden" id="q-quiz-id">
+                            <div class="d-flex gap-12 mb-16">
+                                <button type="button" onclick="toggleQuestionForm(true)">Tambah Soal</button>
+                                <button type="button" class="btn-outline btn-danger" onclick="handleDeleteQuiz()">Hapus Kuis</button>
+                            </div>
+                            <div id="admin-questions-table"></div>
+                            <div id="admin-question-form-container" class="d-none mt-24">
+                                <form id="create-question-form" onsubmit="handleSaveQuestion(event)">
+                                    <div><label for="q-text">Pertanyaan</label><textarea id="q-text" required></textarea></div>
+                                    <div><label for="q-opt-a">Opsi A</label><input type="text" id="q-opt-a" required></div>
+                                    <div><label for="q-opt-b">Opsi B</label><input type="text" id="q-opt-b" required></div>
+                                    <div><label for="q-opt-c">Opsi C</label><input type="text" id="q-opt-c" required></div>
+                                    <div><label for="q-opt-d">Opsi D</label><input type="text" id="q-opt-d" required></div>
+                                    <div><label for="q-correct">Jawaban Benar</label><select id="q-correct"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
+                                    <button type="submit">Simpan Soal</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-tab-pengguna" class="admin-tab-content d-none">
+                <div class="content-card">
+                    <h3>Data Siswa</h3>
+                    <div id="admin-users-table"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

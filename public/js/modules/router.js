@@ -1,0 +1,75 @@
+/**
+ * Belajaryuk - Frontend Router
+ */
+
+import { UI } from './ui.js';
+
+export const Router = {
+    routes: {
+        'landing-page': '/pages/landing.html',
+        'login-page': '/pages/login.html',
+        'register-page': '/pages/register.html',
+        'dashboard-page': '/pages/dashboard.html',
+        'materials-page': '/pages/materials.html',
+        'material-detail-page': '/pages/material-detail.html',
+        'progress-page': '/pages/progress.html',
+        'profile-page': '/pages/profile.html',
+        'admin-page': '/pages/admin.html'
+    },
+
+    cache: {},
+
+    init() {
+        window.addEventListener('hashchange', () => this.handleRoute());
+    },
+
+    async handleInitialRoute() {
+        const hash = window.location.hash.replace('#', '') || 'landing-page';
+        await this.navigateTo(hash);
+    },
+
+    async handleRoute() {
+        const hash = window.location.hash.replace('#', '') || 'landing-page';
+        await this.navigateTo(hash);
+    },
+
+    async navigateTo(pageId) {
+        if (!this.routes[pageId]) {
+            console.error(`Route not found: ${pageId}`);
+            return;
+        }
+
+        UI.showLoading();
+
+        try {
+            // 1. Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.add('d-none'));
+
+            // 2. Load page content if not cached
+            if (!this.cache[pageId]) {
+                const response = await fetch(this.routes[pageId]);
+                if (!response.ok) throw new Error(`Failed to fetch page: ${pageId}`);
+                this.cache[pageId] = await response.text();
+            }
+
+            // 3. Inject content
+            const container = document.getElementById(pageId);
+            if (container) {
+                container.innerHTML = this.cache[pageId];
+                container.classList.remove('d-none');
+                
+                // Re-initialize icons for new content
+                if (window.lucide) window.lucide.createIcons();
+                
+                // Dispatch event for page-specific JS
+                window.dispatchEvent(new CustomEvent('page-loaded', { detail: { pageId } }));
+            }
+
+        } catch (error) {
+            console.error('Navigation error:', error);
+            UI.showNotification('Gagal memuat halaman.', 'error');
+        } finally {
+            UI.hideLoading();
+        }
+    }
+};

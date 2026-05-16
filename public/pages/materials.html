@@ -1,0 +1,27 @@
+<main>
+    <div class="header-section">
+        <h1>Materi Pembelajaran</h1>
+        <p>Pilih kelas yang ingin kamu pelajari.</p>
+    </div>
+
+    <div id="categoryTabs" class="category-tabs-scroll"></div>
+    
+    <div id="materials-search-bar" class="search-bar">
+        <div class="search-input-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari judul atau deskripsi materi...">
+        </div>
+        <div class="custom-dropdown" id="categoryDropdown">
+            <button type="button" id="categoryDropdownTrigger" class="custom-dropdown-trigger">
+                <span id="current-category-label">Semua Kategori</span>
+                <i data-lucide="chevron-down" class="chevron-icon"></i>
+            </button>
+            <div class="custom-dropdown-menu" id="categoryDropdownMenu">
+                <div class="custom-dropdown-item active" data-value="all">Semua Kategori</div>
+            </div>
+            <input type="hidden" id="categoryFilter" value="all">
+        </div>
+    </div>
+
+    <div id="materials-list"></div>
+</main>

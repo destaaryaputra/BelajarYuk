@@ -1,0 +1,28 @@
+<div class="auth-overlay">
+    <div class="auth-card reveal-on-scroll">
+        <div class="auth-header">
+            <h2>Selamat Datang</h2>
+            <p>Lanjutkan progres belajar di <strong>Belajaryuk</strong>.</p>
+        </div>
+        <form id="login-form" class="modern-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="login-username"><i data-lucide="user"></i> Username</label>
+                <input type="text" id="login-username" placeholder="Masukkan username kamu" autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password"><i data-lucide="lock"></i> Kata Sandi</label>
+                <div class="password-input-wrapper">
+                    <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-p btn-full">Masuk Sekarang</button>
+                <div class="auth-divider"><span>atau</span></div>
+                <button type="button" class="btn-outline btn-full" data-page="register-page">Belum punya akun? Daftar</button>
+            </div>
+        </form>
+        <button type="button" class="btn-back-home" data-page="landing-page">
+            <i data-lucide="arrow-left"></i> Kembali ke Beranda
+        </button>
+    </div>
+</div>

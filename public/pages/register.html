@@ -1,0 +1,42 @@
+<div class="auth-overlay">
+    <div class="auth-card reveal-on-scroll">
+        <div class="auth-header">
+            <h2>Daftar Akun Baru</h2>
+            <p>Mulai kembangkan skill digital bersama <strong>Belajaryuk</strong>.</p>
+        </div>
+        <form id="register-form" class="modern-form" onsubmit="handleRegister(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="register-fullname"><i data-lucide="user-plus"></i> Nama Lengkap</label>
+                    <input type="text" id="register-fullname" placeholder="Nama Lengkap" autocomplete="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-username"><i data-lucide="at-sign"></i> Username</label>
+                    <input type="text" id="register-username" placeholder="username_kamu" autocomplete="username" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="register-email"><i data-lucide="mail"></i> Email</label>
+                <input type="email" id="register-email" placeholder="email@contoh.com" autocomplete="email" required>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="register-password"><i data-lucide="lock"></i> Kata Sandi</label>
+                    <input type="password" id="register-password" placeholder="••••••••" autocomplete="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password-confirm"><i data-lucide="shield-check"></i> Konfirmasi</label>
+                    <input type="password" id="register-password-confirm" placeholder="••••••••" autocomplete="new-password" required>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-p btn-full">Buat Akun Sekarang</button>
+                <div class="auth-divider"><span>atau</span></div>
+                <button type="button" class="btn-outline btn-full" data-page="login-page">Sudah punya akun? Masuk</button>
+            </div>
+        </form>
+        <button type="button" class="btn-back-home" data-page="landing-page">
+            <i data-lucide="arrow-left"></i> Kembali ke Beranda
+        </button>
+    </div>
+</div>

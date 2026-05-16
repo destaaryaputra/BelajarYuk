@@ -1,0 +1,22 @@
+<main class="learning-detail-page-shell">
+    <div class="material-detail-toolbar">
+        <button type="button" class="btn-back-material" data-page="materials-page">
+            <i data-lucide="arrow-left"></i>
+            Kembali ke Materi
+        </button>
+        <div class="syllabus-dropdown" id="syllabusDropdown">
+            <button type="button" id="syllabusDropdownTrigger" class="syllabus-dropdown-trigger">
+                <i data-lucide="list" class="syllabus-icon"></i>
+                <span>Episode: <strong id="current-episode-title">Pilih Episode</strong></span>
+                <i data-lucide="chevron-down" class="chevron-icon"></i>
+            </button>
+            <div class="syllabus-dropdown-menu" id="syllabus-dropdown-items">
+                <!-- Items akan dimuat secara dinamis -->
+            </div>
+        </div>
+    </div>
+    <div class="learning-detail-layout">
+        <aside id="course-syllabus" class="content-card"></aside>
+        <div id="material-detail"></div>
+    </div>
+</main>
