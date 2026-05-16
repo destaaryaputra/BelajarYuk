@@ -5,15 +5,8 @@
 import { UI } from './ui.js';
 
 export const Router = {
-    getPagesBaseUrl() {
-        let path = window.location.pathname;
-        path = path.replace(/\/(index|api)\.(php|html?)$/i, '');
-        // If path is /belajaryuk/public/, we need /belajaryuk/public
-        return path.replace(/\/$/, '');
-    },
-
     get routes() {
-        const base = this.getPagesBaseUrl();
+        const base = UI.getBasePath();
         return {
             'landing-page': `${base}/pages/landing.html`,
             'login-page': `${base}/pages/login.html`,
