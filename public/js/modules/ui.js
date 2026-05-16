@@ -12,6 +12,33 @@ export const UI = {
                 window.location.hash = pageId;
             }
         });
+
+        // Initialize Scroll Reveal Observer
+        this.initScrollReveal();
+    },
+
+    initScrollReveal() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    // Once visible, no need to observe anymore
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Listen for page-loaded to re-observe new elements
+        window.addEventListener('page-loaded', () => {
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+        });
     },
 
     hideSplash() {
