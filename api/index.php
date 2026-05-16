@@ -90,6 +90,14 @@ if (strpos($uri, '/api') === 0) {
 if (empty($uri) || $uri === '/') $uri = '/';
 else $uri = rtrim($uri, '/');
 
+// DEBUG: Log URI yang diterima (Hanya muncul jika gagal)
+$debug_info = [
+    'requested_uri' => $_SERVER['REQUEST_URI'],
+    'cleaned_uri' => $uri,
+    'method' => $method,
+    'base_dir' => $base_dir
+];
+
 // Jika request adalah API (Bisa dideteksi dari URI atau REQUEST_URI)
 if (strpos($_SERVER['REQUEST_URI'], '/api') !== false || $base_dir !== '') {
     $routes = require __DIR__ . '/routes.php';
@@ -115,7 +123,11 @@ if (strpos($_SERVER['REQUEST_URI'], '/api') !== false || $base_dir !== '') {
 
     if (!$found) {
         http_response_code(404);
-        echo json_encode(['success' => false, 'message' => 'Route API tidak terdaftar.']);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Route API tidak terdaftar.',
+            'debug' => $debug_info
+        ]);
     }
     exit;
 }
