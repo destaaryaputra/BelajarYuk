@@ -189,6 +189,7 @@ p { color: var(--text-muted); margin-bottom: 1.2rem; font-size: 1.05rem; line-he
 .flex-column { flex-direction: column !important; }
 .align-center { align-items: center !important; }
 .justify-between { justify-content: space-between !important; }
+.justify-end { justify-content: flex-end !important; }
 .gap-8 { gap: 8px !important; }
 .gap-12 { gap: 12px !important; }
 .gap-16 { gap: 16px !important; }

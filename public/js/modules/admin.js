@@ -9,7 +9,8 @@ import { UI } from './ui.js';
 export const Admin = {
     charts: {
         registration: null,
-        category: null
+        category: null,
+        reports: null
     },
     editors: {
         matQuill: null,
@@ -455,7 +456,7 @@ export const Admin = {
             const comments = res.data || [];
             const container = document.getElementById('admin-tab-diskusi');
             if (!container) return;
-            let html = '<div class="content-card"><h3>Moderasi Forum</h3><table class="admin-table"><thead><tr><th>Siswa</th><th>Komentar</th><th>Aksi</th></tr></thead><tbody>';
+            let html = '<div class="content-card"><h3>Moderasi Forum</h3><p class="text-muted mb-16">Pantau komentar siswa dan hapus konten yang tidak sesuai.</p><div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>Siswa</th><th>Komentar</th><th>Aksi</th></tr></thead><tbody>';
             if (comments.length === 0) html += '<tr><td colspan="3" class="text-center">Kosong.</td></tr>';
             else {
                 comments.forEach(c => {
@@ -463,7 +464,7 @@ export const Admin = {
                     <td><button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteComment(${c.id})">Hapus</button></td></tr>`;
                 });
             }
-            container.innerHTML = html + '</tbody></table></div>';
+            container.innerHTML = html + '</tbody></table></div></div>';
         } catch (error) { console.error(error); }
     },
 
@@ -478,14 +479,51 @@ export const Admin = {
             const summary = data.summary || {};
             const perQuiz = data.per_quiz || [];
             const recent = data.recent_results || [];
+            const topQuiz = perQuiz.reduce((best, row) => Number(row.avg_score || 0) > Number(best.avg_score || 0) ? row : best, {});
+            const totalPassed = perQuiz.reduce((sum, row) => sum + Number(row.passed_count || 0), 0);
+            const averageAttempts = perQuiz.length > 0
+                ? Math.round(perQuiz.reduce((sum, row) => sum + Number(row.attempts || 0), 0) / perQuiz.length)
+                : 0;
 
             let html = `
-                <div class="stats-grid mb-16">
+                <div class="stats-grid admin-primary-metrics mb-16">
                     <div class="stat-card"><h3>Total Percobaan</h3><div class="value">${Number(summary.total_attempts || 0)}</div></div>
                     <div class="stat-card"><h3>Rata-rata Nilai</h3><div class="value">${Math.round(Number(summary.avg_score || 0))}%</div></div>
                     <div class="stat-card"><h3>Nilai Tertinggi</h3><div class="value">${Math.round(Number(summary.highest_score || 0))}%</div></div>
                 </div>
-                <div class="content-card">
+                <div class="admin-dashboard-grid mb-16">
+                    <div class="content-card chart-card">
+                        <h3>Tren Nilai per Kuis</h3>
+                        <canvas id="adminReportsChart"></canvas>
+                    </div>
+                    <div class="content-card">
+                        <h3>Insight Cepat</h3>
+                        <div class="admin-mini-list">
+                            <div class="admin-mini-item">
+                                <span class="admin-course-mark"><i data-lucide="award"></i></span>
+                                <div class="admin-mini-main">
+                                    <strong>${UI.escapeHtml(topQuiz.quiz_title || 'Belum ada data')}</strong>
+                                    <span>Kuis dengan rata-rata tertinggi (${Math.round(Number(topQuiz.avg_score || 0))}%)</span>
+                                </div>
+                            </div>
+                            <div class="admin-mini-item">
+                                <span class="admin-course-mark"><i data-lucide="check-circle-2"></i></span>
+                                <div class="admin-mini-main">
+                                    <strong>${totalPassed}</strong>
+                                    <span>Total kelulusan dari seluruh kuis</span>
+                                </div>
+                            </div>
+                            <div class="admin-mini-item">
+                                <span class="admin-course-mark"><i data-lucide="activity"></i></span>
+                                <div class="admin-mini-main">
+                                    <strong>${averageAttempts}</strong>
+                                    <span>Rata-rata percobaan per kuis</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card mb-16">
                     <h3>Performa per Kuis</h3>
                     <div class="admin-table-wrapper">
                         <table class="admin-table">
@@ -542,6 +580,8 @@ export const Admin = {
 
             html += '</tbody></table></div></div>';
             container.innerHTML = html;
+            this.renderReportsChart(perQuiz);
+            if (window.lucide) window.lucide.createIcons();
         } catch (error) {
             console.error(error);
             container.innerHTML = '<div class="content-card"><p class="text-danger">Gagal memuat laporan kuis.</p></div>';
@@ -556,7 +596,30 @@ export const Admin = {
 
     async loadSettings() {
         const container = document.getElementById('admin-tab-pengaturan');
-        if (container) container.innerHTML = '<div class="content-card"><h3>Pengaturan Platform</h3><p>Konfigurasi API: ' + Config.API_BASE_URL + '</p></div>';
+        if (!container) return;
+        container.innerHTML = `
+            <div class="content-card">
+                <h3>Pengaturan Platform</h3>
+                <p class="text-muted mb-12">Ringkasan konfigurasi sistem yang aktif saat ini.</p>
+                <div class="admin-mini-list">
+                    <div class="admin-mini-item">
+                        <span class="admin-course-mark"><i data-lucide="server"></i></span>
+                        <div class="admin-mini-main">
+                            <strong>API Endpoint</strong>
+                            <span>${UI.escapeHtml(Config.API_BASE_URL)}</span>
+                        </div>
+                    </div>
+                    <div class="admin-mini-item">
+                        <span class="admin-course-mark"><i data-lucide="shield-check"></i></span>
+                        <div class="admin-mini-main">
+                            <strong>Mode Operasional</strong>
+                            <span>Konfigurasi produksi aktif</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        if (window.lucide) window.lucide.createIcons();
     },
 
     async generateCourseWithAI() {
@@ -613,6 +676,62 @@ export const Admin = {
             this.charts.category.destroy();
             this.charts.category = null;
         }
+        if (this.charts.reports) {
+            this.charts.reports.destroy();
+            this.charts.reports = null;
+        }
+    },
+
+    renderReportsChart(perQuiz) {
+        if (typeof Chart === 'undefined') return;
+        const canvas = document.getElementById('adminReportsChart');
+        if (!canvas) return;
+
+        if (this.charts.reports) {
+            this.charts.reports.destroy();
+        }
+
+        const labels = perQuiz.slice(0, 8).map(row => row.quiz_title || 'Kuis');
+        const scores = perQuiz.slice(0, 8).map(row => Math.round(Number(row.avg_score || 0)));
+        const attempts = perQuiz.slice(0, 8).map(row => Number(row.attempts || 0));
+
+        if (labels.length === 0) {
+            labels.push('Belum ada data');
+            scores.push(0);
+            attempts.push(0);
+        }
+
+        this.charts.reports = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Rata-rata Nilai (%)',
+                        data: scores,
+                        backgroundColor: 'rgba(31, 138, 112, 0.8)',
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'Jumlah Percobaan',
+                        data: attempts,
+                        backgroundColor: 'rgba(37, 99, 167, 0.7)',
+                        borderRadius: 8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
+            }
+        });
     },
 
     renderCharts(students, materials) {
