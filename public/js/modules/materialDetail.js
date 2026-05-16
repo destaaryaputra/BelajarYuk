@@ -60,10 +60,15 @@ export const MaterialDetail = {
         if (!container || !currentLabel || !this.state.material) return;
 
         const items = [{ id: 'main', title: this.state.material.title || 'Materi Utama' }]
-            .concat(this.state.subMaterials.map((s, idx) => ({
-                id: String(s.id),
-                title: s.title || `Episode ${idx + 1}`
-            })));
+            .concat(this.state.subMaterials.map((s, idx) => {
+                // Bersihkan title dari awalan angka manual (misal "1. Judul" jadi "Judul")
+                // karena kita sudah punya bubble nomor indeks sendiri
+                const cleanTitle = (s.title || '').replace(/^\d+[\.\s\-]+/, '');
+                return {
+                    id: String(s.id),
+                    title: cleanTitle || `Episode ${idx + 1}`
+                };
+            }));
 
         const activeItem = items.find(i => i.id === this.state.activeItemId) || items[0];
         currentLabel.textContent = activeItem.title;
