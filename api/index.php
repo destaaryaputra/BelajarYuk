@@ -51,7 +51,12 @@ $config = $root . '/src/Config/lingkungan.php';
 if (!file_exists($config)) $config = $root . '/src/config/lingkungan.php';
 if (file_exists($config)) require_once $config;
 
-// 4. Pengaturan CORS & Security
+// 4. Jalankan Session (Penting untuk CSRF token di API)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 5. Pengaturan CORS & Security
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
 header('Access-Control-Allow-Origin: ' . $origin);
 header('Access-Control-Allow-Credentials: true');

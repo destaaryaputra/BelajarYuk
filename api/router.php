@@ -1,10 +1,40 @@
 <?php
 
-// API router
-use App\Utils\Response;
+/**
+ * Belajaryuk - API Router (Local/XAMPP Optimized)
+ * Menangani routing API dengan autoloader dan session support
+ */
 
-// Suppress notices/warnings to keep JSON clean
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING & ~E_DEPRECATED);
+// 1. Setup Environment & Autoloader
+$root = dirname(__DIR__);
+
+// Autoloader PSR-4 manual fallback jika vendor/autoload belum jalan sempurna
+spl_autoload_register(function ($class) use ($root) {
+    if (strpos($class, 'App\\') !== 0) return;
+    $rel = str_replace(['App\\', '\\'], ['', '/'], $class);
+    $path = $root . '/src/' . $rel . '.php';
+    if (file_exists($path)) {
+        require_once $path;
+    }
+}, true, true);
+
+// Composer Autoloader
+if (file_exists($root . '/vendor/autoload.php')) {
+    require_once $root . '/vendor/autoload.php';
+}
+
+// Load Environment Config
+$config = $root . '/src/Config/lingkungan.php';
+if (file_exists($config)) {
+    require_once $config;
+}
+
+// 2. Start Session (Penting untuk CSRF)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+use App\Utils\Response;
 
 // Parse URL properly
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
