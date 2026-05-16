@@ -429,3 +429,25 @@ export const Admin = {
 };
 
 window.Admin = Admin;
+window.switchAdminTab = (id) => Admin.switchTab(id);
+window.toggleAdminForm = (show) => Admin.toggleMaterialForm(show);
+window.handleSaveMaterial = (e) => Admin.handleSaveMaterial(e);
+window.handleDeleteMaterial = (id) => Admin.handleDeleteMaterial(id);
+window.handleEditMaterial = (id) => Admin.handleEditMaterial(id);
+window.openSubMaterialView = (id, title) => Admin.openSubMaterialView(id, title);
+window.handleSaveSubMaterial = (e) => Admin.handleSaveSubMaterial(e);
+window.toggleSubMaterialForm = (show) => document.getElementById('admin-submaterial-form-container').classList.toggle('d-none', !show);
+window.toggleSubMaterialView = (show) => {
+    document.getElementById('admin-submaterial-view').classList.toggle('d-none', !show);
+    document.getElementById('admin-list-view').classList.toggle('d-none', show);
+};
+window.openQuizView = (id, title) => Admin.openQuizView(id, title);
+window.toggleQuizView = (show) => {
+    document.getElementById('admin-quiz-view').classList.toggle('d-none', !show);
+    document.getElementById('admin-list-view').classList.toggle('d-none', show);
+};
+window.handleCreateQuiz = (e) => Admin.handleCreateQuiz(e);
+window.toggleQuestionForm = (show) => document.getElementById('admin-question-form-container').classList.toggle('d-none', !show);
+window.handleSaveQuestion = (e) => Admin.handleSaveQuestion(e);
+window.handleDeleteQuiz = () => Admin.handleDeleteQuiz();
+window.generateCourseWithAI = () => Admin.generateCourseWithAI();

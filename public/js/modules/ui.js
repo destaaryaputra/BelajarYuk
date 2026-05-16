@@ -4,12 +4,13 @@
 
 export const UI = {
     init() {
-        // Handle global navigation clicks
-        document.querySelectorAll('[data-page]').forEach(el => {
-            el.addEventListener('click', (e) => {
-                const pageId = e.currentTarget.getAttribute('data-page');
+        // Global Event Delegation for Navigation
+        document.addEventListener('click', (e) => {
+            const navBtn = e.target.closest('[data-page]');
+            if (navBtn) {
+                const pageId = navBtn.getAttribute('data-page');
                 window.location.hash = pageId;
-            });
+            }
         });
     },
 

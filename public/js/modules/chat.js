@@ -23,7 +23,8 @@ export const AIChat = {
 
     async loadComponent() {
         try {
-            const response = await fetch('/components/ai-chat.html');
+            const base = window.location.pathname.replace(/\/(index|api)\.(php|html?)$/i, '').replace(/\/$/, '');
+            const response = await fetch(`${base}/components/ai-chat.html`);
             const html = await response.text();
             const widget = document.getElementById('ai-chat-widget');
             if (widget) {

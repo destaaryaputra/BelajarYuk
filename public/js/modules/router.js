@@ -5,16 +5,26 @@
 import { UI } from './ui.js';
 
 export const Router = {
-    routes: {
-        'landing-page': '/pages/landing.html',
-        'login-page': '/pages/login.html',
-        'register-page': '/pages/register.html',
-        'dashboard-page': '/pages/dashboard.html',
-        'materials-page': '/pages/materials.html',
-        'material-detail-page': '/pages/material-detail.html',
-        'progress-page': '/pages/progress.html',
-        'profile-page': '/pages/profile.html',
-        'admin-page': '/pages/admin.html'
+    getPagesBaseUrl() {
+        let path = window.location.pathname;
+        path = path.replace(/\/(index|api)\.(php|html?)$/i, '');
+        // If path is /belajaryuk/public/, we need /belajaryuk/public
+        return path.replace(/\/$/, '');
+    },
+
+    get routes() {
+        const base = this.getPagesBaseUrl();
+        return {
+            'landing-page': `${base}/pages/landing.html`,
+            'login-page': `${base}/pages/login.html`,
+            'register-page': `${base}/pages/register.html`,
+            'dashboard-page': `${base}/pages/dashboard.html`,
+            'materials-page': `${base}/pages/materials.html`,
+            'material-detail-page': `${base}/pages/material-detail.html`,
+            'progress-page': `${base}/pages/progress.html`,
+            'profile-page': `${base}/pages/profile.html`,
+            'admin-page': `${base}/pages/admin.html`
+        };
     },
 
     cache: {},
