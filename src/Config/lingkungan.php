@@ -19,6 +19,11 @@ if (file_exists($envFile)) {
             $name = trim($parts[0]);
             $value = trim($parts[1]);
             
+            // Remove quotes if present
+            if (preg_match('/^["\'](.*)["\']$/', $value, $matches)) {
+                $value = $matches[1];
+            }
+            
             // Overwrite existing env vars
             putenv("{$name}={$value}");
             $_ENV[$name] = $value;

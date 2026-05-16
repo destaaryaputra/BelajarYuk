@@ -30,19 +30,21 @@ class Database {
         $this->password = $this->getEnvVar('DB_PASS');
         $this->port = $this->getEnvVar('DB_PORT', '5432');
 
-        if (!$this->host || !$this->user || !$this->password) {
+        if (!$this->host || !$this->user || !$this->password || !$this->db) {
             $missing = [];
             if (!$this->host) $missing[] = 'DB_HOST';
             if (!$this->user) $missing[] = 'DB_USER';
             if (!$this->password) $missing[] = 'DB_PASS';
+            if (!$this->db) $missing[] = 'DB_NAME';
             
             error_log("CRITICAL: Database credentials missing: " . implode(', ', $missing));
             http_response_code(500);
             header('Content-Type: application/json');
             exit(json_encode([
                 'success' => false, 
-                'message' => 'Konfigurasi database belum lengkap di Vercel Settings.',
-                'missing_vars' => $missing
+                'message' => 'Konfigurasi database (env) tidak lengkap.',
+                'missing_vars' => $missing,
+                'version' => 'FIX-IDENTIFIER-V1'
             ]));
         }
     }
