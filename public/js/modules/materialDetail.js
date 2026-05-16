@@ -56,9 +56,8 @@ export const MaterialDetail = {
 
     renderSyllabus() {
         const container = document.getElementById('course-syllabus');
-        const dropdownMenu = document.getElementById('syllabus-dropdown-items');
         const currentLabel = document.getElementById('current-episode-title');
-        if (!container || !dropdownMenu || !currentLabel || !this.state.material) return;
+        if (!container || !currentLabel || !this.state.material) return;
 
         const items = [{ id: 'main', title: this.state.material.title || 'Materi Utama' }]
             .concat(this.state.subMaterials.map((s, idx) => ({
@@ -66,63 +65,48 @@ export const MaterialDetail = {
                 title: s.title || `Episode ${idx + 1}`
             })));
 
-        const activeTitle = items.find(i => i.id === this.state.activeItemId)?.title || items[0].title;
-        currentLabel.textContent = activeTitle;
+        const activeItem = items.find(i => i.id === this.state.activeItemId) || items[0];
+        currentLabel.textContent = activeItem.title;
 
         container.innerHTML = `
-            <h3 class="mb-16">Daftar Episode</h3>
+            <div class="syllabus-header mb-16">
+                <h3>Daftar Episode</h3>
+                <p class="text-muted small">${items.length} Bagian</p>
+            </div>
             <div class="syllabus-list">
                 ${items.map((item, idx) => `
                     <button type="button" class="syllabus-item ${this.state.activeItemId === item.id ? 'active' : ''}" data-syllabus-id="${item.id}">
-                        <span class="syllabus-index">${idx + 1}</span>
-                        <span>${UI.escapeHtml(item.title)}</span>
+                        <div class="syllabus-index">${idx + 1}</div>
+                        <div class="syllabus-info">
+                            <span class="syllabus-title">${UI.escapeHtml(item.title)}</span>
+                        </div>
+                        ${this.state.activeItemId === item.id ? '<i data-lucide="play" class="active-play-icon"></i>' : ''}
                     </button>
                 `).join('')}
             </div>
         `;
 
-        dropdownMenu.innerHTML = items.map(item => `
-            <button type="button" class="syllabus-dropdown-item ${this.state.activeItemId === item.id ? 'active' : ''}" data-syllabus-id="${item.id}">
-                ${UI.escapeHtml(item.title)}
-            </button>
-        `).join('');
-
         container.querySelectorAll('[data-syllabus-id]').forEach(btn => {
-            btn.addEventListener('click', () => this.selectItem(btn.getAttribute('data-syllabus-id')));
+            btn.addEventListener('click', () => {
+                this.selectItem(btn.getAttribute('data-syllabus-id'));
+                // Smooth scroll to top on mobile when switching
+                if (window.innerWidth <= 1024) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
         });
-        dropdownMenu.querySelectorAll('[data-syllabus-id]').forEach(btn => {
-            btn.addEventListener('click', () => this.selectItem(btn.getAttribute('data-syllabus-id')));
-        });
+
+        if (window.lucide) window.lucide.createIcons();
     },
 
     bindDropdown() {
-        const wrapper = document.getElementById('syllabusDropdown');
-        const trigger = document.getElementById('syllabusDropdownTrigger');
-        if (!wrapper || !trigger) return;
-
-        trigger.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            wrapper.classList.toggle('show');
-        };
-
-        if (!this.dropdownBound) {
-            document.addEventListener('click', (e) => {
-                const currentWrapper = document.getElementById('syllabusDropdown');
-                if (!currentWrapper) return;
-                if (!currentWrapper.contains(e.target)) {
-                    currentWrapper.classList.remove('show');
-                }
-            });
-            this.dropdownBound = true;
-        }
+        // Dropdown removed for cleaner UI
     },
 
     selectItem(itemId) {
         this.state.activeItemId = itemId;
         this.renderSyllabus();
         this.renderContent();
-        document.getElementById('syllabusDropdown')?.classList.remove('show');
     },
 
     getActiveItem() {
