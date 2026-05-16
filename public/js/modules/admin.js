@@ -777,7 +777,33 @@ export const Admin = {
                         backgroundColor: ['#1f8a70', '#2563a7', '#f59e0b', '#ef4444']
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, animation: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    cutout: '62%',
+                    layout: {
+                        padding: {
+                            top: 6
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            align: 'start',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 10,
+                                boxHeight: 10,
+                                padding: 12,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
             });
         }
     }
