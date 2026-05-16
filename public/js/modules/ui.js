@@ -28,7 +28,7 @@ export const UI = {
         const hash = window.location.hash.replace('#', '') || 'landing-page';
         const isPublicPage = ['landing-page', 'login-page', 'register-page'].includes(hash);
         const isAdminPage = hash === 'admin-page';
-        
+
         // Cek apakah user sudah login dari localStorage
         const isLoggedIn = !!localStorage.getItem('belajaryuk_auth_token');
 
@@ -36,9 +36,20 @@ export const UI = {
         if (isLoggedIn && !isPublicPage && !isAdminPage) {
             globalNav.classList.remove('d-none');
             document.body.classList.remove('admin-mode');
+
+            // Update active state in student navigation
+            const navButtons = globalNav.querySelectorAll('.nav-bottom-bar button');
+            navButtons.forEach(btn => {
+                const btnPage = btn.getAttribute('data-page');
+                if (btnPage === hash) {
+                    btn.classList.add('nav-active');
+                } else {
+                    btn.classList.remove('nav-active');
+                }
+            });
         } else {
             globalNav.classList.add('d-none');
-            
+
             // Tambahkan admin-mode class ke body jika di halaman admin
             if (isAdminPage) {
                 document.body.classList.add('admin-mode');
@@ -47,7 +58,6 @@ export const UI = {
             }
         }
     },
-
     initScrollReveal() {
         const observerOptions = {
             threshold: 0.1,
