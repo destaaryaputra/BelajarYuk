@@ -4,9 +4,9 @@
    ======================== */
 body.admin-mode { 
     --admin-shell: #f6f8fb;
-    --admin-sidebar: #111827;
-    --admin-sidebar-hover: #1f2937;
-    --admin-sidebar-active: rgba(20, 184, 166, 0.14);
+    --admin-sidebar: #e2e8f0; /* Light Slate/Grey - Not White */
+    --admin-sidebar-hover: #cbd5e1;
+    --admin-sidebar-active: #ffffff; /* White for active item highlight */
     --admin-card: var(--surface);
     --admin-card-muted: #f8fafc;
     --admin-chart-grid: rgba(148, 163, 184, 0.22);
@@ -31,14 +31,14 @@ body.admin-mode .page > nav {
 }
 
 .admin-sidebar {
-    width: 260px; background-color: var(--admin-sidebar); color: #f8fafc;
+    width: 260px; background-color: var(--admin-sidebar); color: #000;
     display: flex; flex-direction: column; flex-shrink: 0;
 }
 
 .admin-brand {
     height: 70px; display: flex; align-items: center; gap: 12px;
     padding: 0 24px; font-size: 1.25rem; font-weight: 700;
-    border-bottom: 1px solid #1e293b; color: white;
+    border-bottom: 1px solid #cbd5e1; color: #000;
 }
 
 .admin-sidebar-nav {
@@ -46,10 +46,10 @@ body.admin-mode .page > nav {
 }
 
 .admin-sidebar-nav button {
-    background: transparent; color: #94a3b8; border: none;
+    background: transparent; color: #334155; border: none;
     box-shadow: none; border-radius: 0; justify-content: flex-start;
     min-height: 48px;
-    padding: 14px 24px; font-size: 0.95rem; font-weight: 600; /* Bolder */
+    padding: 14px 24px; font-size: 0.95rem; font-weight: 700;
     line-height: 1.25;
     border-left: 4px solid transparent; transition: all 0.2s;
     display: flex; align-items: center; gap: 12px;
@@ -60,23 +60,24 @@ body.admin-mode .page > nav {
 .admin-sidebar-nav button svg {
     width: 18px;
     height: 18px;
-    stroke-width: 2.5px; /* Thicker icons */
+    stroke-width: 2.5px;
+    color: #000;
 }
 .admin-sidebar-nav button:hover {
-    background-color: var(--admin-sidebar-hover); color: #fff;
+    background-color: var(--admin-sidebar-hover); color: #000;
 }
 
 .admin-sidebar-nav button.active {
     background-color: var(--admin-sidebar-active); 
-    color: #fff; /* White for best contrast on dark bg */
+    color: var(--primary);
     border-left-color: var(--primary);
-    font-weight: 700;
+    font-weight: 800;
     box-shadow: inset 3px 0 0 var(--primary);
 }
 
 .admin-sidebar-footer {
     padding: 16px;
-    border-top: 1px solid #1e293b;
+    border-top: 1px solid #cbd5e1;
 }
 
 .btn-logout-admin {
@@ -86,26 +87,28 @@ body.admin-mode .page > nav {
     justify-content: center;
     gap: 10px;
     padding: 12px;
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background-color: #ef4444;
+    color: #ffffff;
+    border: none;
     border-radius: var(--radius-md);
-    font-weight: 600;
+    font-weight: 800;
     font-size: 0.9rem;
     transition: all 0.2s;
     cursor: pointer;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
 }
 
 .btn-logout-admin:hover {
-    background-color: #ef4444;
-    color: white;
-    border-color: #ef4444;
+    background-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(239, 68, 68, 0.3);
 }
 
 .btn-logout-admin i,
 .btn-logout-admin svg {
     width: 18px;
     height: 18px;
+    color: #ffffff;
 }
 
 .admin-main {
