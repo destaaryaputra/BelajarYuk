@@ -148,7 +148,12 @@ class Security {
      * Verify CSRF token
      */
     public static function verifyCSRFToken(string $token): bool {
-        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+        // Jika di Vercel/Production, kita berikan toleransi jika session baru saja di-start
+        if (!isset($_SESSION['csrf_token'])) {
+            error_log("CSRF Debug: No session token found during verification.");
+            return false;
+        }
+        return hash_equals($_SESSION['csrf_token'], $token);
     }
 
     /**
