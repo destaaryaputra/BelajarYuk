@@ -191,30 +191,54 @@ export const MaterialDetail = {
             const commentsRes = await API.getComments(materialId);
             const comments = commentsRes.data || [];
             const listHtml = comments.length === 0
-                ? '<p class="text-muted">Belum ada diskusi untuk materi ini.</p>'
-                : comments.map(c => `
-                    <div class="quiz-history-card">
-                        <div>
-                            <h4 class="quiz-history-title">${UI.escapeHtml(c.full_name || c.username || 'Siswa')}</h4>
-                            <p class="mb-0">${UI.escapeHtml(c.comment_text || '')}</p>
+                ? '<div class="empty-discussion"><i data-lucide="message-circle" class="icon-lg"></i><p>Jadilah yang pertama memulai diskusi!</p></div>'
+                : comments.map(c => {
+                    const initials = (c.full_name || c.username || '?')[0].toUpperCase();
+                    const isAdmin = c.role === 'admin';
+                    return `
+                        <div class="comment-item">
+                            <div class="comment-avatar ${isAdmin ? 'admin-avatar-bg' : ''}">${initials}</div>
+                            <div class="comment-body">
+                                <div class="comment-header">
+                                    <span class="comment-author">${UI.escapeHtml(c.full_name || c.username)}</span>
+                                    ${isAdmin ? '<span class="badge-admin">Mentor</span>' : ''}
+                                    <span class="comment-time">• ${c.created_at ? new Date(c.created_at).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'}) : '-'}</span>
+                                </div>
+                                <div class="comment-text">${UI.escapeHtml(c.comment_text || '')}</div>
+                            </div>
                         </div>
-                        <span class="qhc-date">${c.created_at ? new Date(c.created_at).toLocaleString('id-ID') : '-'}</span>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
 
             return `
-                <div class="content-card discussion-card">
-                    <h3 class="discussion-title"><i data-lucide="messages-square"></i> Diskusi Materi</h3>
-                    <form id="material-comment-form" class="comment-form">
-                        <textarea id="material-comment-text" class="comment-textarea" placeholder="Tulis pertanyaan atau insight kamu..." required></textarea>
-                        <button type="submit" class="btn-send"><i data-lucide="send"></i></button>
+                <div class="content-card discussion-section">
+                    <div class="discussion-header-main mb-24">
+                        <div class="d-flex align-center gap-12">
+                            <div class="discussion-icon-box"><i data-lucide="messages-square"></i></div>
+                            <div>
+                                <h3 class="mb-0">Forum Diskusi</h3>
+                                <p class="text-muted small mb-0">${comments.length} Komentar</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="material-comment-form" class="modern-comment-form mb-32">
+                        <div class="input-with-btn">
+                            <textarea id="material-comment-text" class="comment-textarea" placeholder="Tanyakan sesuatu atau bagikan insight kamu..." required></textarea>
+                            <button type="submit" class="comment-submit-btn" title="Kirim Komentar">
+                                <i data-lucide="send"></i>
+                            </button>
+                        </div>
                     </form>
-                    <div class="comments-list">${listHtml}</div>
+
+                    <div class="comments-container">
+                        ${listHtml}
+                    </div>
                 </div>
             `;
         } catch (error) {
             console.error(error);
-            return '<div class="content-card discussion-card"><p class="text-muted">Diskusi belum tersedia.</p></div>';
+            return '<div class="content-card"><p class="text-muted text-center">Diskusi tidak dapat dimuat.</p></div>';
         }
     },
 
