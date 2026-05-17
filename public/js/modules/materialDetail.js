@@ -269,7 +269,7 @@ export const MaterialDetail = {
         const currentIndex = this.state.subMaterials.findIndex(s => String(s.id) === String(this.state.activeItemId));
         const nextEpisode = (currentIndex !== -1 && currentIndex < this.state.subMaterials.length - 1) 
             ? this.state.subMaterials[currentIndex + 1] 
-            : null;
+            : (active.isMain && this.state.subMaterials.length > 0 ? this.state.subMaterials[0] : null);
 
         const isCompleted = active.isMain ? !!this.state.material.is_completed : this.state.completedEpisodes.includes(String(active.id));
 
@@ -281,7 +281,28 @@ export const MaterialDetail = {
                     <iframe class="pdf-iframe" src="${UI.escapeHtml(embedVideo)}" title="Video materi" allowfullscreen allow="autoplay; encrypted-media" loading="lazy"></iframe>
                 </div>
             `;
+        } else if (active.isMain && this.state.subMaterials.length > 0) {
+            // Tampilan "Peta Belajar" otomatis jika di halaman Pengenalan
+            let roadmapHtml = this.state.subMaterials.map((s, i) => `
+                <div class="roadmap-item">
+                    <div class="roadmap-num">${i + 1}</div>
+                    <div class="roadmap-info">
+                        <span class="roadmap-title">${UI.escapeHtml(s.title)}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            mediaHtml = `
+                <div class="roadmap-container mb-32">
+                    <div class="roadmap-header">
+                        <i data-lucide="map"></i>
+                        <span>Apa yang akan kamu pelajari?</span>
+                    </div>
+                    <div class="roadmap-list">${roadmapHtml}</div>
+                </div>
+            `;
         }
+
         if (active.document_url) {
             mediaHtml += `
                 <div class="pdf-container mb-24">
@@ -295,32 +316,31 @@ export const MaterialDetail = {
         
         container.innerHTML = `
             <article class="content-card">
-                <div class="header-section mb-24">
-                    <div class="d-flex justify-between align-center">
-                        <span class="section-eyebrow">${active.isMain ? 'Pengenalan Materi' : 'Episode ' + (currentIndex + 1)}</span>
+                <div class="header-section mb-32">
+                    <div class="d-flex justify-between align-center mb-12">
+                        <span class="section-eyebrow">${active.isMain ? 'Ringkasan Modul' : 'Episode ' + (currentIndex + 1)}</span>
                         ${isCompleted ? '<span class="badge badge-success"><i data-lucide="check-circle" class="icon-xs"></i> Selesai</span>' : ''}
                     </div>
-                    <h1>${UI.escapeHtml(active.title || 'Materi')}</h1>
-                    <p class="text-muted">${UI.escapeHtml(this.state.material.description || '')}</p>
+                    <h1 class="display-title">${UI.escapeHtml(active.title || 'Materi')}</h1>
                 </div>
                 
                 ${mediaHtml}
 
-                <div class="mt-24 mb-24">
-                    ${active.content || '<p class="text-muted">Konten materi belum tersedia.</p>'}
+                <div class="material-rich-content mb-32">
+                    ${active.content || (active.isMain ? '<p class="text-muted">Selamat datang di modul ini! Silakan baca ringkasan di atas untuk mengetahui apa yang akan kita bahas.</p>' : '<p class="text-muted">Konten materi belum tersedia.</p>')}
                 </div>
 
                 <div class="action-buttons pt-24 border-top">
                     ${nextEpisode ? `
-                        <button type="button" id="next-material-btn" class="btn-primary">
-                            Selesaikan & Lanjut ke Episode Berikutnya <i data-lucide="arrow-right"></i>
+                        <button type="button" id="next-material-btn" class="btn-primary btn-lg">
+                            ${active.isMain ? 'Mulai Belajar Sekarang' : 'Selesaikan & Lanjut Episode Berikutnya'} <i data-lucide="arrow-right"></i>
                         </button>
                     ` : (hasQuiz ? `
-                        <button type="button" id="finish-to-quiz-btn" class="btn-accent">
+                        <button type="button" id="finish-to-quiz-btn" class="btn-accent btn-lg">
                             <i data-lucide="clipboard-check"></i> Selesaikan & Kerjakan Kuis
                         </button>
                     ` : `
-                        <button type="button" id="finish-material-btn" class="btn-primary">
+                        <button type="button" id="finish-material-btn" class="btn-primary btn-lg">
                             <i data-lucide="check-circle-2"></i> Selesaikan Materi
                         </button>
                     `)}
