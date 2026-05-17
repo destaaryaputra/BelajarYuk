@@ -3,6 +3,7 @@
 namespace App\Utils;
 
 use DOMDocument;
+use DOMElement;
 use DOMNode;
 
 /**
@@ -49,6 +50,7 @@ class Security {
 
         $doc = new DOMDocument();
         libxml_use_internal_errors(true);
+        // Load with UTF-8 prefix to handle Indonesian/Special characters correctly
         $doc->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         libxml_clear_errors();
 
@@ -58,8 +60,8 @@ class Security {
         return $clean === null ? '' : $clean;
     }
 
-    private static function sanitizeNode(\DOMNode $node, array $allowedTags, array $allowedAttrs): void {
-        if ($node->nodeType === XML_ELEMENT_NODE) {
+    private static function sanitizeNode(DOMNode $node, array $allowedTags, array $allowedAttrs): void {
+        if ($node->nodeType === XML_ELEMENT_NODE && $node instanceof DOMElement) {
             $tag = strtolower($node->nodeName);
             if (!in_array($tag, $allowedTags, true)) {
                 $parent = $node->parentNode;
@@ -138,6 +140,9 @@ class Security {
      * Generate CSRF token
      */
     public static function generateCSRFToken(): string {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            @session_start();
+        }
         if (!isset($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
@@ -148,6 +153,9 @@ class Security {
      * Verify CSRF token
      */
     public static function verifyCSRFToken(string $token): bool {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            @session_start();
+        }
         $sessionToken = $_SESSION['csrf_token'] ?? null;
         $cookieToken = $_COOKIE['csrf_token'] ?? null;
         
