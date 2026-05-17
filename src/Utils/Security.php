@@ -5,6 +5,9 @@ namespace App\Utils;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Exception;
 
 /**
  * Security Utility Class
@@ -36,7 +39,7 @@ class Security {
     /**
      * Sanitize rich-text HTML (basic allowlist)
      */
-    public static function sanitizeHtml(string $html): string {
+    public static function sanitizeHtml(?string $html): string {
         if ($html === null || $html === '') {
             return '';
         }
@@ -61,41 +64,22 @@ class Security {
     }
 
     private static function sanitizeNode(DOMNode $node, array $allowedTags, array $allowedAttrs): void {
-        if ($node->nodeType === XML_ELEMENT_NODE && $node instanceof DOMElement) {
-            $tag = strtolower($node->nodeName);
+        if ($node instanceof DOMElement) {
+            $element = $node;
+            $tag = strtolower($element->nodeName);
             if (!in_array($tag, $allowedTags, true)) {
-                $parent = $node->parentNode;
+                $parent = $element->parentNode;
                 if ($parent) {
-                    while ($node->firstChild) {
-                        $parent->insertBefore($node->firstChild, $node);
+                    while ($element->firstChild) {
+                        $parent->insertBefore($element->firstChild, $element);
                     }
-                    $parent->removeChild($node);
+                    $parent->removeChild($element);
                 }
                 return;
             }
 
-            if ($node->hasAttributes()) {
-                $attrNames = [];
-                foreach ($node->attributes as $attr) {
-                    $attrNames[] = $attr->name;
-                }
-                foreach ($attrNames as $attrName) {
-                    $attrLower = strtolower($attrName);
-                    if (strpos($attrLower, 'on') === 0 || !in_array($attrLower, $allowedAttrs, true)) {
-                        $node->removeAttribute($attrName);
-                        continue;
-                    }
-
-                    $value = $node->getAttribute($attrName);
-                    if (in_array($attrLower, ['href', 'src'], true)) {
-                        if (!self::isSafeUrl($value)) {
-                            $node->removeAttribute($attrName);
-                        } elseif ($tag === 'a') {
-                            $node->setAttribute('rel', 'noopener noreferrer');
-                            $node->setAttribute('target', '_blank');
-                        }
-                    }
-                }
+            if ($element->hasAttributes()) {
+                self::sanitizeAttributes($element, $tag, $allowedAttrs);
             }
         }
 
@@ -106,6 +90,31 @@ class Security {
             }
             foreach ($children as $child) {
                 self::sanitizeNode($child, $allowedTags, $allowedAttrs);
+            }
+        }
+    }
+
+    private static function sanitizeAttributes(DOMElement $element, string $tag, array $allowedAttrs): void {
+        $attrNames = [];
+        foreach ($element->attributes as $attr) {
+            $attrNames[] = $attr->name;
+        }
+
+        foreach ($attrNames as $attrName) {
+            $attrLower = strtolower($attrName);
+            if (strpos($attrLower, 'on') === 0 || !in_array($attrLower, $allowedAttrs, true)) {
+                $element->removeAttribute($attrName);
+                continue;
+            }
+
+            $value = $element->getAttribute($attrName);
+            if (in_array($attrLower, ['href', 'src'], true)) {
+                if (!self::isSafeUrl($value)) {
+                    $element->removeAttribute($attrName);
+                } elseif ($tag === 'a') {
+                    $element->setAttribute('rel', 'noopener noreferrer');
+                    $element->setAttribute('target', '_blank');
+                }
             }
         }
     }
@@ -141,7 +150,10 @@ class Security {
      */
     public static function generateCSRFToken(): string {
         if (session_status() !== PHP_SESSION_ACTIVE) {
-            @session_start();
+            if (!session_start()) {
+                error_log('CSRF: failed to start session while generating token.');
+                return '';
+            }
         }
         if (!isset($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -154,7 +166,10 @@ class Security {
      */
     public static function verifyCSRFToken(string $token): bool {
         if (session_status() !== PHP_SESSION_ACTIVE) {
-            @session_start();
+            if (!session_start()) {
+                error_log('CSRF: failed to start session while verifying token.');
+                return false;
+            }
         }
         $sessionToken = $_SESSION['csrf_token'] ?? null;
         $cookieToken = $_COOKIE['csrf_token'] ?? null;
@@ -168,7 +183,7 @@ class Security {
             return true;
         }
 
-        error_log("CSRF Failure: Provided token doesn't match session ($sessionToken) or cookie ($cookieToken)");
+        error_log('CSRF verification failed: token mismatch.');
         return false;
     }
 
@@ -179,7 +194,7 @@ class Security {
         $payload['iat'] = time();
         $payload['exp'] = time() + (defined('SESSION_TIMEOUT') ? SESSION_TIMEOUT : 3600);
         
-        return \Firebase\JWT\JWT::encode($payload, JWT_SECRET, 'HS256');
+        return JWT::encode($payload, JWT_SECRET, 'HS256');
     }
 
     /**
@@ -187,12 +202,12 @@ class Security {
      */
     public static function verifyJWT(string $token): ?array {
         try {
-            $decoded = \Firebase\JWT\JWT::decode(
+            $decoded = JWT::decode(
                 $token, 
-                new \Firebase\JWT\Key(JWT_SECRET, 'HS256')
+                new Key(JWT_SECRET, 'HS256')
             );
             return (array) $decoded;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log("JWT Verification Error: " . $e->getMessage());
             return null;
         }
