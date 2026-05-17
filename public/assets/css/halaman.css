@@ -39,54 +39,57 @@
     gap: 16px;
 }
 
+/* Premium Stat Cards Redesign */
 .stat-card {
     background: var(--surface);
-    padding: 22px;
-    border-radius: var(--radius-lg);
+    padding: 24px;
+    border-radius: 20px;
     border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
-
-.stat-card-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
+.stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 
 .stat-card h3 {
-    font-size: 0.76rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    letter-spacing: 0.06em;
+    font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 12px; letter-spacing: 0.05em; font-weight: 700;
 }
-
-.stat-card .value {
-    font-size: clamp(1.45rem, 2.2vw, 1.9rem);
-    font-weight: 800;
-    color: var(--text-main);
-    line-height: 1.2;
-}
-
-.value-suffix {
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-left: 4px;
-}
+.stat-card .value { font-size: 2rem; font-weight: 900; color: var(--text-main); line-height: 1; }
 
 .stat-chip {
-    flex-shrink: 0;
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary);
-    background: color-mix(in srgb, var(--primary-light) 82%, white 18%);
-    border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; transition: all 0.3s ease;
+}
+
+/* Accent Colors */
+.accent-blue { border-bottom: 4px solid #3b82f6; }
+.accent-blue .stat-chip { background: #eff6ff; color: #3b82f6; }
+
+.accent-orange { border-bottom: 4px solid #f59e0b; }
+.accent-orange .stat-chip { background: #fffbeb; color: #f59e0b; }
+
+.accent-green { border-bottom: 4px solid #10b981; }
+.accent-green .stat-chip { background: #f0fdf4; color: #10b981; }
+
+/* Dashboard Side Column & Leaderboard Premium */
+.dashboard-side-col .content-card {
+    border-radius: 24px; padding: 24px;
+    background: linear-gradient(180deg, var(--surface) 0%, #fcfcfc 100%);
+}
+
+.leaderboard-table-wrapper table { border-collapse: separate; border-spacing: 0 8px; width: 100%; }
+.leaderboard-table-wrapper tr { transition: all 0.2s ease; border-radius: 12px; }
+.leaderboard-table-wrapper td { padding: 12px; background: transparent; border: none; }
+.leaderboard-table-wrapper tr:not(.is-me):hover { background: #f9fafb; }
+.leaderboard-table-wrapper tr.is-me { background: #f0fdf4; border-radius: 12px; }
+.leaderboard-table-wrapper tr.is-me td { color: #065f46; }
+
+.rank-badge {
+    width: 32px; height: 32px; font-weight: 800; font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .dashboard-header {

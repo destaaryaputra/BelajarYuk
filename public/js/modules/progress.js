@@ -82,20 +82,42 @@ export const Progress = {
 
         container.innerHTML = `
             <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Modul Selesai</h3>
-                    <div class="value">${data.completed || 0} <span class="value-suffix">dari ${data.total || 0}</span></div>
+                <div class="stat-card accent-blue">
+                    <div class="stat-card-row">
+                        <div>
+                            <h3>Modul Selesai</h3>
+                            <div class="value">${data.completed || 0} <span class="value-suffix">dari ${data.total || 0}</span></div>
+                        </div>
+                        <div class="stat-chip">
+                            <i data-lucide="book-check"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>Total Poin</h3>
-                    <div class="value">${data.total_points || 0}</div>
+                <div class="stat-card accent-orange">
+                    <div class="stat-card-row">
+                        <div>
+                            <h3>Total Poin</h3>
+                            <div class="value">${data.total_points || 0}</div>
+                        </div>
+                        <div class="stat-chip">
+                            <i data-lucide="trophy"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>Rata-rata Nilai</h3>
-                    <div class="value">${Math.round(data.avg_score || 0)}%</div>
+                <div class="stat-card accent-green">
+                    <div class="stat-card-row">
+                        <div>
+                            <h3>Rata-rata Nilai</h3>
+                            <div class="value">${Math.round(data.avg_score || 0)}%</div>
+                        </div>
+                        <div class="stat-chip">
+                            <i data-lucide="trending-up"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
+        if (window.lucide) window.lucide.createIcons();
     },
 
     renderCategories(categories) {
