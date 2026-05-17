@@ -52,11 +52,14 @@ export const MaterialDetail = {
             
             this.state.quiz = quizRes.data || null;
 
-            // Senior UX Fix: Pilih episode terakhir yang belum selesai jika memungkinkan
-            if (!material.video_url && this.state.subMaterials.length > 0) {
-                // Cari episode pertama yang BELUM selesai
+            // Senior UX Logic: Selalu arahkan ke hal pertama yang BELUM selesai
+            // Urutan: Main Material -> Episode 1 -> Episode 2 -> ...
+            if (!this.state.material.is_completed) {
+                this.state.activeItemId = 'main';
+            } else if (this.state.subMaterials.length > 0) {
+                // Cari episode pertama yang belum ada di daftar completed
                 const firstIncomplete = this.state.subMaterials.find(s => !this.state.completedEpisodes.includes(String(s.id)));
-                this.state.activeItemId = firstIncomplete ? String(firstIncomplete.id) : String(this.state.subMaterials[0].id);
+                this.state.activeItemId = firstIncomplete ? String(firstIncomplete.id) : 'main';
             } else {
                 this.state.activeItemId = 'main';
             }
