@@ -4,13 +4,13 @@
             <span>Asisten AI</span>
         </div>
         <div class="ai-header-actions">
-            <button onclick="AIChat.toggleFullscreen()" class="ai-close-btn" title="Layar Penuh">
+            <button class="ai-close-btn" id="ai-chat-fs-btn" title="Layar Penuh">
                 <i data-lucide="maximize-2" id="ai-fs-icon" class="icon-sm"></i>
             </button>
-            <button onclick="clearAIChat()" class="ai-close-btn" title="Hapus Riwayat Obrolan">
+            <button class="ai-close-btn" id="ai-chat-clear-btn" title="Hapus Riwayat Obrolan">
                 <i data-lucide="rotate-ccw" class="icon-sm"></i>
             </button>
-            <button onclick="toggleAIChat()" class="ai-close-btn" title="Tutup Chat">
+            <button class="ai-close-btn" id="ai-chat-close-btn" title="Tutup Chat">
                 <i data-lucide="x" class="icon-md"></i>
             </button>
         </div>
@@ -21,12 +21,12 @@
         </div>
     </div>
     <div class="ai-chat-input-area">
-        <input type="text" id="ai-chat-input" placeholder="Ketik pertanyaanmu..." onkeypress="handleAIChatInput(event)">
-        <button onclick="sendAIChatMessage()" title="Kirim Pesan">
+        <input type="text" id="ai-chat-input" placeholder="Ketik pertanyaanmu...">
+        <button id="ai-chat-send-btn" title="Kirim Pesan">
             <i data-lucide="send-horizontal"></i>
         </button>
     </div>
 </div>
-<button id="ai-chat-toggle" class="ai-chat-toggle" onclick="toggleAIChat()" title="Tanya AI">
+<button id="ai-chat-toggle" class="ai-chat-toggle" title="Tanya AI">
     <i data-lucide="sparkles"></i>
 </button>

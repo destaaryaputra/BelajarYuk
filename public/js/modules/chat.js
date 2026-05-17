@@ -45,18 +45,32 @@ export const AIChat = {
             };
         }
         
+        // Toggle Window
         const toggleBtn = document.getElementById('ai-chat-toggle');
         if (toggleBtn) {
             toggleBtn.onclick = () => this.toggle();
         }
 
-        const closeBtns = document.querySelectorAll('.ai-close-btn');
-        closeBtns.forEach(btn => {
-            if (btn.title === 'Tutup Chat') btn.onclick = () => this.toggle();
-            if (btn.title === 'Hapus Riwayat Obrolan') btn.onclick = () => this.clear();
-        });
+        // Close Button
+        const closeBtn = document.getElementById('ai-chat-close-btn');
+        if (closeBtn) {
+            closeBtn.onclick = () => this.toggle();
+        }
+
+        // Fullscreen Button
+        const fsBtn = document.getElementById('ai-chat-fs-btn');
+        if (fsBtn) {
+            fsBtn.onclick = () => this.toggleFullscreen();
+        }
+
+        // Clear History Button
+        const clearBtn = document.getElementById('ai-chat-clear-btn');
+        if (clearBtn) {
+            clearBtn.onclick = () => this.clear();
+        }
         
-        const sendBtn = document.querySelector('.ai-chat-input-area button');
+        // Send Button
+        const sendBtn = document.getElementById('ai-chat-send-btn');
         if (sendBtn) {
             sendBtn.onclick = () => this.sendMessage();
         }
