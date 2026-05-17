@@ -949,6 +949,10 @@ textarea {
     box-shadow: none !important;
 }
 
+.password-toggle-btn.is-active {
+    color: var(--primary) !important;
+}
+
 .password-toggle-btn:active {
     transform: translateY(-50%) scale(0.9);
 }

@@ -310,9 +310,11 @@ export const UI = {
         if (input.type === 'password') {
             input.type = 'text';
             icon.setAttribute('data-lucide', 'eye-off');
+            btn.classList.add('is-active');
         } else {
             input.type = 'password';
             icon.setAttribute('data-lucide', 'eye');
+            btn.classList.remove('is-active');
         }
         
         if (window.lucide) window.lucide.createIcons();
