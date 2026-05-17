@@ -17,6 +17,12 @@ export const UI = {
             if (themeBtn) {
                 this.toggleTheme();
             }
+
+            // Password Toggle Listener
+            const passToggleBtn = e.target.closest('.password-toggle-btn');
+            if (passToggleBtn) {
+                this.togglePasswordVisibility(passToggleBtn);
+            }
         });
 
         // Initialize Theme
@@ -292,5 +298,23 @@ export const UI = {
 
     getBasePath() {
         return window.location.pathname.replace(/\/(index|api)\.(php|html?)$/i, '').replace(/\/$/, '');
+    },
+
+    togglePasswordVisibility(btn) {
+        const wrapper = btn.closest('.password-input-wrapper');
+        if (!wrapper) return;
+        
+        const input = wrapper.querySelector('input');
+        const icon = btn.querySelector('i');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+            input.type = 'password';
+            icon.setAttribute('data-lucide', 'eye');
+        }
+        
+        if (window.lucide) window.lucide.createIcons();
     }
 };

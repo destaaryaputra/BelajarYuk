@@ -95,7 +95,12 @@ export const Profile = {
                         </div>
                         <div class="form-group">
                             <label>Password Baru (Kosongkan jika tidak ganti)</label>
-                            <input type="password" name="password" placeholder="••••••••">
+                            <div class="password-input-wrapper">
+                                <input type="password" name="password" placeholder="••••••••">
+                                <button type="button" class="password-toggle-btn" aria-label="Tampilkan kata sandi">
+                                    <i data-lucide="eye"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="form-actions mt-24">

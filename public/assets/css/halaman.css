@@ -911,6 +911,40 @@ textarea {
     margin-top: 4px;
 }
 
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper input {
+    padding-right: 48px !important;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    width: 36px;
+    height: 36px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+    border-radius: 8px;
+}
+
+.password-toggle-btn:hover {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
 .auth-divider {
     text-align: center;
     color: var(--text-muted);
