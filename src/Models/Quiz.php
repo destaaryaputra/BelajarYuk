@@ -23,14 +23,16 @@ class Quiz {
      */
     public function getQuizByMaterialId(int $material_id): ?array {
         try {
+            error_log("Fetching final quiz for material_id: $material_id");
             $query = "SELECT id, title, description, material_id, passing_score, total_questions, created_at, quiz_type, sub_material_id 
                      FROM kuis 
-                     WHERE material_id = ? AND quiz_type = 'final' AND status = 'active'";
+                     WHERE material_id = ? AND quiz_type = 'final'";
             
             $stmt = $this->db->prepare($query);
             $stmt->execute([$material_id]);
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            error_log("Quiz result: " . ($result ? json_encode($result) : "NULL"));
             return $result ?: null;
         } catch (Exception $e) {
             error_log("Get quiz error: " . $e->getMessage());
@@ -43,14 +45,16 @@ class Quiz {
      */
     public function getQuizBySubMaterialId(int $sub_material_id): ?array {
         try {
+            error_log("Fetching mini quiz for sub_material_id: $sub_material_id");
             $query = "SELECT id, title, description, material_id, sub_material_id, quiz_type, passing_score, total_questions, created_at 
                      FROM kuis 
-                     WHERE sub_material_id = ? AND quiz_type = 'mini' AND status = 'active'";
+                     WHERE sub_material_id = ? AND quiz_type = 'mini'";
             
             $stmt = $this->db->prepare($query);
             $stmt->execute([$sub_material_id]);
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            error_log("Mini quiz result: " . ($result ? json_encode($result) : "NULL"));
             return $result ?: null;
         } catch (Exception $e) {
             error_log("Get mini quiz error: " . $e->getMessage());
