@@ -21,7 +21,7 @@ class Quiz {
     /**
      * Get quiz by material ID (Final Quiz)
      */
-    public function getQuizByMaterialId($material_id) {
+    public function getQuizByMaterialId(int $material_id): ?array {
         try {
             $query = "SELECT id, title, description, material_id, passing_score, total_questions, created_at, quiz_type, sub_material_id 
                      FROM kuis 
@@ -30,7 +30,8 @@ class Quiz {
             $stmt = $this->db->prepare($query);
             $stmt->execute([$material_id]);
 
-            return $stmt->fetch();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
         } catch (Exception $e) {
             error_log("Get quiz error: " . $e->getMessage());
             return null;
@@ -40,7 +41,7 @@ class Quiz {
     /**
      * Get mini quiz by sub material ID
      */
-    public function getQuizBySubMaterialId($sub_material_id) {
+    public function getQuizBySubMaterialId(int $sub_material_id): ?array {
         try {
             $query = "SELECT id, title, description, material_id, sub_material_id, quiz_type, passing_score, total_questions, created_at 
                      FROM kuis 
@@ -49,7 +50,8 @@ class Quiz {
             $stmt = $this->db->prepare($query);
             $stmt->execute([$sub_material_id]);
 
-            return $stmt->fetch();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
         } catch (Exception $e) {
             error_log("Get mini quiz error: " . $e->getMessage());
             return null;
@@ -59,7 +61,7 @@ class Quiz {
     /**
      * Get questions untuk quiz
      */
-    public function getQuestionsByQuizId($quiz_id) {
+    public function getQuestionsByQuizId(int $quiz_id): array {
         try {
             $query = "SELECT id, quiz_id, question_text, question_type, options, correct_answer, points 
                      FROM pertanyaan 
@@ -68,8 +70,19 @@ class Quiz {
             
             $stmt = $this->db->prepare($query);
             $stmt->execute([$quiz_id]);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            return $stmt->fetchAll();
+            // Transform JSON options for frontend compatibility
+            return array_map(function(array $q) {
+                $opts = is_string($q['options']) ? json_decode($q['options'], true) : $q['options'];
+                if (is_array($opts)) {
+                    $q['opt_a'] = $opts[0] ?? '';
+                    $q['opt_b'] = $opts[1] ?? '';
+                    $q['opt_c'] = $opts[2] ?? '';
+                    $q['opt_d'] = $opts[3] ?? '';
+                }
+                return $q;
+            }, $rows);
         } catch (Exception $e) {
             error_log("Get questions error: " . $e->getMessage());
             return [];
@@ -79,7 +92,7 @@ class Quiz {
     /**
      * Submit quiz answers
      */
-    public function submitQuizAnswers($user_id, $quiz_id, $answers) {
+    public function submitQuizAnswers(int $user_id, int $quiz_id, array $answers): array {
         try {
             // Get all questions
             $questions = $this->getQuestionsByQuizId($quiz_id);
@@ -128,7 +141,7 @@ class Quiz {
     /**
      * Save individual answer
      */
-    private function saveUserAnswer($user_id, $question_id, $answer) {
+    private function saveUserAnswer(int $user_id, int $question_id, string $answer): bool {
         try {
             $query = "INSERT INTO jawaban_pengguna (user_id, question_id, answer, answered_at) 
                      VALUES (?, ?, ?, NOW())";
@@ -146,7 +159,7 @@ class Quiz {
     /**
      * Get user's quiz results
      */
-    public function getUserQuizResults($user_id, $quiz_id = null) {
+    public function getUserQuizResults(int $user_id, ?int $quiz_id = null): array|null|false {
         try {
             $query = "SELECT q.id, q.title, hk.score, hk.total_points, hk.percentage, hk.submitted_at 
                          FROM hasil_kuis hk
@@ -165,7 +178,7 @@ class Quiz {
             $stmt = $this->db->prepare($query);
             $stmt->execute($params);
 
-            return $quiz_id ? $stmt->fetch() : $stmt->fetchAll();
+            return $quiz_id ? $stmt->fetch(PDO::FETCH_ASSOC) : $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             error_log("Get user quiz results error: " . $e->getMessage());
             return null;
@@ -243,7 +256,7 @@ class Quiz {
     /**
      * Create quiz (admin only)
      */
-    public function createQuiz($data) {
+    public function createQuiz(array $data): array {
         try {
             $query = "INSERT INTO kuis (title, description, material_id, sub_material_id, quiz_type, passing_score, total_questions, time_limit_minutes, created_at) 
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW()) RETURNING id";
@@ -270,7 +283,7 @@ class Quiz {
     /**
      * Tambah pertanyaan ke kuis
      */
-    public function addQuestion($data) {
+    public function addQuestion(array $data): array {
         try {
             // Cari urutan terakhir
             $stmt = $this->db->prepare("SELECT COALESCE(MAX(order_number), 0) + 1 FROM pertanyaan WHERE quiz_id = ?");
@@ -291,11 +304,12 @@ class Quiz {
 
             return ['success' => true, 'message' => 'Soal berhasil ditambahkan.'];
         } catch (Exception $e) {
+            error_log("Add question error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal menambahkan soal.'];
         }
     }
 
-    public function deleteQuestion($id) {
+    public function deleteQuestion(int $id): array {
         try {
             $stmt = $this->db->prepare("SELECT quiz_id FROM pertanyaan WHERE id = ?");
             $stmt->execute([$id]);
@@ -305,15 +319,19 @@ class Quiz {
             if ($quiz_id) $this->db->prepare("UPDATE kuis SET total_questions = total_questions - 1 WHERE id = ?")->execute([$quiz_id]);
             
             return ['success' => true, 'message' => 'Soal berhasil dihapus.'];
-        } catch (Exception $e) { return ['success' => false, 'message' => 'Gagal menghapus soal.']; }
+        } catch (Exception $e) { 
+            error_log("Delete question error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Gagal menghapus soal.']; 
+        }
     }
 
-    public function deleteQuiz($id) {
+    public function deleteQuiz(int $id): array {
         try {
             $stmt = $this->db->prepare("DELETE FROM kuis WHERE id = ?");
             $stmt->execute([$id]);
             return ['success' => true, 'message' => 'Kuis beserta soalnya berhasil dihapus.'];
         } catch (Exception $e) {
+            error_log("Delete quiz error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal menghapus kuis.'];
         }
     }
