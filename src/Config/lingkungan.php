@@ -57,10 +57,17 @@ define('ENV', $appEnv); // development, staging, production
 define('DEBUG', ENV === 'development');
 
 // Security
-$jwtSecret = $_ENV['JWT_SECRET'] ?? getenv('JWT_SECRET');
-if (!$jwtSecret || $jwtSecret === '') {
-    error_log('WARNING: JWT_SECRET is not set. Using insecure fallback.');
-    $jwtSecret = 'fallback-insecure-secret-change-me';
+$jwtSecret = trim((string)($_ENV['JWT_SECRET'] ?? getenv('JWT_SECRET') ?: ''));
+if ($jwtSecret === '') {
+    if ($appEnv === 'production') {
+        error_log('FATAL: JWT_SECRET is missing in production environment.');
+        http_response_code(500);
+        exit('Server misconfiguration.');
+    }
+
+    // Ephemeral secret for local/dev to avoid hardcoded insecure fallback.
+    $jwtSecret = bin2hex(random_bytes(32));
+    error_log('WARNING: JWT_SECRET is not set. Using ephemeral runtime secret for non-production.');
 }
 define('JWT_SECRET', $jwtSecret);
 define('SESSION_TIMEOUT', 3600); // 1 hour
@@ -133,10 +140,33 @@ header('X-Frame-Options: SAMEORIGIN');
 header('X-XSS-Protection: 1; mode=block');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 
-// CORS untuk API
-$httpOrigin = $_SERVER['HTTP_ORIGIN'] ?? '*';
-header('Access-Control-Allow-Origin: ' . $httpOrigin);
-header('Access-Control-Allow-Credentials: true');
+// CORS untuk API (strict allowlist; no origin reflection)
+$corsAllowedRaw = (string)($_ENV['CORS_ALLOWED_ORIGINS'] ?? getenv('CORS_ALLOWED_ORIGINS') ?: '');
+$corsAllowedOrigins = array_values(array_filter(array_map('trim', explode(',', $corsAllowedRaw))));
+
+if (count($corsAllowedOrigins) === 0) {
+    $defaultOrigins = ['http://localhost', 'http://127.0.0.1', 'http://localhost:3000', 'http://127.0.0.1:3000'];
+    $appUrlHost = parse_url((string) APP_URL, PHP_URL_HOST);
+    $appUrlScheme = parse_url((string) APP_URL, PHP_URL_SCHEME) ?: 'http';
+    $appUrlPort = parse_url((string) APP_URL, PHP_URL_PORT);
+
+    if ($appUrlHost) {
+        $origin = $appUrlScheme . '://' . $appUrlHost;
+        if ($appUrlPort) {
+            $origin .= ':' . $appUrlPort;
+        }
+        $defaultOrigins[] = $origin;
+    }
+
+    $corsAllowedOrigins = array_values(array_unique($defaultOrigins));
+}
+
+$httpOrigin = trim((string)($_SERVER['HTTP_ORIGIN'] ?? ''));
+if ($httpOrigin !== '' && in_array($httpOrigin, $corsAllowedOrigins, true)) {
+    header('Access-Control-Allow-Origin: ' . $httpOrigin);
+    header('Access-Control-Allow-Credentials: true');
+    header('Vary: Origin');
+}
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token');
 

@@ -133,7 +133,9 @@ class APIService {
     getSubMaterialsAdmin(materialId) { return this.get(`/materials/sub?material_id=${materialId}`); }
     deleteMaterial(materialId) { return this.post('/materials/delete', { material_id: materialId }); }
     deleteSubMaterial(id) { return this.post('/materials/sub/delete', { id }); }
-    markMaterialCompleted(materialId) { return this.post('/materials/mark-completed', { material_id: materialId }); }
+    markMaterialCompleted(materialId, subMaterialId = null) { 
+        return this.post('/materials/mark-completed', { material_id: materialId, sub_material_id: subMaterialId }); 
+    }
     getComments(materialId) { return this.get(`/materials/comments?material_id=${materialId}`); }
     addComment(payload) { return this.post('/materials/comments/add', payload); }
     getAllCommentsAdmin(limit = 100) { return this.get(`/materials/comments/admin?limit=${limit}`); }

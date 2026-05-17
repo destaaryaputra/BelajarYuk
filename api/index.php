@@ -7,20 +7,25 @@
 
 // 1. Monitor Eror Sangat Ketat
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', '0');
 
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
         if (!headers_sent()) header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false, 
-            'message' => 'Vercel Engine Error', 
-            'version' => '1.0.Final',
-            'debug' => $error['message'],
-            'file' => basename($error['file']),
-            'line' => $error['line']
-        ]);
+        $payload = [
+            'success' => false,
+            'message' => 'Vercel Engine Error',
+            'version' => '1.0.Final'
+        ];
+
+        if (defined('DEBUG') && DEBUG) {
+            $payload['debug'] = $error['message'];
+            $payload['file'] = basename($error['file']);
+            $payload['line'] = $error['line'];
+        }
+
+        echo json_encode($payload);
     }
 });
 
@@ -70,9 +75,7 @@ if (isset($_SESSION['csrf_token'])) {
 }
 
 // 5. Pengaturan CORS & Security
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
-header('Access-Control-Allow-Origin: ' . $origin);
-header('Access-Control-Allow-Credentials: true');
+// CORS headers dikelola di src/Config/lingkungan.php (allowlist).
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token');
 
@@ -122,12 +125,7 @@ if ($isApiRequest) {
         header('Content-Type: application/json');
         echo json_encode([
             'success' => false, 
-            'message' => 'Route API tidak terdaftar.',
-            'debug' => [
-                'uri' => $uri,
-                'clean' => $cleanUri,
-                'method' => $method
-            ]
+            'message' => 'Route API tidak terdaftar.'
         ]);
     }
     exit;

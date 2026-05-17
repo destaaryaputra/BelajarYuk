@@ -99,15 +99,15 @@
                     <div class="content-card">
                         <h3 id="admin-form-title">Tambah Materi Baru</h3>
                         <form id="create-material-form" onsubmit="handleSaveMaterial(event)">
-                            <input type="hidden" id="mat-id">
-                            <div><label for="mat-title">Judul</label><input type="text" id="mat-title" required></div>
-                            <div><label for="mat-category">Kategori</label><input type="text" id="mat-category" required></div>
-                            <div><label for="mat-difficulty">Level</label><select id="mat-difficulty"><option value="beginner">Pemula</option><option value="intermediate">Menengah</option><option value="advanced">Mahir</option></select></div>
-                            <div><label for="mat-duration">Durasi Menit</label><input type="number" id="mat-duration" min="0" value="0"></div>
-                            <div><label for="mat-video">Video URL</label><input type="url" id="mat-video"></div>
-                            <div><label for="mat-desc">Deskripsi</label><textarea id="mat-desc" required></textarea></div>
-                            <div><label>Konten</label><div id="mat-content-editor"></div><textarea id="mat-content" class="d-none"></textarea></div>
-                            <div><label for="mat-thumbnail">Thumbnail</label><input type="file" id="mat-thumbnail" accept="image/*"></div>
+                            <input type="hidden" id="mat-id" name="id">
+                            <div><label for="mat-title">Judul</label><input type="text" id="mat-title" name="title" required></div>
+                            <div><label for="mat-category">Kategori</label><input type="text" id="mat-category" name="category" required></div>
+                            <div><label for="mat-difficulty">Level</label><select id="mat-difficulty" name="difficulty"><option value="beginner">Pemula</option><option value="intermediate">Menengah</option><option value="advanced">Mahir</option></select></div>
+                            <div><label for="mat-duration">Durasi Menit</label><input type="number" id="mat-duration" name="duration_minutes" min="0" value="0"></div>
+                            <div><label for="mat-video">Video URL</label><input type="url" id="mat-video" name="video_url"></div>
+                            <div><label for="mat-desc">Deskripsi</label><textarea id="mat-desc" name="description" required></textarea></div>
+                            <div><label>Konten</label><div id="mat-content-editor"></div><textarea id="mat-content" name="content" class="d-none"></textarea></div>
+                            <div><label for="mat-thumbnail">Thumbnail</label><input type="file" id="mat-thumbnail" name="thumbnail" accept="image/*"></div>
                             <div class="d-flex gap-12">
                                 <button type="submit">Simpan</button>
                                 <button type="button" class="btn-outline" onclick="toggleAdminForm(false)">Batal</button>
@@ -130,12 +130,12 @@
                         <div id="admin-submaterial-form-container" class="d-none mt-24">
                             <h3 id="admin-submat-form-title">Form Episode Baru</h3>
                             <form id="create-submaterial-form" onsubmit="handleSaveSubMaterial(event)">
-                                <input type="hidden" id="submat-id">
-                                <input type="hidden" id="submat-material-id">
-                                <div><label for="submat-title">Judul Episode</label><input type="text" id="submat-title" required></div>
-                                <div><label for="submat-video">Video URL</label><input type="url" id="submat-video"></div>
-                                <div><label>Konten Episode</label><div id="submat-content-editor"></div><textarea id="submat-content" class="d-none"></textarea></div>
-                                <div><label for="submat-pdf">PDF</label><input type="file" id="submat-pdf" accept="application/pdf"></div>
+                                <input type="hidden" id="submat-id" name="id">
+                                <input type="hidden" id="submat-material-id" name="material_id">
+                                <div><label for="submat-title">Judul Episode</label><input type="text" id="submat-title" name="title" required></div>
+                                <div><label for="submat-video">Video URL</label><input type="url" id="submat-video" name="video_url"></div>
+                                <div><label>Konten Episode</label><div id="submat-content-editor"></div><textarea id="submat-content" name="content" class="d-none"></textarea></div>
+                                <div><label for="submat-pdf">PDF</label><input type="file" id="submat-pdf" name="pdf" accept="application/pdf"></div>
                                 <button type="submit">Simpan Episode</button>
                             </form>
                         </div>
@@ -160,36 +160,36 @@
 
                         <div id="admin-quiz-setup" class="d-none mt-24 border-top pt-24">
                             <h3 id="admin-quiz-setup-title">Buat Kuis Baru</h3>
-                            <form id="create-quiz-form">
-                                <input type="hidden" id="quiz-id-edit">
+                            <form id="create-quiz-form" onsubmit="handleCreateQuiz(event)">
+                                <input type="hidden" id="quiz-id-edit" name="quiz_id">
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label for="quiz-type">Tipe Kuis</label>
-                                        <select id="quiz-type" onchange="Admin.handleQuizTypeChange()">
+                                        <select id="quiz-type" name="quiz_type" onchange="Admin.handleQuizTypeChange()">
                                             <option value="final">Kuis Final (Syarat Kelulusan Modul)</option>
                                             <option value="mini">Mini Kuis (Per Episode)</option>
                                         </select>
                                     </div>
                                     <div class="form-group d-none" id="sub-material-select-group">
                                         <label for="quiz-sub-material-id">Pilih Episode</label>
-                                        <select id="quiz-sub-material-id">
+                                        <select id="quiz-sub-material-id" name="sub_material_id">
                                             <!-- Pilihan episode akan dimuat dinamis -->
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="quiz-title">Judul Kuis</label>
-                                        <input type="text" id="quiz-title" required placeholder="Contoh: Uji Pemahaman Dasar">
+                                        <input type="text" id="quiz-title" name="title" required placeholder="Contoh: Uji Pemahaman Dasar">
                                     </div>
                                 </div>
-                                <div><label for="quiz-desc">Deskripsi</label><textarea id="quiz-desc" placeholder="Jelaskan tujuan kuis ini..."></textarea></div>
+                                <div><label for="quiz-desc">Deskripsi</label><textarea id="quiz-desc" name="description" placeholder="Jelaskan tujuan kuis ini..."></textarea></div>
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label for="quiz-passing">Passing Score (%)</label>
-                                        <input type="number" id="quiz-passing" value="60" min="0" max="100">
+                                        <input type="number" id="quiz-passing" name="passing_score" value="60" min="0" max="100">
                                     </div>
                                     <div class="form-group">
                                         <label for="quiz-time">Batas Waktu Menit (0 = Tanpa batas)</label>
-                                        <input type="number" id="quiz-time" value="0" min="0">
+                                        <input type="number" id="quiz-time" name="time_limit_minutes" value="0" min="0">
                                     </div>
                                 </div>
                                 <div class="d-flex gap-12 mt-16">
@@ -215,15 +215,16 @@
                             </div>
                             <div id="admin-questions-table"></div>
                             <div id="admin-question-form-container" class="d-none mt-24">
-                                <form id="create-question-form">
-                                    <div><label for="q-text">Pertanyaan</label><textarea id="q-text" required></textarea></div>
+                                <form id="create-question-form" onsubmit="handleSaveQuestion(event)">
+                                    <input type="hidden" id="q-quiz-id" name="quiz_id">
+                                    <div><label for="q-text">Pertanyaan</label><textarea id="q-text" name="question_text" required></textarea></div>
                                     <div class="form-grid">
-                                        <div class="form-group"><label for="q-opt-a">Opsi A</label><input type="text" id="q-opt-a" required></div>
-                                        <div class="form-group"><label for="q-opt-b">Opsi B</label><input type="text" id="q-opt-b" required></div>
-                                        <div class="form-group"><label for="q-opt-c">Opsi C</label><input type="text" id="q-opt-c" required></div>
-                                        <div class="form-group"><label for="q-opt-d">Opsi D</label><input type="text" id="q-opt-d" required></div>
+                                        <div class="form-group"><label for="q-opt-a">Opsi A</label><input type="text" id="q-opt-a" name="opt_a" required></div>
+                                        <div class="form-group"><label for="q-opt-b">Opsi B</label><input type="text" id="q-opt-b" name="opt_b" required></div>
+                                        <div class="form-group"><label for="q-opt-c">Opsi C</label><input type="text" id="q-opt-c" name="opt_c" required></div>
+                                        <div class="form-group"><label for="q-opt-d">Opsi D</label><input type="text" id="q-opt-d" name="opt_d" required></div>
                                     </div>
-                                    <div><label for="q-correct">Jawaban Benar</label><select id="q-correct"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
+                                    <div><label for="q-correct">Jawaban Benar</label><select id="q-correct" name="correct_opt"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
                                     <div class="d-flex gap-12 mt-16">
                                         <button type="submit">Simpan Soal</button>
                                         <button type="button" class="btn-ghost" onclick="toggleQuestionForm(false)">Batal</button>
