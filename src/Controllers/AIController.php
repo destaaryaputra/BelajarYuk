@@ -96,26 +96,39 @@ class AIController {
     }
 
     private function buildSystemPrompt(?array $material): string {
-        $prompt = "Kamu adalah Asisten AI Belajaryuk. Jawab dalam bahasa Indonesia yang jelas, ramah, ringkas, dan membantu siswa belajar. " .
-            "Fokus pada pemrograman, web development, desain, produktivitas belajar, dan materi yang tersedia di platform. " .
-            "Jika pertanyaan di luar konteks belajar, arahkan kembali secara sopan.";
+        $prompt = "Kamu adalah 'Yuki', asisten belajar pintar dan teman diskusi yang asyik di platform Belajaryuk. " .
+            "Gaya bicaramu harus ramah, suportif, manusiawi, dan tidak kaku (gunakan sapaan seperti 'Halo!', 'Semangat ya!', atau 'Wah, pertanyaan bagus nih!'). " .
+            "Gunakan bahasa Indonesia yang luwes namun tetap sopan. Jangan menjawab seperti robot yang membosankan.\n\n" .
+            "Tugas utamanya:\n" .
+            "1. Bantu siswa memahami konsep pemrograman, desain, dan teknologi dengan penjelasan yang sederhana tapi mendalam.\n" .
+            "2. Gunakan analogi dunia nyata agar materi sulit jadi mudah dimengerti.\n" .
+            "3. Selalu berikan motivasi agar siswa semangat belajar.\n" .
+            "4. Gunakan format Markdown (bold, list, code blocks) agar jawabanmu rapi dan enak dibaca.\n" .
+            "5. Jika pertanyaan di luar konteks belajar/edukasi, arahkan kembali ke topik belajar dengan cara yang halus dan lucu.";
 
         if ($material) {
             $content = trim(strip_tags((string)($material['content'] ?? $material['description'] ?? '')));
-            if (strlen($content) > 1200) {
-                $content = substr($content, 0, 1200);
+            if (strlen($content) > 1500) {
+                $content = substr($content, 0, 1500);
             }
 
-            $prompt .= "\n\nKonteks materi yang sedang dibuka siswa:\n" .
+            $prompt .= "\n\nSaat ini siswa sedang membaca materi ini, jadi hubungkan jawabanmu dengan konteks ini jika relevan:\n" .
+                "--- KONTEKS MATERI ---\n" .
                 "Judul: " . ($material['title'] ?? '-') . "\n" .
                 "Kategori: " . ($material['category'] ?? '-') . "\n" .
-                "Ringkasan: " . ($content ?: '-');
+                "Isi/Ringkasan: " . ($content ?: '-') . "\n" .
+                "--- AKHIR KONTEKS ---";
         }
 
         return $prompt;
     }
 
     private function callGroq(array $payload): array {
+        // Gunakan model yang lebih cerdas (70B) untuk respon yang lebih berkualitas
+        if (!isset($payload['model'])) {
+            $payload['model'] = 'llama-3.3-70b-versatile';
+        }
+        
         $ch = curl_init('https://api.groq.com/openai/v1/chat/completions');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
