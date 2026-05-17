@@ -87,11 +87,11 @@ export const Admin = {
             quickActions.innerHTML = `
                 <button type="button" class="btn-p" onclick="Admin.switchTab('materi'); Admin.toggleMaterialForm(true)">
                     <i data-lucide="plus"></i>
-                    <div><span>Tambah</span>Materi</div>
+                    <div><span>Tambah</span> Materi</div>
                 </button>
                 <button type="button" class="btn-outline" onclick="Admin.switchTab('pengguna')">
                     <i data-lucide="users"></i>
-                    <div><span>Kelola</span>Siswa</div>
+                    <div><span>Kelola</span> Siswa</div>
                 </button>
             `;
             if (window.lucide) window.lucide.createIcons();
