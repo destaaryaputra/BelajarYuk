@@ -150,8 +150,8 @@
     font-size: clamp(2.2rem, 5vw, 3.8rem);
     line-height: 1.05;
     font-weight: 900;
-    margin-bottom: 20px;
-    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    letter-spacing: -0.03em;
 }
 
 .text-gradient {
@@ -164,9 +164,9 @@
 .hero-text p {
     font-size: clamp(1.05rem, 1.8vw, 1.25rem);
     color: var(--text-muted);
-    margin-bottom: 36px;
+    margin-bottom: 40px;
     line-height: 1.6;
-    max-width: 48ch;
+    max-width: 50ch;
 }
 
 .hero-cta-group {
@@ -274,13 +274,16 @@
 }
 
 .section-header h2 {
-    margin-bottom: 10px;
-    font-size: clamp(1.62rem, 2.8vw, 2.35rem);
+    margin-bottom: 16px;
+    font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 }
 
 .section-header p {
     margin: 0 auto;
-    max-width: 68ch;
+    max-width: 65ch;
+    line-height: 1.65;
 }
 
 .features-grid-modern {

@@ -177,11 +177,23 @@ button:hover .btn-icon,
 }
 
 /* --- Typography --- */
-h1, h2, h3 { font-family: var(--font-display); font-weight: 800; color: var(--text-main); margin-bottom: 1.5rem; line-height: 1.15; }
-h1 { font-size: 2.8rem; }
+h1, h2, h3 { 
+    font-family: var(--font-display); 
+    font-weight: 800; 
+    color: var(--text-main); 
+    margin-bottom: 1.25rem; 
+    line-height: 1.2; 
+    letter-spacing: -0.02em;
+}
+h1 { font-size: 2.8rem; letter-spacing: -0.03em; }
 h2 { font-size: 2.1rem; }
 h3 { font-size: 1.5rem; }
-p { color: var(--text-muted); margin-bottom: 1.2rem; font-size: 1.05rem; line-height: 1.7; }
+p { 
+    color: var(--text-muted); 
+    margin-bottom: 1.25rem; 
+    font-size: 1rem; 
+    line-height: 1.6; 
+}
 
 /* --- Global Utilities --- */
 .d-none { display: none !important; }
