@@ -17,14 +17,62 @@ export const Dashboard = {
         let user = { full_name: 'Siswa', username: 'siswa', id: 0 };
         if (userData) user = JSON.parse(userData);
 
-        // 1. RENDER SHELL (Header & Placeholder Stats)
+        // 1. RENDER SHELL with SKELETONS
         contentContainer.innerHTML = `
             <div class="dashboard-header mb-32">
                 <div>
                     <p class="section-eyebrow">Ringkasan Belajar</p>
                     <h1>Halo, ${UI.escapeHtml(user.full_name || user.username || 'Siswa')}!</h1>
                 </div>
-                <button type="button" class="btn-p" data-page="materials-page">
+                <div id="dashboard-cta-container">
+                    <div class="skeleton-box" style="height: 48px; width: 200px; border-radius: 12px;"></div>
+                </div>
+            </div>
+
+            <div class="stats-grid mb-32">
+                ${Array(3).fill('<div class="skeleton-box" style="height: 140px; border-radius: 20px;"></div>').join('')}
+            </div>
+
+            <div id="dashboard-recent-materials-container">
+                <div class="skeleton-box mb-24" style="height: 300px; border-radius: 24px;"></div>
+                <div class="dashboard-material-grid">
+                    ${Array(3).fill('<div class="skeleton-box" style="height: 240px; border-radius: 16px;"></div>').join('')}
+                </div>
+            </div>
+        `;
+
+        try {
+            const response = await API.getDashboardData();
+            const data = response.data || {};
+            
+            // 2. RENDER ACTUAL CONTENT
+            this.renderActualDashboard(data, user);
+            
+            if (window.lucide) window.lucide.createIcons();
+
+        } catch (error) {
+            console.error('Dashboard load error:', error);
+            contentContainer.innerHTML = '<p class="text-danger p-24">Gagal memuat data Beranda. Silakan refresh halaman.</p>';
+        }
+    },
+
+    renderActualDashboard(data, user) {
+        const contentContainer = document.getElementById('dynamic-dashboard-content');
+        if (!contentContainer) return;
+
+        const summary = data.summary || {};
+        const leaderboardData = data.leaderboard || [];
+        const userIndex = leaderboardData.findIndex(u => u.id == user.id);
+        const userRank = userIndex !== -1 ? userIndex + 1 : '--';
+        const userPoints = userIndex !== -1 ? leaderboardData[userIndex].total_points : (summary.total_points || 0);
+
+        contentContainer.innerHTML = `
+            <div class="dashboard-header mb-32">
+                <div>
+                    <p class="section-eyebrow">Ringkasan Belajar</p>
+                    <h1>Halo, ${UI.escapeHtml(user.full_name || user.username || 'Siswa')}!</h1>
+                </div>
+                <button type="button" class="btn-p" id="btn-continue-learning">
                     <i data-lucide="play-circle"></i> Lanjutkan Belajar
                 </button>
             </div>
@@ -34,7 +82,7 @@ export const Dashboard = {
                     <div class="stat-card-row">
                         <div>
                             <h3>Pencapaian Modul</h3>
-                            <div class="value"><span id="dash-materials-completed">--</span><span id="dash-total-materials-suffix" class="value-suffix">...</span></div>
+                            <div class="value"><span id="dash-materials-completed">0</span><span class="value-suffix">dari ${summary.total || 0}</span></div>
                         </div>
                         <div class="stat-chip"><i data-lucide="book-check"></i></div>
                     </div>
@@ -44,8 +92,8 @@ export const Dashboard = {
                         <div>
                             <h3>Peringkat Global</h3>
                             <div class="value">
-                                <span id="dash-rank">--</span>
-                                <span class="value-suffix" id="dash-points-suffix">... Poin</span>
+                                <span>${userRank !== '--' ? '#' + userRank : '--'}</span>
+                                <span class="value-suffix">(${userPoints} Poin)</span>
                             </div>
                         </div>
                         <div class="stat-chip"><i data-lucide="trophy"></i></div>
@@ -55,65 +103,31 @@ export const Dashboard = {
                     <div class="stat-card-row">
                         <div>
                             <h3>Semangat Belajar</h3>
-                            <div class="value"><span id="dash-learning-streak">--</span><span class="value-suffix">Hari</span></div>
+                            <div class="value"><span id="dash-learning-streak">0</span><span class="value-suffix">Hari</span></div>
                         </div>
                         <div class="stat-chip"><i data-lucide="flame"></i></div>
                     </div>
                 </div>
             </div>
 
-            <div id="dashboard-recent-materials-container">
-                <div class="skeleton-box dashboard-feature-skeleton"></div>
-            </div>
+            <div id="dashboard-recent-materials-container"></div>
         `;
 
-        // Re-init icons for dynamic content
-        if (window.lucide) window.lucide.createIcons();
+        this.animateNumber('dash-materials-completed', 0, summary.completed || 0, 1000);
+        this.animateNumber('dash-learning-streak', 0, summary.streak || 0, 1000);
 
-        try {
-            const response = await API.getDashboardData();
-            const data = response.data || {};
-
-            // Process Summary
-            const summary = data.summary || {};
-            const leaderboardData = data.leaderboard || [];
-            const userIndex = leaderboardData.findIndex(u => u.id == user.id);
-            const userRank = userIndex !== -1 ? userIndex + 1 : '--';
-            const userPoints = userIndex !== -1 ? leaderboardData[userIndex].total_points : (summary.total_points || 0);
-
-            const suffixEl = document.getElementById('dash-total-materials-suffix');
-            if (suffixEl) suffixEl.textContent = `dari ${summary.total || 0}`;
-            
-            const pointsSuffixEl = document.getElementById('dash-points-suffix');
-            if (pointsSuffixEl) pointsSuffixEl.textContent = `(${userPoints} Poin)`;
-
-            this.animateNumber('dash-materials-completed', 0, summary.completed || 0, 1500);
-            
-            const rankEl = document.getElementById('dash-rank');
-            if (rankEl) rankEl.textContent = userRank !== '--' ? `#${userRank}` : '--';
-            
-            this.animateNumber('dash-learning-streak', 0, summary.streak || 0, 1500);
-
-            // Handle Continue Button
-            const continueBtn = document.querySelector('.dashboard-header button');
-            if (continueBtn && summary.last_material) {
-                continueBtn.innerHTML = `<i data-lucide="play-circle"></i> Lanjut: ${UI.escapeHtml(summary.last_material.title)}`;
-                continueBtn.onclick = () => {
-                    window.location.hash = 'materials-page';
-                    // Deep link to material will be handled by Materials module
-                    localStorage.setItem('pending_material_id', summary.last_material.id);
-                };
-            }
-
-            // Render Materials
-            this.renderRecentMaterials(data.recent_materials || []);
-            if (window.lucide) window.lucide.createIcons();
-
-        } catch (error) {
-            console.error('Dashboard load error:', error);
-            const container = document.getElementById('dashboard-recent-materials-container');
-            if (container) container.innerHTML = '<p class="text-danger">Gagal memuat data dasbor.</p>';
+        const continueBtn = document.getElementById('btn-continue-learning');
+        if (continueBtn && summary.last_material) {
+            continueBtn.innerHTML = `<i data-lucide="play-circle"></i> Lanjut: ${UI.escapeHtml(summary.last_material.title)}`;
+            continueBtn.onclick = () => {
+                localStorage.setItem('pending_material_id', summary.last_material.id);
+                window.location.hash = 'materials-page';
+            };
+        } else if (continueBtn) {
+            continueBtn.onclick = () => window.location.hash = 'materials-page';
         }
+
+        this.renderRecentMaterials(data.recent_materials || []);
     },
 
     animateNumber(id, start, end, duration) {

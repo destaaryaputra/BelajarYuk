@@ -363,8 +363,21 @@ export const MaterialDetail = {
                 await API.post('/materials/mark-completed', payload);
                 
                 // Update local state
-                if (!active.isMain) this.state.completedEpisodes.push(String(active.id));
-                else this.state.material.is_completed = true;
+                if (!active.isMain) {
+                    if (!this.state.completedEpisodes.includes(String(active.id))) {
+                        this.state.completedEpisodes.push(String(active.id));
+                    }
+                } else {
+                    this.state.material.is_completed = true;
+                }
+
+                // Senior UX: Check if 100% completed to fire confetti
+                const totalSteps = this.state.subMaterials.length + 1; // Subs + Main
+                const completedSteps = this.state.completedEpisodes.length + (this.state.material.is_completed ? 1 : 0);
+                
+                if (completedSteps >= totalSteps) {
+                    this.fireSuccessConfetti();
+                }
                 
                 if (!silent) UI.showNotification('Progres belajar disimpan!', 'success');
                 return true;
@@ -411,6 +424,31 @@ export const MaterialDetail = {
         if (window.lucide) window.lucide.createIcons();
 
         if (showComments) this.loadComments(materialId);
+    },
+
+    fireSuccessConfetti() {
+        if (typeof confetti !== 'function') return;
+        
+        const duration = 3 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10007 };
+
+        const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+            // since particles fall down, start a bit higher than random
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
+
+        UI.showNotification('🎉 Selamat! Kamu telah menyelesaikan modul ini!', 'success');
     },
 
     async loadComments(materialId) {
