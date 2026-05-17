@@ -74,7 +74,9 @@ class APIService {
             }
 
             if (!response.ok) {
-                if (response.status === 401 && !endpoint.includes('/auth/login')) {
+                // Jangan logout jika error 401 berasal dari AI (karena itu masalah API Key AI, bukan sesi user)
+                const isAiEndpoint = endpoint.includes('/ai/');
+                if (response.status === 401 && !endpoint.includes('/auth/login') && !isAiEndpoint) {
                     this.clearAuth();
                     window.location.hash = 'login-page';
                 }

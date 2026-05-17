@@ -134,7 +134,10 @@ class AIController {
 
         if ($status >= 400) {
             $message = $data['error']['message'] ?? 'AI sedang sibuk, coba tanya lagi nanti ya.';
-            return ['success' => false, 'status' => $status, 'message' => $message];
+            // Jika Groq return 401 (API Key salah), kita kirim 400 atau 500 ke frontend
+            // agar tidak memicu auto-logout di api.js
+            $finalStatus = ($status === 401) ? 400 : $status;
+            return ['success' => false, 'status' => $finalStatus, 'message' => "AI Error: " . $message];
         }
 
         return ['success' => true, 'status' => $status, 'data' => $data];
