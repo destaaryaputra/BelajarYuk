@@ -139,7 +139,12 @@ class APIService {
     getAllCommentsAdmin(limit = 100) { return this.get(`/materials/comments/admin?limit=${limit}`); }
     
     // --- Quiz API ---
-    getQuiz(materialId) { return this.get(`/quiz?material_id=${materialId}`); }
+    getQuiz(materialId, subMaterialId = null) { 
+        let endpoint = `/quiz?material_id=${materialId}`;
+        if (subMaterialId) endpoint += `&sub_material_id=${subMaterialId}`;
+        return this.get(endpoint); 
+    }
+    getQuizzesAdmin(materialId) { return this.get(`/quiz/list-admin?material_id=${materialId}`); }
     getQuizQuestions(quizId) { return this.get(`/quiz/questions?quiz_id=${quizId}`); }
     submitQuiz(data) { return this.post('/quiz/submit', data); }
     getUserQuizResults() { return this.get('/quiz/results'); }

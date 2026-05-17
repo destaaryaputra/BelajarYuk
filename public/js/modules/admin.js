@@ -348,53 +348,218 @@ export const Admin = {
         try { await API.deleteSubMaterial(id); this.loadSubMaterials(matId); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
 
-    // --- QUIZ ---
+    // --- QUIZ (REFACTORED FOR MULTI-TIER) ---
     async openQuizView(materialId, title) {
         document.getElementById('admin-list-view').classList.add('d-none');
         document.getElementById('admin-quiz-view').classList.remove('d-none');
         document.getElementById('admin-quiz-title').innerText = `Kuis: ${title}`;
         document.getElementById('quiz-material-id').value = materialId;
+        
+        this.hideQuizForm();
+        document.getElementById('admin-quiz-manage').classList.add('d-none');
+        
+        await this.loadQuizList(materialId);
+    },
+
+    async loadQuizList(materialId) {
+        const container = document.getElementById('admin-quiz-list-container');
+        if (!container) return;
+        
+        container.innerHTML = '<div class="skeleton-box" style="height: 100px;"></div>';
+        
+        try {
+            const res = await API.getQuizzesAdmin(materialId);
+            const quizzes = res.data || [];
+            
+            if (quizzes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state p-24 border dashed rounded-16 text-center">
+                        <p class="text-muted mb-12">Materi ini belum memiliki kuis.</p>
+                        <button type="button" class="btn-outline btn-small" onclick="Admin.showCreateQuizForm()">Buat Kuis Pertama</button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="admin-table-wrapper mt-16">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Tipe</th>
+                                <th>Judul Kuis</th>
+                                <th>Konteks</th>
+                                <th>Soal</th>
+                                <th class="text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            quizzes.forEach(q => {
+                const typeLabel = q.quiz_type === 'mini' ? '<span class="badge badge-accent">Mini</span>' : '<span class="badge badge-primary">Final</span>';
+                const context = q.quiz_type === 'mini' ? `Episode: ${UI.escapeHtml(q.sub_material_title || 'Unknown')}` : 'Modul Utama';
+                
+                html += `
+                    <tr>
+                        <td>${typeLabel}</td>
+                        <td class="font-bold">${UI.escapeHtml(q.title)}</td>
+                        <td class="text-muted small">${context}</td>
+                        <td>${q.total_questions} Soal</td>
+                        <td class="text-right">
+                            <div class="d-flex justify-end gap-8">
+                                <button class="btn-outline btn-small" onclick="Admin.manageQuizQuestions(${q.id}, '${UI.escapeHtml(q.title)}')">Kelola Soal</button>
+                                <button class="btn-outline btn-small" onclick="Admin.editQuizConfig(${q.id})">Setting</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            container.innerHTML = html + '</tbody></table></div>';
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = '<p class="text-danger">Gagal memuat daftar kuis.</p>';
+        }
+    },
+
+    async showCreateQuizForm() {
+        const matId = document.getElementById('quiz-material-id').value;
+        const form = document.getElementById('create-quiz-form');
+        form.reset();
+        document.getElementById('quiz-id-edit').value = '';
+        document.getElementById('admin-quiz-setup-title').innerText = 'Buat Kuis Baru';
+        
+        // Load episodes for the dropdown
+        const subRes = await API.getSubMaterialsAdmin(matId);
+        const subs = subRes.data || [];
+        const subSelect = document.getElementById('quiz-sub-material-id');
+        subSelect.innerHTML = subs.map(s => `<option value="${s.id}">${UI.escapeHtml(s.title)}</option>`).join('');
+        
+        document.getElementById('admin-quiz-setup').classList.remove('d-none');
+        document.getElementById('admin-quiz-list-container').classList.add('d-none');
+        document.getElementById('admin-quiz-manage').classList.add('d-none');
+        this.handleQuizTypeChange();
+    },
+
+    hideQuizForm() {
+        document.getElementById('admin-quiz-setup').classList.add('d-none');
+        document.getElementById('admin-quiz-list-container').classList.remove('d-none');
+    },
+
+    handleQuizTypeChange() {
+        const type = document.getElementById('quiz-type').value;
+        const group = document.getElementById('sub-material-select-group');
+        group.classList.toggle('d-none', type !== 'mini');
+    },
+
+    async editQuizConfig(quizId) {
         UI.showLoading();
         try {
-            const res = await API.getQuiz(materialId);
-            const q = res.data;
-            if (q && q.id) {
-                document.getElementById('admin-quiz-setup').classList.add('d-none');
-                document.getElementById('admin-quiz-manage').classList.remove('d-none');
-                document.getElementById('active-quiz-title').innerText = q.title;
-                document.getElementById('q-quiz-id').value = q.id;
-                this.loadQuestions(q.id);
-            } else {
-                document.getElementById('admin-quiz-setup').classList.remove('d-none');
-                document.getElementById('admin-quiz-manage').classList.add('d-none');
-            }
-        } catch (error) { console.error(error); } finally { UI.hideLoading(); }
+            // Fetch all quizzes for this material to find the one to edit
+            const matId = document.getElementById('quiz-material-id').value;
+            const res = await API.getQuizzesAdmin(matId);
+            const quizzes = res.data || [];
+            const q = quizzes.find(x => x.id == quizId);
+            
+            if (!q) throw new Error('Kuis tidak ditemukan.');
+
+            const form = document.getElementById('create-quiz-form');
+            form.reset();
+            document.getElementById('quiz-id-edit').value = q.id;
+            document.getElementById('quiz-type').value = q.quiz_type;
+            document.getElementById('quiz-title').value = q.title;
+            document.getElementById('quiz-desc').value = q.description || '';
+            document.getElementById('quiz-passing').value = q.passing_score;
+            document.getElementById('quiz-time').value = q.time_limit_minutes || 0;
+
+            // Load episodes for the dropdown
+            const subRes = await API.getSubMaterialsAdmin(matId);
+            const subs = subRes.data || [];
+            const subSelect = document.getElementById('quiz-sub-material-id');
+            subSelect.innerHTML = subs.map(s => `<option value="${s.id}" ${s.id == q.sub_material_id ? 'selected' : ''}>${UI.escapeHtml(s.title)}</option>`).join('');
+            
+            this.handleQuizTypeChange();
+            
+            document.getElementById('admin-quiz-setup-title').innerText = 'Edit Pengaturan Kuis';
+            document.getElementById('admin-quiz-setup').classList.remove('d-none');
+            document.getElementById('admin-quiz-list-container').classList.add('d-none');
+            document.getElementById('admin-quiz-manage').classList.add('d-none');
+
+        } catch (error) {
+            UI.showNotification(error.message, 'error');
+        } finally {
+            UI.hideLoading();
+        }
     },
 
     async handleCreateQuiz(e) {
         e.preventDefault();
         const matId = document.getElementById('quiz-material-id').value;
+        const quizId = document.getElementById('quiz-id-edit').value;
+        
         const data = {
             material_id: matId,
+            quiz_id: quizId,
+            quiz_type: document.getElementById('quiz-type').value,
+            sub_material_id: document.getElementById('quiz-type').value === 'mini' ? document.getElementById('quiz-sub-material-id').value : null,
             title: document.getElementById('quiz-title').value,
             description: document.getElementById('quiz-desc').value,
             passing_score: document.getElementById('quiz-passing').value,
             time_limit_minutes: document.getElementById('quiz-time').value
         };
+
         UI.showLoading();
-        try { await API.post('/quiz/create', data); this.openQuizView(matId, 'Kuis Baru'); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
+        try {
+            // NOTE: Current API only supports create. Update would need a new endpoint.
+            // For now we assume create.
+            await API.post('/quiz/create', data);
+            UI.showNotification('Kuis berhasil disimpan!', 'success');
+            this.hideQuizForm();
+            this.loadQuizList(matId);
+        } catch (error) {
+            UI.showNotification(error.message, 'error');
+        } finally {
+            UI.hideLoading();
+        }
+    },
+
+    async manageQuizQuestions(quizId, title) {
+        document.getElementById('admin-quiz-list-container').classList.add('d-none');
+        document.getElementById('admin-quiz-manage').classList.remove('d-none');
+        document.getElementById('active-quiz-title').innerText = title;
+        document.getElementById('q-quiz-id').value = quizId;
+        
+        this.loadQuestions(quizId);
+    },
+
+    backToQuizList() {
+        const matId = document.getElementById('quiz-material-id').value;
+        document.getElementById('admin-quiz-manage').classList.add('d-none');
+        document.getElementById('admin-quiz-list-container').classList.remove('d-none');
+        this.loadQuizList(matId);
     },
 
     async loadQuestions(quizId) {
+        const container = document.getElementById('admin-questions-table');
+        container.innerHTML = '<div class="skeleton-box" style="height: 100px;"></div>';
+        
         try {
             const res = await API.getQuizQuestions(quizId);
             const qs = res.data || [];
-            let html = '<table class="admin-table"><thead><tr><th>No</th><th>Soal</th><th>Aksi</th></tr></thead><tbody>';
-            qs.forEach((q, i) => {
-                html += `<tr><td>${i+1}</td><td>${UI.escapeHtml(q.question_text)}</td><td><button class="btn-outline btn-text-danger btn-small" onclick="Admin.deleteQuestion(${q.id}, ${quizId})">Hapus</button></td></tr>`;
-            });
-            document.getElementById('admin-questions-table').innerHTML = html + '</tbody></table>';
-        } catch (error) { console.error(error); }
+            let html = '<table class="admin-table"><thead><tr><th>No</th><th>Soal</th><th class="text-right">Aksi</th></tr></thead><tbody>';
+            
+            if (qs.length === 0) html += '<tr><td colspan="3" class="text-center p-24 text-muted">Belum ada soal. Klik Tambah Soal untuk memulai.</td></tr>';
+            else {
+                qs.forEach((q, i) => {
+                    html += `<tr><td>${i+1}</td><td>${UI.escapeHtml(q.question_text)}</td><td class="text-right"><button class="btn-outline btn-text-danger btn-small" onclick="Admin.deleteQuestion(${q.id}, ${quizId})">Hapus</button></td></tr>`;
+                });
+            }
+            container.innerHTML = html + '</tbody></table>';
+        } catch (error) { 
+            console.error(error);
+            container.innerHTML = '<p class="text-danger">Gagal memuat soal.</p>';
+        }
     },
 
     async handleSaveQuestion(e) {
@@ -410,23 +575,48 @@ export const Admin = {
             correct_opt: document.getElementById('q-correct').value
         };
         UI.showLoading();
-        try { await API.post('/quiz/questions/add', data); document.getElementById('admin-question-form-container').classList.add('d-none'); this.loadQuestions(quizId); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
+        try { 
+            await API.post('/quiz/questions/add', data); 
+            document.getElementById('admin-question-form-container').classList.add('d-none'); 
+            e.target.reset();
+            this.loadQuestions(quizId); 
+            UI.showNotification('Soal ditambahkan!', 'success');
+        } catch (error) { 
+            UI.showNotification(error.message, 'error'); 
+        } finally { 
+            UI.hideLoading(); 
+        }
     },
 
     async deleteQuestion(id, qid) {
         const confirmed = await UI.confirm('Hapus soal ini?', 'Konfirmasi Hapus', true);
         if (!confirmed) return;
         UI.showLoading();
-        try { await API.post('/quiz/questions/delete', { id }); this.loadQuestions(qid); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
+        try { 
+            await API.post('/quiz/questions/delete', { id }); 
+            this.loadQuestions(qid); 
+            UI.showNotification('Soal dihapus', 'success');
+        } catch (error) { 
+            console.error(error); 
+        } finally { 
+            UI.hideLoading(); 
+        }
     },
 
     async handleDeleteQuiz() {
-        const confirmed = await UI.confirm('Hapus seluruh kuis dan data terkait?', 'Hapus Kuis', true);
+        const confirmed = await UI.confirm('Hapus seluruh kuis ini beserta semua soal dan hasil nilainya? Tindakan ini tidak bisa dibatalkan.', 'Hapus Kuis', true);
         if (!confirmed) return;
         const qid = document.getElementById('q-quiz-id').value;
-        const mid = document.getElementById('quiz-material-id').value;
         UI.showLoading();
-        try { await API.post('/quiz/delete', { id: qid }); this.openQuizView(mid, 'Kuis'); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
+        try { 
+            await API.post('/quiz/delete', { id: qid }); 
+            UI.showNotification('Kuis dihapus', 'success');
+            this.backToQuizList();
+        } catch (error) { 
+            UI.showNotification(error.message, 'error'); 
+        } finally { 
+            UI.hideLoading(); 
+        }
     },
 
     // --- USERS ---
@@ -923,6 +1113,11 @@ window.toggleQuizView = (show) => {
     document.getElementById('admin-list-view').classList.toggle('d-none', show);
 };
 window.handleCreateQuiz = (e) => Admin.handleCreateQuiz(e);
+window.showCreateQuizForm = () => Admin.showCreateQuizForm();
+window.hideQuizForm = () => Admin.hideQuizForm();
+window.manageQuizQuestions = (id, title) => Admin.manageQuizQuestions(id, title);
+window.editQuizConfig = (id) => Admin.editQuizConfig(id);
+window.backToQuizList = () => Admin.backToQuizList();
 window.toggleQuestionForm = (show) => document.getElementById('admin-question-form-container').classList.toggle('d-none', !show);
 window.handleSaveQuestion = (e) => Admin.handleSaveQuestion(e);
 window.handleDeleteQuiz = () => Admin.handleDeleteQuiz();

@@ -13,6 +13,7 @@ import { Profile } from './modules/profile.js';
 import { Progress } from './modules/progress.js';
 import { AIChat } from './modules/chat.js';
 import { MaterialDetail } from './modules/materialDetail.js';
+import { Quiz } from './modules/quiz.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Belajaryuk Bootstrapping...');
@@ -51,6 +52,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (pageId === 'material-detail-page') {
             MaterialDetail.load();
+        }
+        if (pageId === 'quiz-page') {
+            Quiz.load();
         }
         if (pageId === 'profile-page') {
             Profile.load();

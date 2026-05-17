@@ -1,0 +1,79 @@
+<main class="quiz-container">
+    <div id="quiz-loading" class="text-center p-48">
+        <div class="skeleton-box mb-24" style="height: 300px; border-radius: 24px;"></div>
+        <h3>Mempersiapkan kuis...</h3>
+    </div>
+
+    <div id="quiz-content" class="d-none">
+        <div class="quiz-header-section mb-32">
+            <div class="d-flex justify-between align-center mb-12">
+                <span class="section-eyebrow" id="quiz-type-label">Kuis Materi</span>
+                <div class="quiz-timer d-none" id="quiz-timer-container">
+                    <i data-lucide="clock" class="icon-xs"></i>
+                    <span id="quiz-timer-text">00:00</span>
+                </div>
+            </div>
+            <h1 id="quiz-title-display">Judul Kuis</h1>
+            <p class="text-muted" id="quiz-desc-display"></p>
+        </div>
+
+        <div id="questions-container">
+            <!-- Soal kuis akan dimuat di sini -->
+        </div>
+
+        <div class="quiz-actions mt-48 pt-24 border-top">
+            <button type="button" class="btn-primary btn-lg" id="btn-submit-quiz">
+                Kumpulkan Jawaban <i data-lucide="check-circle"></i>
+            </button>
+            <button type="button" class="btn-ghost" id="btn-cancel-quiz">Batal</button>
+        </div>
+    </div>
+
+    <div id="quiz-result" class="d-none text-center">
+        <div class="result-card content-card">
+            <div id="result-icon-box" class="result-icon-box mb-24">
+                <i data-lucide="award" class="icon-xl"></i>
+            </div>
+            <h2 id="result-title">Hasil Kuis</h2>
+            <div class="result-score-display mt-24 mb-32">
+                <div class="score-value" id="result-percentage">0%</div>
+                <p class="text-muted" id="result-score-text">Kamu menjawab 0 dari 0 soal dengan benar.</p>
+            </div>
+            <div id="result-points-box" class="result-points-box mb-32">
+                <span class="points-label">Poin Didapat:</span>
+                <strong class="points-value" id="result-points">+0</strong>
+            </div>
+            <div class="d-flex gap-12 justify-center">
+                <button type="button" class="btn-primary" id="btn-finish-quiz">Lanjut Belajar</button>
+                <button type="button" class="btn-outline" id="btn-retry-quiz">Coba Lagi</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    .quiz-container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    .question-card { margin-bottom: 32px; animation: fadeIn 0.4s ease; }
+    .question-text { font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 20px; line-height: 1.5; }
+    
+    .options-grid { display: grid; gap: 12px; }
+    .option-item {
+        display: flex; align-items: center; gap: 14px;
+        padding: 16px 20px; border-radius: 16px; border: 1.5px solid var(--border);
+        background: var(--surface); cursor: pointer; transition: all 0.2s ease;
+    }
+    .option-item:hover { border-color: var(--primary); background: var(--surface-muted); }
+    .option-item.selected { border-color: var(--primary); background: rgba(16, 185, 129, 0.05); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
+    
+    .option-badge {
+        width: 32px; height: 32px; border-radius: 10px; background: #f3f4f6;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 0.9rem; color: #6b7280; flex-shrink: 0;
+    }
+    .option-item.selected .option-badge { background: var(--primary); color: white; }
+    
+    .result-icon-box { width: 80px; height: 80px; border-radius: 24px; background: #f0fdf4; color: #10b981; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+    .result-icon-box.fail { background: #fef2f2; color: #ef4444; }
+    .score-value { font-size: 4rem; font-weight: 900; color: var(--text-main); }
+    .result-points-box { display: inline-flex; align-items: center; gap: 12px; padding: 8px 24px; border-radius: 99px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+</style>

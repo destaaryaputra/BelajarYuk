@@ -19,13 +19,13 @@ class Quiz {
     }
 
     /**
-     * Get quiz by material ID
+     * Get quiz by material ID (Final Quiz)
      */
     public function getQuizByMaterialId($material_id) {
         try {
-            $query = "SELECT id, title, description, material_id, passing_score, total_questions, created_at 
+            $query = "SELECT id, title, description, material_id, passing_score, total_questions, created_at, quiz_type, sub_material_id 
                      FROM kuis 
-                     WHERE material_id = ? AND status = 'active'";
+                     WHERE material_id = ? AND quiz_type = 'final' AND status = 'active'";
             
             $stmt = $this->db->prepare($query);
             $stmt->execute([$material_id]);
@@ -33,6 +33,25 @@ class Quiz {
             return $stmt->fetch();
         } catch (Exception $e) {
             error_log("Get quiz error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get mini quiz by sub material ID
+     */
+    public function getQuizBySubMaterialId($sub_material_id) {
+        try {
+            $query = "SELECT id, title, description, material_id, sub_material_id, quiz_type, passing_score, total_questions, created_at 
+                     FROM kuis 
+                     WHERE sub_material_id = ? AND quiz_type = 'mini' AND status = 'active'";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$sub_material_id]);
+
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            error_log("Get mini quiz error: " . $e->getMessage());
             return null;
         }
     }
@@ -226,14 +245,16 @@ class Quiz {
      */
     public function createQuiz($data) {
         try {
-            $query = "INSERT INTO kuis (title, description, material_id, passing_score, total_questions, time_limit_minutes, created_at) 
-                     VALUES (?, ?, ?, ?, ?, ?, NOW()) RETURNING id";
+            $query = "INSERT INTO kuis (title, description, material_id, sub_material_id, quiz_type, passing_score, total_questions, time_limit_minutes, created_at) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW()) RETURNING id";
             
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 $data['title'],
                 $data['description'],
                 $data['material_id'],
+                $data['sub_material_id'] ?? null,
+                $data['quiz_type'] ?? 'final',
                 $data['passing_score'] ?? 60,
                 $data['total_questions'] ?? 0,
                 $data['time_limit_minutes'] ?? null

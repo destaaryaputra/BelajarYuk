@@ -371,6 +371,20 @@ export const MaterialDetail = {
                     this.state.material.is_completed = true;
                 }
 
+                // Check for Mini Quiz for this episode
+                if (!active.isMain) {
+                    const quizRes = await API.getQuiz(materialId, active.id);
+                    if (quizRes.data) {
+                        // There is a mini quiz!
+                        localStorage.setItem('active_sub_material_id', active.id);
+                        const goQuiz = await UI.confirm('Ada kuis mini untuk episode ini. Kerjakan sekarang untuk membuka episode berikutnya?', 'Uji Pemahaman');
+                        if (goQuiz) {
+                            window.location.hash = 'quiz-page';
+                            return false; // Stop navigation, we are going to quiz
+                        }
+                    }
+                }
+
                 // Senior UX: Check if 100% completed to fire confetti
                 const totalSteps = this.state.subMaterials.length + 1; // Subs + Main
                 const completedSteps = this.state.completedEpisodes.length + (this.state.material.is_completed ? 1 : 0);
@@ -391,9 +405,9 @@ export const MaterialDetail = {
         if (nextBtn && nextEpisode) {
             nextBtn.onclick = async () => {
                 UI.showLoading();
-                const success = await markCurrentComplete(true);
+                const proceed = await markCurrentComplete(true);
                 UI.hideLoading();
-                if (success) {
+                if (proceed) {
                     this.selectItem(String(nextEpisode.id));
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
@@ -404,9 +418,12 @@ export const MaterialDetail = {
         if (finishToQuizBtn) {
             finishToQuizBtn.onclick = async () => {
                 UI.showLoading();
-                await markCurrentComplete(true);
+                const proceed = await markCurrentComplete(true);
                 UI.hideLoading();
-                window.location.hash = 'quiz-page';
+                if (proceed) {
+                    localStorage.removeItem('active_sub_material_id'); // Clear sub_id for Final Quiz
+                    window.location.hash = 'quiz-page';
+                }
             };
         }
 

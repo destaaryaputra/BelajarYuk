@@ -32,8 +32,9 @@ return [
     'POST /materials/comments/delete' => ['App\\Controllers\\MaterialController', 'deleteCommentAdmin'],
 
     'GET /quiz' => ['App\\Controllers\\QuizController', 'getQuiz'],
-    'GET /quiz/questions' => ['App\\Controllers\\QuizController', 'getQuestions'],
-    'POST /quiz/submit' => ['App\\Controllers\\QuizController', 'submitQuiz'],
+    'GET /quiz/questions' => ['App\\\\Controllers\\\\QuizController', 'getQuestions'],
+    'GET /quiz/list-admin' => ['App\\\\Controllers\\\\QuizController', 'listQuizzesAdmin'],
+    'POST /quiz/submit' => ['App\\\\Controllers\\\\QuizController', 'submitQuiz'],
     'GET /quiz/results' => ['App\\Controllers\\QuizController', 'getUserResults'],
     'GET /quiz/admin-report' => ['App\\Controllers\\QuizController', 'getAdminReport'],
     'POST /quiz/create' => ['App\\Controllers\\QuizController', 'createQuizAdmin'],

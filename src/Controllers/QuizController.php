@@ -20,20 +20,52 @@ class QuizController {
         $this->quizModel = new Quiz();
     }
 
+    public function listQuizzesAdmin(): void {
+        AuthMiddleware::requireAuth();
+        $user = AuthMiddleware::getAuthUser();
+        if (!isset($user['role']) || $user['role'] !== 'admin') {
+            Response::error('Unauthorized', null, 403);
+        }
+
+        try {
+            $material_id = isset($_GET['material_id']) ? intval($_GET['material_id']) : null;
+            if (!$material_id) Response::error('Material ID required', null, 400);
+
+            $db = \App\Config\Database::getInstance();
+            $stmt = $db->prepare("SELECT q.*, sm.title as sub_material_title 
+                                 FROM kuis q 
+                                 LEFT JOIN sub_materi sm ON q.sub_material_id = sm.id 
+                                 WHERE q.material_id = ? 
+                                 ORDER BY q.quiz_type DESC, q.created_at ASC");
+            $stmt->execute([$material_id]);
+            $quizzes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            Response::success('Daftar kuis berhasil dimuat', $quizzes);
+        } catch (Exception $e) {
+            Response::error($e->getMessage(), null, 500);
+        }
+    }
+
     /**
-     * Get quiz untuk material tertentu
+     * Get quiz untuk material atau sub-materi tertentu
      */
     public function getQuiz(): void {
         try {
-            if (!isset($_GET['material_id'])) {
-                Response::error('Pilih materi pembelajarannya dulu ya.', null, 400);
+            $material_id = isset($_GET['material_id']) ? intval($_GET['material_id']) : null;
+            $sub_material_id = isset($_GET['sub_material_id']) ? intval($_GET['sub_material_id']) : null;
+
+            if (!$material_id && !$sub_material_id) {
+                Response::error('Pilih materi atau episode pembelajarannya dulu ya.', null, 400);
             }
 
-            $material_id = intval($_GET['material_id']);
-            $quiz = $this->quizModel->getQuizByMaterialId($material_id);
+            if ($sub_material_id) {
+                $quiz = $this->quizModel->getQuizBySubMaterialId($sub_material_id);
+            } else {
+                $quiz = $this->quizModel->getQuizByMaterialId($material_id);
+            }
 
             if (!$quiz) {
-                Response::success('Belum ada kuis untuk materi ini.', null);
+                Response::success('Belum ada kuis untuk bagian ini.', null);
                 return;
             }
 
@@ -150,6 +182,8 @@ class QuizController {
         $data = json_decode(file_get_contents("php://input"), true);
 
         $materialId = intval($data['material_id'] ?? 0);
+        $subMaterialId = isset($data['sub_material_id']) ? intval($data['sub_material_id']) : null;
+        $quizType = Security::sanitize($data['quiz_type'] ?? 'final');
         $title = Security::sanitize($data['title'] ?? '');
         $description = Security::sanitize($data['description'] ?? '');
         $passingScore = intval($data['passing_score'] ?? 70);
@@ -165,6 +199,8 @@ class QuizController {
         
         $result = $this->quizModel->createQuiz([
             'material_id' => $materialId,
+            'sub_material_id' => $subMaterialId,
+            'quiz_type' => $quizType,
             'title' => $title,
             'description' => $description,
             'passing_score' => $passingScore,

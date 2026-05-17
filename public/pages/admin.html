@@ -145,37 +145,89 @@
                 <div id="admin-quiz-view" class="d-none">
                     <div class="content-card">
                         <div class="d-flex justify-between align-center mb-16">
-                            <h3 id="admin-quiz-title">Kuis</h3>
-                            <button type="button" class="btn-outline" onclick="toggleQuizView(false)">Kembali</button>
+                            <h3 id="admin-quiz-title">Manajemen Kuis</h3>
+                            <div class="d-flex gap-12">
+                                <button type="button" id="btn-add-quiz-modal" onclick="Admin.showCreateQuizForm()">Tambah Kuis</button>
+                                <button type="button" class="btn-outline" onclick="toggleQuizView(false)">Kembali</button>
+                            </div>
                         </div>
+                        
                         <input type="hidden" id="quiz-material-id">
-                        <div id="admin-quiz-setup">
-                            <form id="create-quiz-form" onsubmit="handleCreateQuiz(event)">
-                                <div><label for="quiz-title">Judul Kuis</label><input type="text" id="quiz-title" required></div>
-                                <div><label for="quiz-desc">Deskripsi</label><textarea id="quiz-desc"></textarea></div>
-                                <div><label for="quiz-passing">Passing Score</label><input type="number" id="quiz-passing" value="60" min="0" max="100"></div>
-                                <div><label for="quiz-time">Batas Waktu Menit</label><input type="number" id="quiz-time" value="0" min="0"></div>
-                                <button type="submit">Buat Kuis</button>
+                        
+                        <div id="admin-quiz-list-container">
+                            <!-- Daftar kuis akan dimuat di sini -->
+                        </div>
+
+                        <div id="admin-quiz-setup" class="d-none mt-24 border-top pt-24">
+                            <h3 id="admin-quiz-setup-title">Buat Kuis Baru</h3>
+                            <form id="create-quiz-form">
+                                <input type="hidden" id="quiz-id-edit">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="quiz-type">Tipe Kuis</label>
+                                        <select id="quiz-type" onchange="Admin.handleQuizTypeChange()">
+                                            <option value="final">Kuis Final (Syarat Kelulusan Modul)</option>
+                                            <option value="mini">Mini Kuis (Per Episode)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group d-none" id="sub-material-select-group">
+                                        <label for="quiz-sub-material-id">Pilih Episode</label>
+                                        <select id="quiz-sub-material-id">
+                                            <!-- Pilihan episode akan dimuat dinamis -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="quiz-title">Judul Kuis</label>
+                                        <input type="text" id="quiz-title" required placeholder="Contoh: Uji Pemahaman Dasar">
+                                    </div>
+                                </div>
+                                <div><label for="quiz-desc">Deskripsi</label><textarea id="quiz-desc" placeholder="Jelaskan tujuan kuis ini..."></textarea></div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="quiz-passing">Passing Score (%)</label>
+                                        <input type="number" id="quiz-passing" value="60" min="0" max="100">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="quiz-time">Batas Waktu Menit (0 = Tanpa batas)</label>
+                                        <input type="number" id="quiz-time" value="0" min="0">
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-12 mt-16">
+                                    <button type="submit">Simpan Konfigurasi Kuis</button>
+                                    <button type="button" class="btn-ghost" onclick="Admin.hideQuizForm()">Batal</button>
+                                </div>
                             </form>
                         </div>
-                        <div id="admin-quiz-manage" class="d-none">
-                            <h3 id="active-quiz-title"></h3>
-                            <p id="active-quiz-info"></p>
+
+                        <div id="admin-quiz-manage" class="d-none mt-24 border-top pt-24">
+                            <div class="d-flex justify-between align-center mb-16">
+                                <div>
+                                    <h3 id="active-quiz-title" class="mb-4"></h3>
+                                    <p id="active-quiz-info" class="text-muted small"></p>
+                                </div>
+                                <button type="button" class="btn-ghost btn-small" onclick="Admin.backToQuizList()"><i data-lucide="arrow-left"></i> Kembali ke Daftar</button>
+                            </div>
+                            
                             <input type="hidden" id="q-quiz-id">
                             <div class="d-flex gap-12 mb-16">
                                 <button type="button" onclick="toggleQuestionForm(true)">Tambah Soal</button>
-                                <button type="button" class="btn-outline btn-danger" onclick="handleDeleteQuiz()">Hapus Kuis</button>
+                                <button type="button" class="btn-outline btn-text-danger" onclick="handleDeleteQuiz()">Hapus Kuis Ini</button>
                             </div>
                             <div id="admin-questions-table"></div>
                             <div id="admin-question-form-container" class="d-none mt-24">
-                                <form id="create-question-form" onsubmit="handleSaveQuestion(event)">
+                                <form id="create-question-form">
                                     <div><label for="q-text">Pertanyaan</label><textarea id="q-text" required></textarea></div>
-                                    <div><label for="q-opt-a">Opsi A</label><input type="text" id="q-opt-a" required></div>
-                                    <div><label for="q-opt-b">Opsi B</label><input type="text" id="q-opt-b" required></div>
-                                    <div><label for="q-opt-c">Opsi C</label><input type="text" id="q-opt-c" required></div>
-                                    <div><label for="q-opt-d">Opsi D</label><input type="text" id="q-opt-d" required></div>
+                                    <div class="form-grid">
+                                        <div class="form-group"><label for="q-opt-a">Opsi A</label><input type="text" id="q-opt-a" required></div>
+                                        <div class="form-group"><label for="q-opt-b">Opsi B</label><input type="text" id="q-opt-b" required></div>
+                                        <div class="form-group"><label for="q-opt-c">Opsi C</label><input type="text" id="q-opt-c" required></div>
+                                        <div class="form-group"><label for="q-opt-d">Opsi D</label><input type="text" id="q-opt-d" required></div>
+                                    </div>
                                     <div><label for="q-correct">Jawaban Benar</label><select id="q-correct"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
-                                    <button type="submit">Simpan Soal</button>
+                                    <div class="d-flex gap-12 mt-16">
+                                        <button type="submit">Simpan Soal</button>
+                                        <button type="button" class="btn-ghost" onclick="toggleQuestionForm(false)">Batal</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
