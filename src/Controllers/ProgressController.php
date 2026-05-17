@@ -45,6 +45,7 @@ class ProgressController {
                     'completed' => intval($summary['materials_completed'] ?? 0),
                     'total' => intval($summary['total_materials'] ?? 0),
                     'avg_score' => isset($summary['average_quiz_score']) ? round($summary['average_quiz_score']) : 0,
+                    'total_points' => intval($summary['total_points'] ?? 0),
                     'streak' => intval($streakData['active_days'] ?? 0),
                     'last_material' => $lastMaterial
                 ],
@@ -75,6 +76,7 @@ class ProgressController {
                 'completed' => intval($summary['materials_completed'] ?? 0),
                 'total' => intval($summary['total_materials'] ?? 0),
                 'avg_score' => isset($summary['average_quiz_score']) ? round($summary['average_quiz_score']) : 0,
+                'total_points' => intval($summary['total_points'] ?? 0),
                 'streak' => intval($streakData['active_days'] ?? 0),
                 'last_material' => $lastMaterial
             ];
@@ -95,8 +97,9 @@ class ProgressController {
         try {
             $user = AuthMiddleware::getAuthUser();
             $progressRaw = $this->progressModel->getProgressByCategory($user['id']) ?: [];
+            $materialProgress = $this->progressModel->getDetailedMaterialProgress($user['id']) ?: [];
 
-            $progress = array_map(function($cat) {
+            $categories = array_map(function($cat) {
                 return [
                     'category' => $cat['category'],
                     'total' => intval($cat['total_materials']),
@@ -105,10 +108,13 @@ class ProgressController {
                 ];
             }, $progressRaw);
 
-            Response::success('Progres per kategori berhasil diambil', $progress);
+            Response::success('Data progres berhasil diambil', [
+                'categories' => $categories,
+                'materials' => $materialProgress
+            ]);
         } catch (Exception $e) {
             error_log("Get progress by category error: " . $e->getMessage());
-            Response::error('Gagal mengambil progres per kategori', null, 500);
+            Response::error('Gagal mengambil data progres', null, 500);
         }
     }
 

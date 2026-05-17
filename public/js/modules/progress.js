@@ -12,28 +12,69 @@ export const Progress = {
 
         // 1. Loading States
         summaryContainer.innerHTML = '<div class="skeleton-box" style="height: 120px; width: 100%;"></div>';
-        document.getElementById('category-progress').innerHTML = '<div class="skeleton-box" style="height: 200px; width: 100%;"></div>';
+        const catsContainer = document.getElementById('category-progress');
+        const materialsContainer = document.getElementById('material-progress-list');
+        if (catsContainer) catsContainer.innerHTML = '<div class="skeleton-box" style="height: 200px; width: 100%;"></div>';
+        if (materialsContainer) materialsContainer.innerHTML = '<div class="skeleton-box" style="height: 200px; width: 100%;"></div>';
         document.getElementById('leaderboard-list').innerHTML = '<div class="skeleton-box" style="height: 300px; width: 100%;"></div>';
 
         try {
             // Fetch all data in parallel
-            const [summaryRes, catsRes, leaderboardRes, quizRes] = await Promise.all([
+            const [summaryRes, detailedRes, leaderboardRes, quizRes] = await Promise.all([
                 API.getProgressSummary(),
                 API.getProgressByCategories(),
                 API.getLeaderboard(),
                 API.getQuizPerformance()
             ]);
 
+            const progressData = detailedRes.data || {};
             this.renderSummary(summaryRes.data || {});
-            this.renderCategories(catsRes.data || []);
+            this.renderCategories(progressData.categories || []);
             this.renderLeaderboard(leaderboardRes.data || []);
             this.renderQuizHistory(quizRes.data || []);
+
+            if (materialsContainer) {
+                this.renderMaterials(progressData.materials || [], materialsContainer);
+            }
 
             if (window.lucide) window.lucide.createIcons();
         } catch (error) {
             console.error('Progress load error:', error);
             UI.showNotification('Gagal memuat data progres.', 'error');
         }
+    },
+
+    renderMaterials(materials, container) {
+        if (!materials || materials.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>Belum ada progres materi.</p></div>';
+            return;
+        }
+
+        let html = `
+            <div class="content-card">
+                <h3 class="mb-20"><i data-lucide="book-open" class="icon-md mr-8"></i> Progres Per Materi</h3>
+                <div class="material-progress-grid">
+        `;
+
+        materials.forEach(m => {
+            const isDone = m.percentage >= 100;
+            html += `
+                <div class="material-progress-card">
+                    <div class="mpc-info">
+                        <div class="mpc-text">
+                            <span class="category-tag mb-8">${UI.escapeHtml(m.category)}</span>
+                            <h4>${UI.escapeHtml(m.title)}</h4>
+                        </div>
+                        <div class="mpc-percentage ${isDone ? 'text-success' : ''}">${m.percentage}%</div>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${m.percentage}%"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html + '</div></div>';
     },
 
     renderSummary(data) {

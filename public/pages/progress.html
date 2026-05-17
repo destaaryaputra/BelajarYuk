@@ -1,19 +1,42 @@
 <main>
     <div class="header-section">
-        <h1>Progress Belajar</h1>
-        <p>Ringkasan aktivitas dan hasil kuis kamu.</p>
+        <h1>Progres Belajar</h1>
+        <p>Pantau sejauh mana kamu sudah melangkah dan kumpulkan poin!</p>
     </div>
+
+    <!-- Ringkasan Statistik -->
     <div id="progress-summary" class="mb-32"></div>
-    <div class="content-card">
-        <h2>Progress per Kategori</h2>
-        <div id="category-progress"></div>
-    </div>
-    <div class="content-card">
-        <h2>Papan Peringkat (Leaderboard)</h2>
-        <div id="leaderboard-list"></div>
-    </div>
-    <div class="content-card">
-        <h2>Riwayat Kuis</h2>
-        <div id="quiz-performance"></div>
+
+    <div class="dashboard-layout" style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start;">
+        <div class="dashboard-main-col">
+            <!-- Progres Per Kategori -->
+            <div class="content-card mb-24">
+                <h3 class="mb-16">Ringkasan Kategori</h3>
+                <div id="category-progress"></div>
+            </div>
+
+            <!-- Progres Per Materi (Detail) -->
+            <div id="material-progress-list" class="mb-24"></div>
+
+            <!-- Riwayat Kuis -->
+            <div class="content-card">
+                <h3 class="mb-16">Riwayat Kuis Terakhir</h3>
+                <div id="quiz-performance"></div>
+            </div>
+        </div>
+
+        <div class="dashboard-side-col">
+            <!-- Leaderboard -->
+            <div class="content-card">
+                <h3 class="mb-16">Papan Peringkat</h3>
+                <div id="leaderboard-list"></div>
+            </div>
+        </div>
     </div>
 </main>
+
+<style>
+    @media (max-width: 1024px) {
+        .dashboard-layout { grid-template-columns: 1fr !important; }
+    }
+</style>

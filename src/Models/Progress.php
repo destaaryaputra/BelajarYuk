@@ -24,18 +24,22 @@ class Progress {
      */
     public function getUserProgressSummary(int $user_id): ?array {
         try {
-            // Simplified summary query
+            // Updated summary query to include total points
             $query = "SELECT 
                         (SELECT COUNT(*)::int FROM progres_materi WHERE user_id = :uid) as materials_completed,
                         (SELECT COUNT(*)::int FROM materi WHERE status = 'active') as total_materials,
                         (SELECT COUNT(*)::int FROM hasil_kuis WHERE user_id = :uid2) as quizzes_completed,
-                        (SELECT COALESCE(AVG(percentage), 0)::float FROM hasil_kuis WHERE user_id = :uid3) as average_quiz_score";
+                        (SELECT COALESCE(AVG(percentage), 0)::float FROM hasil_kuis WHERE user_id = :uid3) as average_quiz_score,
+                        (SELECT COALESCE(SUM(max_score), 0)::int FROM (
+                            SELECT MAX(score) as max_score FROM hasil_kuis WHERE user_id = :uid4 GROUP BY quiz_id
+                        ) t) as total_points";
 
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 'uid' => $user_id,
                 'uid2' => $user_id,
-                'uid3' => $user_id
+                'uid3' => $user_id,
+                'uid4' => $user_id
             ]);
 
             $result = $stmt->fetch();
@@ -46,6 +50,7 @@ class Progress {
                     'total_materials' => 0,
                     'quizzes_completed' => 0,
                     'average_quiz_score' => 0,
+                    'total_points' => 0,
                     'completion_percentage' => 0
                 ];
             }
@@ -63,6 +68,7 @@ class Progress {
                 'total_materials' => $total_materials,
                 'quizzes_completed' => (int) ($result['quizzes_completed'] ?? 0),
                 'average_quiz_score' => round((float) ($result['average_quiz_score'] ?? 0), 2),
+                'total_points' => (int) ($result['total_points'] ?? 0),
                 'completion_percentage' => round($completion_percentage, 2)
             ];
         } catch (Exception $e) {
@@ -74,6 +80,53 @@ class Progress {
     /**
      * Get detailed progress per kategori
      */
+    /**
+     * Get detailed progress for each material for a specific user
+     */
+    public function getDetailedMaterialProgress(int $user_id): array {
+        try {
+            // Logic: Count total sub_materials vs completed sub_materials for each active material
+            $query = "SELECT 
+                        m.id, m.title, m.category, m.thumbnail,
+                        (SELECT COUNT(*)::int FROM sub_materi WHERE material_id = m.id) as total_episodes,
+                        (SELECT COUNT(*)::int FROM progres_sub_materi psm 
+                         JOIN sub_materi sm ON psm.sub_material_id = sm.id 
+                         WHERE sm.material_id = m.id AND psm.user_id = :uid) as completed_episodes,
+                        EXISTS(SELECT 1 FROM progres_materi WHERE user_id = :uid2 AND material_id = m.id AND completed_at IS NOT NULL) as main_completed
+                     FROM materi m
+                     WHERE m.status = 'active'
+                     ORDER BY m.category, m.title";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->execute(['uid' => $user_id, 'uid2' => $user_id]);
+            $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return array_map(function($m) {
+                $total = (int) $m['total_episodes'];
+                $completed = (int) $m['completed_episodes'];
+                $mainDone = (bool) $m['main_completed'];
+                
+                // Add 1 to total and completed for the 'Main Material' part
+                $adjTotal = $total + 1;
+                $adjCompleted = $completed + ($mainDone ? 1 : 0);
+                
+                $percentage = ($adjTotal > 0) ? ($adjCompleted / $adjTotal) * 100 : 0;
+                
+                return [
+                    'id' => $m['id'],
+                    'title' => $m['title'],
+                    'category' => $m['category'],
+                    'thumbnail' => $m['thumbnail'],
+                    'percentage' => round($percentage, 0),
+                    'is_fully_completed' => ($adjCompleted >= $adjTotal && $adjTotal > 0)
+                ];
+            }, $materials);
+        } catch (Exception $e) {
+            error_log("Get detailed material progress error: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function getProgressByCategory(int $user_id): array {
         try {
             // Refactored query for better compatibility
