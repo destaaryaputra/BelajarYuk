@@ -108,13 +108,24 @@ export const MaterialDetail = {
             const isActive = this.state.activeItemId === item.id;
             const isLocked = !previousCompleted && !item.isMain;
 
+            let indexContent = '';
+            if (isCompleted) {
+                indexContent = '<i data-lucide="check" class="icon-xs"></i>';
+            } else if (isLocked) {
+                indexContent = '<i data-lucide="lock" class="icon-xs"></i>';
+            } else if (item.isMain) {
+                indexContent = '<i data-lucide="book-open" class="icon-xs"></i>';
+            } else {
+                indexContent = idx; // idx dimulai dari 1 untuk episode karena idx 0 adalah Main
+            }
+
             html += `
                 <button type="button" 
                     class="syllabus-item ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}" 
                     data-syllabus-id="${item.id}"
                     ${isLocked ? 'disabled' : ''}>
                     <div class="syllabus-index">
-                        ${isCompleted ? '<i data-lucide="check" class="icon-xs"></i>' : (isLocked ? '<i data-lucide="lock" class="icon-xs"></i>' : idx + 1)}
+                        ${indexContent}
                     </div>
                     <div class="syllabus-info">
                         <span class="syllabus-title">${UI.escapeHtml(item.title)}</span>
@@ -283,7 +294,7 @@ export const MaterialDetail = {
             <article class="content-card">
                 <div class="header-section mb-24">
                     <div class="d-flex justify-between align-center">
-                        <span class="section-eyebrow">${active.isMain ? 'Pengenalan Materi' : 'Episode ' + (currentIndex + 2)}</span>
+                        <span class="section-eyebrow">${active.isMain ? 'Pengenalan Materi' : 'Episode ' + (currentIndex + 1)}</span>
                         ${isCompleted ? '<span class="badge badge-success"><i data-lucide="check-circle" class="icon-xs"></i> Selesai</span>' : ''}
                     </div>
                     <h1>${UI.escapeHtml(active.title || 'Materi')}</h1>
