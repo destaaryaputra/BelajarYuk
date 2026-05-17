@@ -24,51 +24,38 @@ class Progress {
      */
     public function getUserProgressSummary(int $user_id): ?array {
         try {
-            // Updated summary query to include total points
-            $query = "SELECT 
-                        (SELECT COUNT(*)::int FROM progres_materi WHERE user_id = :uid) as materials_completed,
-                        (SELECT COUNT(*)::int FROM materi WHERE status = 'active') as total_materials,
-                        (SELECT COUNT(*)::int FROM hasil_kuis WHERE user_id = :uid2) as quizzes_completed,
-                        (SELECT COALESCE(AVG(percentage), 0)::float FROM hasil_kuis WHERE user_id = :uid3) as average_quiz_score,
-                        (SELECT COALESCE(SUM(max_score), 0)::int FROM (
-                            SELECT MAX(score) as max_score FROM hasil_kuis WHERE user_id = :uid4 GROUP BY quiz_id
-                        ) t) as total_points";
-
-            $stmt = $this->db->prepare($query);
-            $stmt->execute([
-                'uid' => $user_id,
-                'uid2' => $user_id,
-                'uid3' => $user_id,
-                'uid4' => $user_id
-            ]);
-
-            $result = $stmt->fetch();
+            // New Sync Logic: Get all detailed material progress first
+            $materials = $this->getDetailedMaterialProgress($user_id);
             
-            if (!$result) {
-                return [
-                    'materials_completed' => 0,
-                    'total_materials' => 0,
-                    'quizzes_completed' => 0,
-                    'average_quiz_score' => 0,
-                    'total_points' => 0,
-                    'completion_percentage' => 0
-                ];
+            $total_materials = count($materials);
+            $materials_completed = 0;
+            $total_points = 0;
+            $total_quiz_percentage = 0;
+            
+            foreach ($materials as $m) {
+                if ($m['percentage'] >= 100) $materials_completed++;
             }
-            
-            $materials_completed = (int) ($result['materials_completed'] ?? 0);
-            $total_materials = (int) ($result['total_materials'] ?? 0);
 
-            // Calculate completion percentage
-            $completion_percentage = ($total_materials > 0) 
-                ? ($materials_completed / $total_materials) * 100 
-                : 0;
+            // Quiz specific stats
+            $queryQuiz = "SELECT 
+                            (SELECT COUNT(*)::int FROM hasil_kuis WHERE user_id = :uid) as quizzes_completed,
+                            (SELECT COALESCE(AVG(percentage), 0)::float FROM hasil_kuis WHERE user_id = :uid2) as average_quiz_score,
+                            (SELECT COALESCE(SUM(max_score), 0)::int FROM (
+                                SELECT MAX(score) as max_score FROM hasil_kuis WHERE user_id = :uid3 GROUP BY quiz_id
+                            ) t) as total_points";
+
+            $stmt = $this->db->prepare($queryQuiz);
+            $stmt->execute(['uid' => $user_id, 'uid2' => $user_id, 'uid3' => $user_id]);
+            $quizData = $stmt->fetch();
+
+            $completion_percentage = ($total_materials > 0) ? ($materials_completed / $total_materials) * 100 : 0;
 
             return [
                 'materials_completed' => $materials_completed,
                 'total_materials' => $total_materials,
-                'quizzes_completed' => (int) ($result['quizzes_completed'] ?? 0),
-                'average_quiz_score' => round((float) ($result['average_quiz_score'] ?? 0), 2),
-                'total_points' => (int) ($result['total_points'] ?? 0),
+                'quizzes_completed' => (int) ($quizData['quizzes_completed'] ?? 0),
+                'average_quiz_score' => round((float) ($quizData['average_quiz_score'] ?? 0), 2),
+                'total_points' => (int) ($quizData['total_points'] ?? 0),
                 'completion_percentage' => round($completion_percentage, 2)
             ];
         } catch (Exception $e) {
@@ -77,9 +64,6 @@ class Progress {
         }
     }
 
-    /**
-     * Get detailed progress per kategori
-     */
     /**
      * Get detailed progress for each material for a specific user
      */
@@ -112,13 +96,16 @@ class Progress {
                 
                 $percentage = ($adjTotal > 0) ? ($adjCompleted / $adjTotal) * 100 : 0;
                 
+                // Clamp at 100% just in case
+                $percentage = min(100, round($percentage, 0));
+
                 return [
                     'id' => $m['id'],
                     'title' => $m['title'],
                     'category' => $m['category'],
                     'thumbnail' => $m['thumbnail'],
-                    'percentage' => round($percentage, 0),
-                    'is_fully_completed' => ($adjCompleted >= $adjTotal && $adjTotal > 0)
+                    'percentage' => $percentage,
+                    'is_fully_completed' => ($percentage >= 100)
                 ];
             }, $materials);
         } catch (Exception $e) {
@@ -129,12 +116,11 @@ class Progress {
 
     public function getProgressByCategory(int $user_id): array {
         try {
-            // Perfect Sync: Get detailed material progress first
+            // Perfect Sync: Group material progress by category
             $materials = $this->getDetailedMaterialProgress($user_id);
             
             if (empty($materials)) return [];
 
-            // Group by category
             $categories = [];
             foreach ($materials as $m) {
                 $catName = $m['category'];
@@ -142,20 +128,23 @@ class Progress {
                     $categories[$catName] = [
                         'category' => $catName,
                         'total_materials' => 0,
+                        'completed_materials' => 0,
                         'total_percentage' => 0
                     ];
                 }
                 $categories[$catName]['total_materials']++;
                 $categories[$catName]['total_percentage'] += $m['percentage'];
+                if ($m['percentage'] >= 100) {
+                    $categories[$catName]['completed_materials']++;
+                }
             }
 
-            // Calculate average
             return array_map(function($cat) {
                 return [
                     'category' => $cat['category'],
-                    'total_materials' => $cat['total_materials'],
-                    'completed_materials' => 0, // No longer strictly needed but kept for BC
-                    'completion_percentage' => round($cat['total_percentage'] / $cat['total_materials'], 2)
+                    'total' => $cat['total_materials'],
+                    'completed' => $cat['completed_materials'],
+                    'percentage' => round($cat['total_percentage'] / $cat['total_materials'], 0)
                 ];
             }, array_values($categories));
         } catch (Exception $e) {

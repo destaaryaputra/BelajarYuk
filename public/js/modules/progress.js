@@ -110,13 +110,18 @@ export const Progress = {
 
         let html = '<div class="category-progress-list">';
         categories.forEach(cat => {
-            // Use percentage from API for perfect sync
+            const total = cat.total || 0;
+            const completed = cat.completed || 0;
             const percentage = Math.round(cat.percentage || 0);
+            
             html += `
                 <div class="category-progress-item mb-16">
                     <div class="d-flex justify-between mb-8">
-                        <strong>${UI.escapeHtml(cat.category)}</strong>
-                        <span>${percentage}%</span>
+                        <div>
+                            <strong class="block">${UI.escapeHtml(cat.category)}</strong>
+                            <span class="text-muted small">${completed} dari ${total} modul selesai</span>
+                        </div>
+                        <span class="font-bold">${percentage}%</span>
                     </div>
                     <div class="progress-bar-bg">
                         <div class="progress-bar-fill" style="width: ${percentage}%"></div>
