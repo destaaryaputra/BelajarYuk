@@ -29,7 +29,6 @@ export const Progress = {
 
             const progressData = detailedRes.data || {};
             this.renderSummary(summaryRes.data || {});
-            this.renderCategories(progressData.categories || []);
             this.renderLeaderboard(leaderboardRes.data || []);
             this.renderQuizHistory(quizRes.data || []);
 
