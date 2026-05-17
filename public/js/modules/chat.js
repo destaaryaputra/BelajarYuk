@@ -181,8 +181,10 @@ export const AIChat = {
         this.trimHistory();
 
         try {
-            // Ambil material_id dari localStorage jika ada (saat di halaman detail)
-            const materialId = localStorage.getItem('active_material_id');
+            // Ambil material_id hanya jika sedang berada di halaman detail materi
+            const isDetailPage = window.location.hash.includes('material-detail-page');
+            const materialId = isDetailPage ? localStorage.getItem('active_material_id') : null;
+            
             const response = await API.chatAI(this.history, materialId);
             document.getElementById(typingId)?.remove();
 
