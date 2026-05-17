@@ -55,6 +55,23 @@
     transform: scale(1) translateY(0); opacity: 1; pointer-events: all;
 }
 
+/* Fullscreen Mode */
+.ai-chat-window.fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+}
+.ai-chat-window.fullscreen .ai-chat-messages {
+    padding: 24px clamp(16px, 10vw, 120px);
+}
+.ai-chat-window.fullscreen .ai-chat-input-area {
+    padding: 20px clamp(16px, 10vw, 120px);
+}
+
 .ai-chat-header {
     background: var(--surface-muted); padding: 16px; border-bottom: 1px solid var(--border);
     display: flex; justify-content: space-between; align-items: center;

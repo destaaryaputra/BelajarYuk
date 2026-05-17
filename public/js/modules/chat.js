@@ -83,7 +83,27 @@ export const AIChat = {
         if (windowEl.classList.contains('open')) {
             this.loadHistory();
             document.getElementById('ai-chat-input')?.focus();
+        } else {
+            // Tutup fullscreen jika jendela chat ditutup
+            windowEl.classList.remove('fullscreen');
+            this.updateFullscreenIcon(false);
         }
+    },
+
+    toggleFullscreen() {
+        const windowEl = document.getElementById('ai-chat-window');
+        if (!windowEl) return;
+        
+        const isFS = windowEl.classList.toggle('fullscreen');
+        this.updateFullscreenIcon(isFS);
+    },
+
+    updateFullscreenIcon(isFS) {
+        const icon = document.getElementById('ai-fs-icon');
+        if (!icon) return;
+        
+        icon.setAttribute('data-lucide', isFS ? 'minimize-2' : 'maximize-2');
+        if (window.lucide) window.lucide.createIcons();
     },
 
     async loadHistory() {
