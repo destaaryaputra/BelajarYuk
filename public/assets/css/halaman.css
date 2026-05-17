@@ -943,6 +943,12 @@ textarea {
 .password-toggle-btn:hover {
     color: var(--primary);
     background: var(--primary-light);
+    transform: translateY(-50%); /* Tetap di tengah, jangan goyang */
+    box-shadow: none;
+}
+
+.password-toggle-btn:active {
+    transform: translateY(-50%) scale(0.95); /* Sedikit mengecil saat diklik tapi tetap di tengah */
 }
 
 .auth-divider {
