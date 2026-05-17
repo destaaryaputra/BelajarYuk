@@ -140,12 +140,148 @@ export const UI = {
         const toast = document.getElementById('notification-toast');
         if (!toast) return;
         
-        toast.textContent = message;
-        toast.className = `notification-toast show ${type}`;
+        // Define icons based on type
+        const icons = {
+            success: 'check-circle',
+            error: 'alert-circle',
+            warning: 'alert-triangle',
+            info: 'info'
+        };
+
+        toast.innerHTML = `
+            <div class="toast-icon-wrapper">
+                <i data-lucide="${icons[type] || 'info'}"></i>
+            </div>
+            <div class="toast-message-text">${message}</div>
+        `;
         
-        setTimeout(() => {
+        toast.className = `notification-toast show ${type}`;
+        if (window.lucide) window.lucide.createIcons();
+        
+        // Auto hide
+        if (this._toastTimer) clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => {
             toast.classList.remove('show');
-        }, 3000);
+        }, 4000);
+    },
+
+    /**
+     * Modern Alert Dialog
+     */
+    alert(message, title = 'Informasi') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('custom-modal');
+            const iconBox = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const msgEl = document.getElementById('modal-message');
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+
+            if (!modal) return resolve(alert(message));
+
+            iconBox.className = 'modal-icon';
+            iconBox.innerHTML = '<i data-lucide="info"></i>';
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            
+            cancelBtn.classList.add('d-none');
+            confirmBtn.textContent = 'Tutup';
+
+            modal.classList.remove('d-none');
+            if (window.lucide) window.lucide.createIcons();
+
+            confirmBtn.onclick = () => {
+                modal.classList.add('d-none');
+                resolve(true);
+            };
+        });
+    },
+
+    /**
+     * Modern Confirmation Dialog
+     */
+    confirm(message, title = 'Konfirmasi Tindakan', isDanger = false) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('custom-modal');
+            const iconBox = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const msgEl = document.getElementById('modal-message');
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+
+            if (!modal) return resolve(confirm(message));
+
+            iconBox.className = `modal-icon ${isDanger ? 'danger' : ''}`;
+            iconBox.innerHTML = `<i data-lucide="${isDanger ? 'trash-2' : 'help-circle'}"></i>`;
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            
+            cancelBtn.classList.remove('d-none');
+            confirmBtn.textContent = 'Ya, Lanjutkan';
+            confirmBtn.className = isDanger ? 'btn-danger' : 'btn-primary';
+
+            modal.classList.remove('d-none');
+            if (window.lucide) window.lucide.createIcons();
+
+            confirmBtn.onclick = () => {
+                modal.classList.add('d-none');
+                resolve(true);
+            };
+
+            cancelBtn.onclick = () => {
+                modal.classList.add('d-none');
+                resolve(false);
+            };
+        });
+    },
+
+    /**
+     * Modern Prompt Dialog
+     */
+    prompt(message, placeholder = '', title = 'Input Diperlukan') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('custom-modal');
+            const iconBox = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const msgEl = document.getElementById('modal-message');
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+
+            if (!modal) return resolve(prompt(message, placeholder));
+
+            iconBox.className = 'modal-icon';
+            iconBox.innerHTML = '<i data-lucide="edit-3"></i>';
+            titleEl.textContent = title;
+            msgEl.innerHTML = `
+                <div class="mb-16">${message}</div>
+                <input type="text" id="modal-prompt-input" class="form-control" placeholder="${placeholder}" style="width: 100%; margin-top: 10px;">
+            `;
+            
+            cancelBtn.classList.remove('d-none');
+            confirmBtn.textContent = 'Kirim';
+            confirmBtn.className = 'btn-primary';
+
+            modal.classList.remove('d-none');
+            const input = document.getElementById('modal-prompt-input');
+            input?.focus();
+            if (window.lucide) window.lucide.createIcons();
+
+            confirmBtn.onclick = () => {
+                const val = input?.value || '';
+                modal.classList.add('d-none');
+                resolve(val);
+            };
+
+            cancelBtn.onclick = () => {
+                modal.classList.add('d-none');
+                resolve(null);
+            };
+
+            // Support Enter key
+            input?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') confirmBtn.click();
+            });
+        });
     },
 
     escapeHtml(value) {

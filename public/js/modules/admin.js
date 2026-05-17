@@ -278,7 +278,9 @@ export const Admin = {
     },
 
     async handleDeleteMaterial(id) {
-        if (!confirm('Hapus materi?')) return;
+        const confirm = await UI.confirm('Apakah Anda yakin ingin menghapus materi ini beserta seluruh isinya?', 'Hapus Materi', true);
+        if (!confirm) return;
+        
         UI.showLoading();
         try { await API.deleteMaterial(id); this.loadMaterials(); } catch (error) { UI.showNotification(error.message, 'error'); } finally { UI.hideLoading(); }
     },
@@ -340,7 +342,8 @@ export const Admin = {
     },
 
     async handleDeleteSubMat(id, matId) {
-        if (!confirm('Hapus episode?')) return;
+        const confirmed = await UI.confirm('Hapus episode ini?', 'Konfirmasi Hapus', true);
+        if (!confirmed) return;
         UI.showLoading();
         try { await API.deleteSubMaterial(id); this.loadSubMaterials(matId); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
@@ -411,13 +414,15 @@ export const Admin = {
     },
 
     async deleteQuestion(id, qid) {
-        if (!confirm('Hapus soal?')) return;
+        const confirmed = await UI.confirm('Hapus soal ini?', 'Konfirmasi Hapus', true);
+        if (!confirmed) return;
         UI.showLoading();
         try { await API.post('/quiz/questions/delete', { id }); this.loadQuestions(qid); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
 
     async handleDeleteQuiz() {
-        if (!confirm('Hapus seluruh kuis?')) return;
+        const confirmed = await UI.confirm('Hapus seluruh kuis dan data terkait?', 'Hapus Kuis', true);
+        if (!confirmed) return;
         const qid = document.getElementById('q-quiz-id').value;
         const mid = document.getElementById('quiz-material-id').value;
         UI.showLoading();
@@ -444,7 +449,8 @@ export const Admin = {
     },
 
     async handleDeleteUser(id) {
-        if (!confirm('Hapus akun siswa permanen?')) return;
+        const confirmed = await UI.confirm('Hapus akun siswa secara permanen? Tindakan ini tidak bisa dibatalkan.', 'Hapus Siswa', true);
+        if (!confirmed) return;
         UI.showLoading();
         try { await API.post('/auth/users/delete', { user_id: id }); this.loadUsers(); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
@@ -589,7 +595,8 @@ export const Admin = {
     },
 
     async handleDeleteComment(id) {
-        if (!confirm('Hapus komentar?')) return;
+        const confirmed = await UI.confirm('Hapus komentar ini?', 'Konfirmasi Hapus', true);
+        if (!confirmed) return;
         UI.showLoading();
         try { await API.post('/materials/comments/delete', { id }); this.loadDiscussions(); } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
@@ -623,10 +630,10 @@ export const Admin = {
     },
 
     async generateCourseWithAI() {
-        const topic = prompt("Topik materi AI?");
+        const topic = await UI.prompt("Masukkan topik materi yang ingin dibuat oleh AI (misal: 'Dasar Pemrograman Go')", "Misal: React Context API", "Buat Materi dengan AI");
         if (!topic) return;
         UI.showLoading();
-        UI.showNotification('AI sedang menyusun materi...', 'info', 10000);
+        UI.showNotification('AI sedang menyusun materi...', 'info');
         try {
             const res = await API.post('/ai/generate-course', { topic });
             const d = res.data?.course || res.data;

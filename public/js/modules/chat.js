@@ -149,13 +149,14 @@ export const AIChat = {
     },
 
     async clear() {
-        if (!confirm("Hapus riwayat obrolan?")) return;
+        const confirmed = await UI.confirm("Apakah Anda yakin ingin menghapus seluruh riwayat obrolan dengan Yuki?", "Hapus Riwayat", true);
+        if (!confirmed) return;
         
         try {
             await API.clearAIHistory();
             this.history = [{ role: 'system', content: this.systemPrompt }];
             const container = document.getElementById('ai-chat-messages');
-            if (container) container.innerHTML = '<div class="chat-message ai-message">Riwayat dibersihkan.</div>';
+            if (container) container.innerHTML = '<div class="chat-message ai-message">Riwayat dibersihkan. Yuki siap membantu dari awal!</div>';
         } catch (error) {
             UI.showNotification(error.message, 'error');
         }
