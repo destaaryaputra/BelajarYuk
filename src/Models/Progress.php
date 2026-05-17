@@ -29,7 +29,6 @@ class Progress {
             
             $total_materials = count($materials);
             $materials_completed = 0;
-            $total_points = 0;
             $sum_percentages = 0;
             
             foreach ($materials as $m) {
@@ -37,16 +36,20 @@ class Progress {
                 $sum_percentages += $m['percentage'];
             }
 
-            // Quiz specific stats
+            // Quiz specific stats - BASED ON BEST ATTEMPTS for consistency
             $queryQuiz = "SELECT 
-                            (SELECT COUNT(*)::int FROM hasil_kuis WHERE user_id = :uid) as quizzes_completed,
-                            (SELECT COALESCE(AVG(percentage), 0)::float FROM hasil_kuis WHERE user_id = :uid2) as average_quiz_score,
-                            (SELECT COALESCE(SUM(max_score), 0)::int FROM (
-                                SELECT MAX(score) as max_score FROM hasil_kuis WHERE user_id = :uid3 GROUP BY quiz_id
-                            ) t) as total_points";
+                            COUNT(DISTINCT quiz_id)::int as quizzes_completed,
+                            COALESCE(AVG(max_percentage), 0)::float as average_quiz_score,
+                            COALESCE(SUM(max_score), 0)::int as total_points
+                          FROM (
+                            SELECT quiz_id, MAX(percentage) as max_percentage, MAX(score) as max_score 
+                            FROM hasil_kuis 
+                            WHERE user_id = :uid 
+                            GROUP BY quiz_id
+                          ) t";
 
             $stmt = $this->db->prepare($queryQuiz);
-            $stmt->execute(['uid' => $user_id, 'uid2' => $user_id, 'uid3' => $user_id]);
+            $stmt->execute(['uid' => $user_id]);
             $quizData = $stmt->fetch();
 
             // Overall percentage is now average of all material percentages
