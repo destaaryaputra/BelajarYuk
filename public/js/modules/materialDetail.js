@@ -273,22 +273,19 @@ export const MaterialDetail = {
                 </div>
 
                 <div class="action-buttons pt-24 border-top">
-                    <button type="button" id="mark-complete-btn" class="btn-primary" ${isCompleted ? 'disabled' : ''}>
-                        <i data-lucide="${isCompleted ? 'check-circle' : 'circle'}"></i> 
-                        ${isCompleted ? 'Sudah Diselesaikan' : 'Tandai Selesai'}
-                    </button>
-                    
                     ${nextEpisode ? `
-                        <button type="button" id="next-material-btn" class="btn-outline">
-                            Lanjut ke Episode Berikutnya <i data-lucide="arrow-right"></i>
+                        <button type="button" id="next-material-btn" class="btn-primary">
+                            Selesaikan & Lanjut ke Episode Berikutnya <i data-lucide="arrow-right"></i>
                         </button>
-                    ` : ''}
-
-                    ${hasQuiz ? `
-                        <button type="button" class="btn-accent" onclick="window.location.hash='quiz-page'">
-                            <i data-lucide="clipboard-check"></i> Kerjakan Kuis
+                    ` : (hasQuiz ? `
+                        <button type="button" id="finish-to-quiz-btn" class="btn-accent">
+                            <i data-lucide="clipboard-check"></i> Selesaikan & Kerjakan Kuis
                         </button>
-                    ` : ''}
+                    ` : `
+                        <button type="button" id="finish-material-btn" class="btn-primary">
+                            <i data-lucide="check-circle-2"></i> Selesaikan Materi
+                        </button>
+                    `)}
                 </div>
             </article>
 
@@ -300,36 +297,56 @@ export const MaterialDetail = {
         `;
 
         // 2. Setup listeners
-        const markBtn = document.getElementById('mark-complete-btn');
-        if (markBtn && !isCompleted) {
-            markBtn.onclick = async () => {
+        const markCurrentComplete = async (silent = false) => {
+            if (isCompleted) return true;
+            try {
+                const payload = { material_id: materialId };
+                if (!active.isMain) payload.sub_material_id = active.id;
+                await API.post('/materials/mark-completed', payload);
+                
+                // Update local state
+                if (!active.isMain) this.state.completedEpisodes.push(String(active.id));
+                else this.state.material.is_completed = true;
+                
+                if (!silent) UI.showNotification('Progres belajar disimpan!', 'success');
+                return true;
+            } catch (error) {
+                console.error('Auto-complete error:', error);
+                return false;
+            }
+        };
+
+        const nextBtn = document.getElementById('next-material-btn');
+        if (nextBtn && nextEpisode) {
+            nextBtn.onclick = async () => {
                 UI.showLoading();
-                try {
-                    const payload = { material_id: materialId };
-                    if (!active.isMain) payload.sub_material_id = active.id;
-
-                    await API.post('/materials/mark-completed', payload);
-                    
-                    // Refresh data
-                    if (!active.isMain) this.state.completedEpisodes.push(String(active.id));
-                    else this.state.material.is_completed = true;
-
-                    UI.showNotification('Berhasil! Episode ini telah kamu selesaikan.', 'success');
-                    this.renderSyllabus();
-                    this.renderContent();
-                } catch (error) {
-                    UI.showNotification(error.message || 'Gagal menandai materi.', 'error');
-                } finally {
-                    UI.hideLoading();
+                const success = await markCurrentComplete(true);
+                UI.hideLoading();
+                if (success) {
+                    this.selectItem(String(nextEpisode.id));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             };
         }
 
-        const nextBtn = document.getElementById('next-material-btn');
-        if (nextBtn && nextEpisode) {
-            nextBtn.onclick = () => {
-                this.selectItem(String(nextEpisode.id));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+        const finishToQuizBtn = document.getElementById('finish-to-quiz-btn');
+        if (finishToQuizBtn) {
+            finishToQuizBtn.onclick = async () => {
+                UI.showLoading();
+                await markCurrentComplete(true);
+                UI.hideLoading();
+                window.location.hash = 'quiz-page';
+            };
+        }
+
+        const finishBtn = document.getElementById('finish-material-btn');
+        if (finishBtn) {
+            finishBtn.onclick = async () => {
+                UI.showLoading();
+                await markCurrentComplete();
+                UI.hideLoading();
+                this.renderSyllabus();
+                this.renderContent();
             };
         }
 
