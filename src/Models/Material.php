@@ -229,6 +229,54 @@ class Material {
     }
 
     /**
+     * Mark sub-material (episode) as completed
+     */
+    public function markSubMaterialCompleted($user_id, $sub_material_id) {
+        try {
+            $this->createSubMaterialProgressTable();
+            $query = "INSERT INTO progres_sub_materi (user_id, sub_material_id, completed_at) 
+                     VALUES (?, ?, NOW())
+                     ON CONFLICT (user_id, sub_material_id) DO UPDATE SET completed_at = NOW()";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$user_id, $sub_material_id]);
+
+            return ['success' => true, 'message' => 'Episode ditandai selesai.'];
+        } catch (Exception $e) {
+            error_log("Mark sub-material completed error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Gagal menandai episode.'];
+        }
+    }
+
+    /**
+     * Get list of completed sub-material IDs for a user in a specific material
+     */
+    public function getCompletedSubMaterials($user_id, $material_id) {
+        try {
+            $this->createSubMaterialProgressTable();
+            $query = "SELECT sub_material_id FROM progres_sub_materi psm
+                     JOIN sub_materi sm ON psm.sub_material_id = sm.id
+                     WHERE psm.user_id = ? AND sm.material_id = ?";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$user_id, $material_id]);
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    private function createSubMaterialProgressTable() {
+        $query = "CREATE TABLE IF NOT EXISTS progres_sub_materi (
+            id SERIAL PRIMARY KEY,
+            user_id INT REFERENCES pengguna(id) ON DELETE CASCADE,
+            sub_material_id INT REFERENCES sub_materi(id) ON DELETE CASCADE,
+            completed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (user_id, sub_material_id)
+        );";
+        $this->db->exec($query);
+    }
+
+    /**
      * Get sub materials (episode) by material ID
      */
     public function getSubMaterials($material_id) {

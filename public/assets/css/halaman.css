@@ -564,6 +564,31 @@
     color: white;
 }
 
+/* Completed Episode Style */
+.syllabus-item.completed .syllabus-index {
+    background: #dcfce7;
+    color: #10b981;
+    border: 1px solid #10b981;
+}
+
+/* Locked Episode Style */
+.syllabus-item.locked {
+    cursor: not-allowed;
+    opacity: 0.6;
+    background: var(--surface-muted);
+}
+.syllabus-item.locked:hover {
+    border-color: transparent;
+    background: var(--surface-muted);
+}
+.syllabus-item.locked .syllabus-index {
+    background: #e5e7eb;
+    color: #9ca3af;
+}
+.syllabus-item.locked .syllabus-title {
+    color: #9ca3af;
+}
+
 .syllabus-info {
     flex: 1;
     min-width: 0;

@@ -9,6 +9,7 @@ export const MaterialDetail = {
     state: {
         material: null,
         subMaterials: [],
+        completedEpisodes: [], // Track IDs of completed sub-materials
         activeItemId: 'main',
         quiz: null
     },
@@ -38,6 +39,12 @@ export const MaterialDetail = {
             const payload = detailRes.data || {};
             const material = payload.material || {};
             this.state.material = material;
+            this.state.completedEpisodes = (payload.completed_episodes || []).map(id => String(id));
+            
+            // Sync completion status for main material
+            if (payload.user_progress && payload.user_progress.completed_at) {
+                this.state.material.is_completed = true;
+            }
             
             // UX Fix: Sembunyikan episode yang tidak punya video sesuai permintaan
             const rawSubs = Array.isArray(material.sub_materials) ? material.sub_materials : [];
@@ -45,10 +52,11 @@ export const MaterialDetail = {
             
             this.state.quiz = quizRes.data || null;
 
-            // Senior UX Fix: Jika materi utama tidak punya video tapi ada episode (sub-materi) yang valid,
-            // otomatis pilih episode pertama agar user langsung melihat video.
+            // Senior UX Fix: Pilih episode terakhir yang belum selesai jika memungkinkan
             if (!material.video_url && this.state.subMaterials.length > 0) {
-                this.state.activeItemId = String(this.state.subMaterials[0].id);
+                // Cari episode pertama yang BELUM selesai
+                const firstIncomplete = this.state.subMaterials.find(s => !this.state.completedEpisodes.includes(String(s.id)));
+                this.state.activeItemId = firstIncomplete ? String(firstIncomplete.id) : String(this.state.subMaterials[0].id);
             } else {
                 this.state.activeItemId = 'main';
             }
@@ -70,45 +78,63 @@ export const MaterialDetail = {
         const currentLabel = document.getElementById('current-episode-title');
         if (!container || !currentLabel || !this.state.material) return;
 
-        const items = [{ id: 'main', title: this.state.material.title || 'Materi Utama' }]
+        const items = [{ id: 'main', title: this.state.material.title || 'Materi Utama', isMain: true }]
             .concat(this.state.subMaterials.map((s, idx) => {
-                // Bersihkan title dari awalan angka manual (misal "1. Judul" jadi "Judul")
-                // karena kita sudah punya bubble nomor indeks sendiri
                 const cleanTitle = (s.title || '').replace(/^\d+[\.\s\-]+/, '');
                 return {
                     id: String(s.id),
-                    title: cleanTitle || `Episode ${idx + 1}`
+                    title: cleanTitle || `Episode ${idx + 1}`,
+                    isMain: false
                 };
             }));
 
         const activeItem = items.find(i => i.id === this.state.activeItemId) || items[0];
         currentLabel.textContent = activeItem.title;
 
-        container.innerHTML = `
+        // Logic: Episode i terkunci jika episode i-1 belum selesai
+        // Kecuali episode pertama (Main)
+        let html = `
             <div class="syllabus-header mb-16">
                 <h3>Daftar Episode</h3>
                 <p class="text-muted small">${items.length} Bagian</p>
             </div>
             <div class="syllabus-list">
-                ${items.map((item, idx) => `
-                    <button type="button" class="syllabus-item ${this.state.activeItemId === item.id ? 'active' : ''}" data-syllabus-id="${item.id}">
-                        <div class="syllabus-index">${idx + 1}</div>
-                        <div class="syllabus-info">
-                            <span class="syllabus-title">${UI.escapeHtml(item.title)}</span>
-                        </div>
-                        ${this.state.activeItemId === item.id ? '<i data-lucide="play" class="active-play-icon"></i>' : ''}
-                    </button>
-                `).join('')}
-            </div>
         `;
 
-        container.querySelectorAll('[data-syllabus-id]').forEach(btn => {
+        let previousCompleted = true; // Main is always unlocked
+
+        items.forEach((item, idx) => {
+            const isCompleted = item.isMain ? !!this.state.material.is_completed : this.state.completedEpisodes.includes(item.id);
+            const isActive = this.state.activeItemId === item.id;
+            const isLocked = !previousCompleted && !item.isMain;
+
+            html += `
+                <button type="button" 
+                    class="syllabus-item ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}" 
+                    data-syllabus-id="${item.id}"
+                    ${isLocked ? 'disabled' : ''}>
+                    <div class="syllabus-index">
+                        ${isCompleted ? '<i data-lucide="check" class="icon-xs"></i>' : (isLocked ? '<i data-lucide="lock" class="icon-xs"></i>' : idx + 1)}
+                    </div>
+                    <div class="syllabus-info">
+                        <span class="syllabus-title">${UI.escapeHtml(item.title)}</span>
+                    </div>
+                    ${isActive ? '<i data-lucide="play" class="active-play-icon"></i>' : ''}
+                </button>
+            `;
+
+            // Update status untuk episode berikutnya
+            // Jika ini Main, kita anggap selesai jika materi ditandai selesai
+            // TAPI, agar user bisa lanjut ke Ep 1, kita anggap Main "selesai" untuk tujuan unlocking
+            previousCompleted = isCompleted || item.isMain; 
+        });
+
+        container.innerHTML = html + '</div>';
+
+        container.querySelectorAll('.syllabus-item:not([disabled])').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.selectItem(btn.getAttribute('data-syllabus-id'));
-                // Smooth scroll to top on mobile when switching
-                if (window.innerWidth <= 1024) {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+                if (window.innerWidth <= 1024) window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         });
 
@@ -128,6 +154,7 @@ export const MaterialDetail = {
     getActiveItem() {
         if (this.state.activeItemId === 'main') {
             return {
+                id: 'main',
                 title: this.state.material.title || 'Materi',
                 content: this.state.material.content || '',
                 video_url: this.state.material.video_url || '',
@@ -136,7 +163,8 @@ export const MaterialDetail = {
             };
         }
         const selected = this.state.subMaterials.find(s => String(s.id) === String(this.state.activeItemId));
-        return selected || {
+        return selected ? { ...selected, isMain: false } : {
+            id: 'main',
             title: this.state.material.title || 'Materi',
             content: this.state.material.content || '',
             video_url: this.state.material.video_url || '',
@@ -205,6 +233,8 @@ export const MaterialDetail = {
             ? this.state.subMaterials[currentIndex + 1] 
             : null;
 
+        const isCompleted = active.isMain ? !!this.state.material.is_completed : this.state.completedEpisodes.includes(String(active.id));
+
         let mediaHtml = '';
         if (embedVideo) {
             mediaHtml += `
@@ -223,13 +253,15 @@ export const MaterialDetail = {
             `;
         }
 
-        // 1. Render core content with NEW SEQUENCE: Title -> Video -> Content -> Actions
         const showComments = !!embedVideo;
         
         container.innerHTML = `
             <article class="content-card">
                 <div class="header-section mb-24">
-                    <span class="section-eyebrow">${embedVideo ? 'Video Pembelajaran' : 'Pengenalan Materi'}</span>
+                    <div class="d-flex justify-between align-center">
+                        <span class="section-eyebrow">${active.isMain ? 'Pengenalan Materi' : 'Episode ' + (currentIndex + 2)}</span>
+                        ${isCompleted ? '<span class="badge badge-success"><i data-lucide="check-circle" class="icon-xs"></i> Selesai</span>' : ''}
+                    </div>
                     <h1>${UI.escapeHtml(active.title || 'Materi')}</h1>
                     <p class="text-muted">${UI.escapeHtml(this.state.material.description || '')}</p>
                 </div>
@@ -241,8 +273,9 @@ export const MaterialDetail = {
                 </div>
 
                 <div class="action-buttons pt-24 border-top">
-                    <button type="button" id="mark-complete-btn" class="btn-primary">
-                        <i data-lucide="check-circle-2"></i> Tandai Selesai
+                    <button type="button" id="mark-complete-btn" class="btn-primary" ${isCompleted ? 'disabled' : ''}>
+                        <i data-lucide="${isCompleted ? 'check-circle' : 'circle'}"></i> 
+                        ${isCompleted ? 'Sudah Diselesaikan' : 'Tandai Selesai'}
                     </button>
                     
                     ${nextEpisode ? `
@@ -268,13 +301,26 @@ export const MaterialDetail = {
 
         // 2. Setup listeners
         const markBtn = document.getElementById('mark-complete-btn');
-        if (markBtn) {
+        if (markBtn && !isCompleted) {
             markBtn.onclick = async () => {
+                UI.showLoading();
                 try {
-                    await API.markMaterialCompleted(materialId);
-                    UI.showNotification('Materi ditandai selesai.', 'success');
+                    const payload = { material_id: materialId };
+                    if (!active.isMain) payload.sub_material_id = active.id;
+
+                    await API.post('/materials/mark-completed', payload);
+                    
+                    // Refresh data
+                    if (!active.isMain) this.state.completedEpisodes.push(String(active.id));
+                    else this.state.material.is_completed = true;
+
+                    UI.showNotification('Berhasil! Episode ini telah kamu selesaikan.', 'success');
+                    this.renderSyllabus();
+                    this.renderContent();
                 } catch (error) {
                     UI.showNotification(error.message || 'Gagal menandai materi.', 'error');
+                } finally {
+                    UI.hideLoading();
                 }
             };
         }
@@ -289,10 +335,7 @@ export const MaterialDetail = {
 
         if (window.lucide) window.lucide.createIcons();
 
-        // 3. Load comments only if needed
-        if (showComments) {
-            this.loadComments(materialId);
-        }
+        if (showComments) this.loadComments(materialId);
     },
 
     async loadComments(materialId) {

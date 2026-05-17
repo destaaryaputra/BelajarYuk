@@ -72,10 +72,12 @@ class MaterialController {
         try {
             $data = json_decode(file_get_contents("php://input"), true);
             $materialId = intval($data['material_id'] ?? 0);
+            $subMaterialId = isset($data['sub_material_id']) ? intval($data['sub_material_id']) : null;
+            
             if (!$materialId) Response::error('Pilih materi dulu ya.', null, 400);
 
             $user = AuthMiddleware::getAuthUser();
-            $result = $this->materialService->markAsCompleted($user['id'], $materialId);
+            $result = $this->materialService->markAsCompleted($user['id'], $materialId, $subMaterialId);
             Response::success($result['message']);
         } catch (Exception $e) {
             $code = $e->getCode();

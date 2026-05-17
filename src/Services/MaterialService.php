@@ -39,8 +39,10 @@ class MaterialService {
         }
 
         $user_progress = null;
+        $completed_episodes = [];
         if ($userId) {
             $user_progress = $this->materialModel->getUserProgress($userId, $id);
+            $completed_episodes = $this->materialModel->getCompletedSubMaterials($userId, $id);
         }
 
         if (method_exists($this->materialModel, 'getSubMaterials')) {
@@ -49,7 +51,8 @@ class MaterialService {
 
         return [
             'material' => $material,
-            'user_progress' => $user_progress
+            'user_progress' => $user_progress,
+            'completed_episodes' => $completed_episodes
         ];
     }
 
@@ -201,8 +204,13 @@ class MaterialService {
         return $this->materialModel->getCategories();
     }
 
-    public function markAsCompleted(int $userId, int $materialId): array {
-        $result = $this->materialModel->markAsCompleted($userId, $materialId);
+    public function markAsCompleted(int $userId, int $materialId, ?int $subMaterialId = null): array {
+        if ($subMaterialId) {
+            $result = $this->materialModel->markSubMaterialCompleted($userId, $subMaterialId);
+        } else {
+            $result = $this->materialModel->markAsCompleted($userId, $materialId);
+        }
+        
         if (!$result['success']) {
             throw new Exception($result['message'], 400);
         }
