@@ -31,7 +31,7 @@ class User {
             $query = "SELECT streak_count, last_active_date FROM pengguna WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$user_id]);
-            $user = $stmt->fetch();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) return;
 
@@ -66,7 +66,7 @@ class User {
     /**
      * Create user baru (registrasi)
      */
-    public function register($username, $email, $password, $full_name) {
+    public function register(string $username, string $email, string $password, string $full_name): array {
         try {
             // Check if user already exists
             $query = "SELECT id FROM pengguna WHERE email = ? OR username = ?";
@@ -96,7 +96,7 @@ class User {
     /**
      * Login user
      */
-    public function login($username, $password) {
+    public function login(string $username, string $password): array {
         try {
             $query = "SELECT id, username, email, full_name, password, role FROM pengguna WHERE username = ?";
             $stmt = $this->db->prepare($query);
@@ -106,7 +106,7 @@ class User {
                 return ['success' => false, 'message' => 'Username atau password salah.'];
             }
 
-            $user = $stmt->fetch();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!Security::verifyPassword($password, $user['password'])) {
                 return ['success' => false, 'message' => 'Username atau password salah.'];
@@ -142,13 +142,14 @@ class User {
     /**
      * Get user by ID
      */
-    public function getUserById($id) {
+    public function getUserById(int $id): ?array {
         try {
             $query = "SELECT id, username, email, full_name, avatar, bio, created_at FROM pengguna WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
 
-            return $stmt->fetch();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
         } catch (Exception $e) {
             error_log("Get user error: " . $e->getMessage());
             return null;
@@ -158,7 +159,7 @@ class User {
     /**
      * Update user profile with safety checks
      */
-    public function updateProfile($user_id, $data) {
+    public function updateProfile(int $user_id, array $data): array {
         try {
             $full_name = $data['full_name'] ?? null;
             $username = $data['username'] ?? null;
@@ -209,7 +210,7 @@ class User {
     /**
      * Change password
      */
-    public function changePassword($user_id, $old_password, $new_password) {
+    public function changePassword(int $user_id, string $old_password, string $new_password): array {
         try {
             $query = "SELECT password FROM pengguna WHERE id = ?";
             $stmt = $this->db->prepare($query);
@@ -219,7 +220,7 @@ class User {
                 return ['success' => false, 'message' => 'User tidak ditemukan.'];
             }
 
-            $user = $stmt->fetch();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!Security::verifyPassword($old_password, $user['password'])) {
                 return ['success' => false, 'message' => 'Password lama salah.'];
@@ -240,7 +241,7 @@ class User {
     /**
      * Mengambil daftar seluruh pengguna (Dengan Pagination untuk Admin)
      */
-    public function getAllUsers($page = 1, $limit = 50) {
+    public function getAllUsers(int $page = 1, int $limit = 50): array {
         try {
             $offset = ($page - 1) * $limit;
             $query = "SELECT id, username, email, full_name, role, created_at 
@@ -249,8 +250,8 @@ class User {
                      LIMIT :limit OFFSET :offset";
             
             $stmt = $this->db->prepare($query);
-            $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -263,11 +264,12 @@ class User {
     /**
      * Hitung total user untuk pagination
      */
-    public function getTotalUsersCount() {
+    public function getTotalUsersCount(): int {
         try {
             $stmt = $this->db->query("SELECT COUNT(*) FROM pengguna");
             return (int) $stmt->fetchColumn();
         } catch (Exception $e) {
+            error_log("Get total users count error: " . $e->getMessage());
             return 0;
         }
     }
@@ -275,7 +277,7 @@ class User {
     /**
      * Update role pengguna
      */
-    public function updateUserRole($user_id, $role) {
+    public function updateUserRole(int $user_id, string $role): array {
         try {
             $stmt = $this->db->prepare("UPDATE pengguna SET role = ? WHERE id = ?");
             $stmt->execute([$role, $user_id]);
@@ -284,6 +286,7 @@ class User {
             }
             return ['success' => true, 'message' => 'Role pengguna berhasil diperbarui.'];
         } catch (Exception $e) {
+            error_log("Update user role error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal memperbarui role pengguna.'];
         }
     }
@@ -291,7 +294,7 @@ class User {
     /**
      * Hapus pengguna
      */
-    public function deleteUser($user_id) {
+    public function deleteUser(int $user_id): array {
         try {
             $stmt = $this->db->prepare("DELETE FROM pengguna WHERE id = ?");
             $stmt->execute([$user_id]);
@@ -300,6 +303,7 @@ class User {
             }
             return ['success' => true, 'message' => 'Pengguna berhasil dihapus.'];
         } catch (Exception $e) {
+            error_log("Delete user error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal menghapus pengguna.'];
         }
     }
