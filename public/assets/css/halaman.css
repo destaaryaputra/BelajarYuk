@@ -58,6 +58,13 @@
 }
 .stat-card .value { font-size: 2rem; font-weight: 900; color: var(--text-main); line-height: 1; }
 
+.stat-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
 .stat-chip {
     width: 48px; height: 48px; border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
