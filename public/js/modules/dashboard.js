@@ -82,7 +82,7 @@ export const Dashboard = {
                     <div class="stat-card-row">
                         <div>
                             <h3>Pencapaian Modul</h3>
-                            <div class="value"><span id="dash-materials-completed">0</span><span class="value-suffix">dari ${summary.total || 0}</span></div>
+                            <div class="value"><span id="dash-materials-completed">0</span><span class="value-suffix"> dari ${summary.total || 0}</span></div>
                         </div>
                         <div class="stat-chip"><i data-lucide="book-check"></i></div>
                     </div>
@@ -93,7 +93,7 @@ export const Dashboard = {
                             <h3>Peringkat Global</h3>
                             <div class="value">
                                 <span>${userRank !== '--' ? '#' + userRank : '--'}</span>
-                                <span class="value-suffix">(${userPoints} Poin)</span>
+                                <span class="value-suffix"> (${userPoints} Poin)</span>
                             </div>
                         </div>
                         <div class="stat-chip"><i data-lucide="trophy"></i></div>
@@ -103,7 +103,7 @@ export const Dashboard = {
                     <div class="stat-card-row">
                         <div>
                             <h3>Semangat Belajar</h3>
-                            <div class="value"><span id="dash-learning-streak">0</span><span class="value-suffix">Hari</span></div>
+                            <div class="value"><span id="dash-learning-streak">0</span><span class="value-suffix"> Hari</span></div>
                         </div>
                         <div class="stat-chip"><i data-lucide="flame"></i></div>
                     </div>
