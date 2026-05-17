@@ -8,24 +8,32 @@
 $baseDir = dirname(dirname(__DIR__));
 $envFile = $baseDir . DIRECTORY_SEPARATOR . '.env';
 
+// Fallback path check
+if (!file_exists($envFile)) {
+    $envFile = dirname(__DIR__, 2) . '/.env';
+}
+
 if (file_exists($envFile)) {
     $content = file_get_contents($envFile);
-    // Remove BOM if exists
-    $content = str_replace("\xEF\xBB\xBF", "", $content);
+    $content = str_replace("\xEF\xBB\xBF", "", $content); // Remove BOM
     
-    $lines = explode("\n", str_replace("\r", "", $content));
+    // Split lines more robustly
+    $lines = preg_split('/\r\n|\r|\n/', $content);
+    
     foreach ($lines as $line) {
         $line = trim($line);
         if (empty($line) || strpos($line, '#') === 0) continue;
         
-        // Regex untuk menangkap key=value, mengabaikan komentar di belakang
-        if (preg_match('/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/', $line, $matches)) {
-            $name = trim($matches[1]);
-            $value = trim($matches[2]);
+        // Simpler key=value split
+        if (strpos($line, '=') !== false) {
+            list($name, $value) = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value);
             
-            // Hapus kutipan jika ada
+            // Remove quotes if present
             $value = preg_replace('/^["\'](.*)["\']$/', '$1', $value);
-            // Hapus komentar inline
+            
+            // Remove inline comments
             if (strpos($value, '#') !== false) {
                 $value = trim(explode('#', $value)[0]);
             }
@@ -35,6 +43,8 @@ if (file_exists($envFile)) {
             $_SERVER[$name] = $value;
         }
     }
+} else {
+    error_log("CRITICAL: .env file NOT FOUND at " . $envFile);
 }
 
 // Environment
@@ -54,7 +64,8 @@ define('MAX_LOGIN_ATTEMPTS', 5);
 define('LOCKOUT_TIME', 900); // 15 minutes
 
 // AI (Groq)
-define('GROQ_API_KEY', $_ENV['GROQ_API_KEY'] ?? getenv('GROQ_API_KEY') ?: '');
+$groqApiKey = $_ENV['GROQ_API_KEY'] ?? getenv('GROQ_API_KEY') ?? $_SERVER['GROQ_API_KEY'] ?? '';
+define('GROQ_API_KEY', $groqApiKey);
 
 // Error Handling (Cegah kebocoran error ke JSON response)
 if (ENV === 'development') {

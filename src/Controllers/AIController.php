@@ -26,6 +26,7 @@ class AIController {
 
     private function requireApiKey(): void {
         if (!defined('GROQ_API_KEY') || GROQ_API_KEY === '') {
+            error_log("AI API Key Error: Constant " . (defined('GROQ_API_KEY') ? 'IS defined but EMPTY' : 'is NOT defined'));
             Response::error('Sistem AI belum siap, nih. Hubungi admin ya.', null, 503);
         }
     }

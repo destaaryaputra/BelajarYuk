@@ -85,16 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Deteksi apakah ini request API
-// Di Vercel, /api/login biasanya masuk ke sini dengan $uri = /api/login atau di-rewrite
-$isApiRequest = (strpos($uri, '/api') === 0);
+// Deteksi apakah ini request API (Lebih fleksibel untuk subfolder)
+$isApiRequest = (strpos($uri, '/api') !== false);
 
 if ($isApiRequest) {
     $routes = require __DIR__ . '/routes.php';
     
     // Bersihkan URI untuk pencocokan route
-    // /api/auth/login -> /auth/login
-    $cleanUri = str_replace('/api', '', $uri);
+    // Cari posisi /api dan ambil setelahnya
+    $apiPos = strpos($uri, '/api');
+    $cleanUri = substr($uri, $apiPos + 4); // +4 untuk melewati '/api'
     if (empty($cleanUri)) $cleanUri = '/';
     $cleanUri = rtrim($cleanUri, '/') ?: '/';
 
