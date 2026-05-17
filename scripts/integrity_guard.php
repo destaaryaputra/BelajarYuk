@@ -5,15 +5,15 @@
  */
 
 class IntegrityGuard {
-    private $root;
-    private $errors = [];
-    private $warnings = [];
+    private string $root;
+    private array $errors = [];
+    private array $warnings = [];
 
-    public function __construct($root) {
+    public function __construct(string $root) {
         $this->root = $root;
     }
 
-    public function run() {
+    public function run(): void {
         echo "🛡️  Starting Belajaryuk Integrity Audit...\n\n";
 
         $this->checkSeparationOfConcerns();
@@ -26,11 +26,13 @@ class IntegrityGuard {
     /**
      * Rule: No inline styles or scripts in HTML templates.
      */
-    private function checkSeparationOfConcerns() {
+    private function checkSeparationOfConcerns(): void {
         $files = glob($this->root . '/public/pages/*.html');
         $files[] = $this->root . '/public/layout.html';
 
         foreach ($files as $file) {
+            if (!file_exists($file)) continue;
+            
             $content = file_get_contents($file);
             $name = basename($file);
 
@@ -51,7 +53,7 @@ class IntegrityGuard {
     /**
      * Rule: Avoid duplicate CSS selectors across files.
      */
-    private function checkDuplicateSelectors() {
+    private function checkDuplicateSelectors(): void {
         $cssFiles = glob($this->root . '/public/assets/css/*.css');
         $allSelectors = [];
 
@@ -71,11 +73,11 @@ class IntegrityGuard {
     /**
      * Rule: No broken asset links in pages.
      */
-    private function checkMissingAssets() {
+    private function checkMissingAssets(): void {
         // Basic check for local images/scripts
     }
 
-    private function report() {
+    private function report(): void {
         if (empty($this->errors) && empty($this->warnings)) {
             echo "✅  Perfect! No integrity issues found.\n";
             return;
