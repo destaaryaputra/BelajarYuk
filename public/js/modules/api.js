@@ -146,7 +146,9 @@ class APIService {
     // --- AI Chat API ---
     getAIHistory(limit = 12) { return this.get(`/ai/history?limit=${limit}`); }
     clearAIHistory() { return this.post('/ai/clear-history', {}); }
-    chatAI(history) { return this.post('/ai/chat', { history }); }
+    chatAI(messages, materialId = null) { 
+        return this.post('/ai/chat', { messages, material_id: materialId }); 
+    }
 }
 
 export const API = new APIService(Config.API_BASE_URL);

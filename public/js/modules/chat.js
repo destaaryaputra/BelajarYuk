@@ -146,7 +146,9 @@ export const AIChat = {
         this.trimHistory();
 
         try {
-            const response = await API.chatAI(this.history);
+            // Ambil material_id dari localStorage jika ada (saat di halaman detail)
+            const materialId = localStorage.getItem('active_material_id');
+            const response = await API.chatAI(this.history, materialId);
             document.getElementById(typingId)?.remove();
 
             const aiReply = response?.data?.reply || 'AI sedang sibuk.';
@@ -155,7 +157,9 @@ export const AIChat = {
             this.appendMessage(aiReply, 'ai');
         } catch (error) {
             document.getElementById(typingId)?.remove();
-            this.appendMessage('Gagal menghubungi AI.', 'ai');
+            const errorMsg = error.message || 'Gagal menghubungi AI.';
+            this.appendMessage(errorMsg, 'ai');
+            console.error('AI Chat Error:', error);
         }
     },
 
