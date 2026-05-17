@@ -81,7 +81,15 @@ class AuthController {
     public function getCurrentUser(): void {
         AuthMiddleware::requireAuth();
         $user = AuthMiddleware::getAuthUser();
-        Response::success('Data pengguna berhasil dimuat', $user);
+        
+        // Update Streak on every heartbeat
+        $this->userModel->updateStreak($user['id']);
+        
+        // Refetch to get updated streak_count
+        $freshUser = $this->userModel->getUserById($user['id']);
+        $freshUser['role'] = $user['role'];
+        
+        Response::success('Data pengguna berhasil dimuat', $freshUser);
     }
 
     public function updateProfile(): void {

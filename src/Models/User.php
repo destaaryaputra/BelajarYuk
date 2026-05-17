@@ -20,6 +20,50 @@ class User {
     }
 
     /**
+     * Update user daily streak
+     */
+    public function updateStreak(int $user_id): void {
+        try {
+            // Ensure columns exist (Safeguard)
+            $this->db->exec("ALTER TABLE pengguna ADD COLUMN IF NOT EXISTS streak_count INT DEFAULT 0");
+            $this->db->exec("ALTER TABLE pengguna ADD COLUMN IF NOT EXISTS last_active_date DATE");
+
+            $query = "SELECT streak_count, last_active_date FROM pengguna WHERE id = ?";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch();
+
+            if (!$user) return;
+
+            $today = date('Y-m-d');
+            $last_date = $user['last_active_date'];
+            $streak = (int) $user['streak_count'];
+
+            if ($last_date === $today) {
+                // Already active today, no change
+                return;
+            }
+
+            $yesterday = date('Y-m-d', strtotime('-1 day'));
+
+            if ($last_date === $yesterday) {
+                // Consecutive day!
+                $streak++;
+            } else {
+                // Broke the streak, reset to 1
+                $streak = 1;
+            }
+
+            $update = "UPDATE pengguna SET streak_count = ?, last_active_date = ? WHERE id = ?";
+            $stmt = $this->db->prepare($update);
+            $stmt->execute([$streak, $today, $user_id]);
+
+        } catch (Exception $e) {
+            error_log("Update streak error: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Create user baru (registrasi)
      */
     public function register($username, $email, $password, $full_name) {

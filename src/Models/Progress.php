@@ -279,44 +279,22 @@ class Progress {
      */
     public function getLearningStreak(int $user_id): array {
         try {
-            $query = "SELECT DISTINCT activity_date 
-                      FROM (
-                          SELECT DATE(completed_at) as activity_date 
-                          FROM progres_materi 
-                          WHERE user_id = :uid1 
-                          UNION
-                          SELECT DATE(submitted_at) as activity_date 
-                          FROM hasil_kuis 
-                          WHERE user_id = :uid2
-                      ) as activity_history
-                      ORDER BY activity_date DESC";
-                      
+            $query = "SELECT streak_count, last_active_date FROM pengguna WHERE id = ?";
             $stmt = $this->db->prepare($query);
-            $stmt->execute(['uid1' => $user_id, 'uid2' => $user_id]);
-            $dates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch();
 
-            if (!$dates) return ['active_days' => 0];
+            if (!$user) return ['active_days' => 0];
 
-            $streak = 0;
-            $current_date = new DateTime('today');
-            $yesterday = new DateTime('yesterday');
-            
-            $first_activity = new DateTime($dates[0]);
+            $today = date('Y-m-d');
+            $yesterday = date('Y-m-d', strtotime('-1 day'));
+            $last_date = $user['last_active_date'];
+            $streak = (int) $user['streak_count'];
 
-            if ($first_activity != $current_date && $first_activity != $yesterday) {
+            // If user hasn't been active today OR yesterday, the streak shown to UI should be 0 (expired)
+            // But we only reset it in database when they actually log in next time.
+            if ($last_date !== $today && $last_date !== $yesterday) {
                 return ['active_days' => 0];
-            }
-
-            $date_to_check = clone $first_activity;
-
-            foreach ($dates as $date_str) {
-                $activity_date = new DateTime($date_str);
-                if ($activity_date == $date_to_check) {
-                    $streak++;
-                    $date_to_check->modify('-1 day');
-                } else {
-                    break;
-                }
             }
 
             return ['active_days' => $streak];
