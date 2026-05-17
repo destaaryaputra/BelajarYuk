@@ -422,6 +422,8 @@ export const MaterialDetail = {
                 UI.hideLoading();
                 if (proceed) {
                     localStorage.removeItem('active_sub_material_id'); // Clear sub_id for Final Quiz
+                    // Set active material ID explicitly to be sure
+                    localStorage.setItem('active_material_id', materialId);
                     window.location.hash = 'quiz-page';
                 }
             };
@@ -431,10 +433,12 @@ export const MaterialDetail = {
         if (finishBtn) {
             finishBtn.onclick = async () => {
                 UI.showLoading();
-                await markCurrentComplete();
+                const proceed = await markCurrentComplete();
                 UI.hideLoading();
-                this.renderSyllabus();
-                this.renderContent();
+                if (proceed) {
+                    this.renderSyllabus();
+                    this.renderContent();
+                }
             };
         }
 
