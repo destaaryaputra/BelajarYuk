@@ -29,6 +29,16 @@ class AIController {
             error_log("AI API Key Error: Constant " . (defined('GROQ_API_KEY') ? 'IS defined but EMPTY' : 'is NOT defined'));
             Response::error('Sistem AI belum siap, nih. Hubungi admin ya.', null, 503);
         }
+        
+        // Debug: Log safe fragment of the key (first 4 and last 4 chars)
+        $key = GROQ_API_KEY;
+        $len = strlen($key);
+        if ($len > 10) {
+            $fragment = substr($key, 0, 4) . '...' . substr($key, -4);
+            error_log("AI Chat Diagnostic: Using key fragment {$fragment} (Length: {$len})");
+        } else {
+            error_log("AI Chat Diagnostic: Key too short or invalid format (Length: {$len})");
+        }
     }
 
     private function checkRateLimit(string $key, int $limit, int $windowSeconds): bool {

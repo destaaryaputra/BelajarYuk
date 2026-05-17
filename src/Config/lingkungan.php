@@ -38,13 +38,17 @@ if (file_exists($envFile)) {
                 $value = trim(explode('#', $value)[0]);
             }
             
-            putenv("{$name}={$value}");
-            $_ENV[$name] = $value;
-            $_SERVER[$name] = $value;
+            // HANYA isi jika belum ada di environment (PENTING untuk Vercel)
+            if (getenv($name) === false || getenv($name) === '') {
+                putenv("{$name}={$value}");
+                $_ENV[$name] = $value;
+                $_SERVER[$name] = $value;
+            }
         }
     }
 } else {
-    error_log("CRITICAL: .env file NOT FOUND at " . $envFile);
+    // Di Vercel ini normal, karena env variables diset di dashboard
+    // error_log("INFO: .env file not found. Using system environment variables.");
 }
 
 // Environment
@@ -54,7 +58,7 @@ define('DEBUG', ENV === 'development');
 
 // Security
 $jwtSecret = $_ENV['JWT_SECRET'] ?? getenv('JWT_SECRET');
-if (!$jwtSecret) {
+if (!$jwtSecret || $jwtSecret === '') {
     error_log('WARNING: JWT_SECRET is not set. Using insecure fallback.');
     $jwtSecret = 'fallback-insecure-secret-change-me';
 }
@@ -63,8 +67,21 @@ define('SESSION_TIMEOUT', 3600); // 1 hour
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('LOCKOUT_TIME', 900); // 15 minutes
 
-// AI (Groq)
-$groqApiKey = $_ENV['GROQ_API_KEY'] ?? getenv('GROQ_API_KEY') ?? $_SERVER['GROQ_API_KEY'] ?? '';
+// AI (Groq) - Deteksi lebih cerdas: cari yang tidak kosong
+$groqApiKey = '';
+$potentialKeys = [
+    $_ENV['GROQ_API_KEY'] ?? null,
+    getenv('GROQ_API_KEY'),
+    $_SERVER['GROQ_API_KEY'] ?? null
+];
+
+foreach ($potentialKeys as $key) {
+    if ($key && trim($key) !== '') {
+        $groqApiKey = trim($key);
+        break;
+    }
+}
+
 define('GROQ_API_KEY', $groqApiKey);
 
 // Error Handling (Cegah kebocoran error ke JSON response)
