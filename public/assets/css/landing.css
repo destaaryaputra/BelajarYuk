@@ -109,13 +109,13 @@
 }
 
 .hero-wrapper {
-    padding: 72px 0 78px;
+    padding: 92px 0 100px;
 }
 
 .hero-grid {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 56px;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 64px;
     align-items: center;
 }
 
@@ -147,10 +147,11 @@
 }
 
 .hero-text h1 {
-    font-size: clamp(2rem, 4.4vw, 3.5rem);
-    line-height: 1.08;
-    font-weight: 800;
-    margin-bottom: 16px;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 1.05;
+    font-weight: 900;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
 }
 
 .text-gradient {
@@ -161,11 +162,11 @@
 }
 
 .hero-text p {
-    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
     color: var(--text-muted);
-    margin-bottom: 26px;
-    line-height: 1.68;
-    max-width: 54ch;
+    margin-bottom: 36px;
+    line-height: 1.6;
+    max-width: 48ch;
 }
 
 .hero-cta-group {
