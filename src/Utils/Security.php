@@ -2,9 +2,6 @@
 
 namespace App\Utils;
 
-use DOMDocument;
-use DOMElement;
-use DOMNode;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Exception;
@@ -51,7 +48,7 @@ class Security {
         $allowedTags = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ol', 'ul', 'li', 'a', 'blockquote', 'code', 'pre', 'h2', 'h3', 'h4', 'h5', 'h6', 'img'];
         $allowedAttrs = ['href', 'src', 'alt', 'title', 'target', 'rel'];
 
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         libxml_use_internal_errors(true);
         // Load with UTF-8 prefix to handle Indonesian/Special characters correctly
         $doc->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -63,23 +60,27 @@ class Security {
         return $clean === null ? '' : $clean;
     }
 
-    private static function sanitizeNode(DOMNode $node, array $allowedTags, array $allowedAttrs): void {
-        if ($node instanceof DOMElement) {
-            $element = $node;
-            $tag = strtolower($element->nodeName);
+    /**
+     * @param \DOMNode $node
+     * @param array $allowedTags
+     * @param array $allowedAttrs
+     */
+    private static function sanitizeNode(\DOMNode $node, array $allowedTags, array $allowedAttrs): void {
+        if ($node instanceof \DOMElement) {
+            $tag = strtolower($node->nodeName);
             if (!in_array($tag, $allowedTags, true)) {
-                $parent = $element->parentNode;
+                $parent = $node->parentNode;
                 if ($parent) {
-                    while ($element->firstChild) {
-                        $parent->insertBefore($element->firstChild, $element);
+                    while ($node->firstChild) {
+                        $parent->insertBefore($node->firstChild, $node);
                     }
-                    $parent->removeChild($element);
+                    $parent->removeChild($node);
                 }
                 return;
             }
 
-            if ($element->hasAttributes()) {
-                self::sanitizeAttributes($element, $tag, $allowedAttrs);
+            if ($node->hasAttributes()) {
+                self::sanitizeAttributes($node, $tag, $allowedAttrs);
             }
         }
 
@@ -94,7 +95,12 @@ class Security {
         }
     }
 
-    private static function sanitizeAttributes(DOMElement $element, string $tag, array $allowedAttrs): void {
+    /**
+     * @param \DOMElement $element
+     * @param string $tag
+     * @param array $allowedAttrs
+     */
+    private static function sanitizeAttributes(\DOMElement $element, string $tag, array $allowedAttrs): void {
         $attrNames = [];
         foreach ($element->attributes as $attr) {
             $attrNames[] = $attr->name;
