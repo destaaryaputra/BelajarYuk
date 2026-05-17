@@ -129,26 +129,35 @@ class Progress {
 
     public function getProgressByCategory(int $user_id): array {
         try {
-            // Refactored query for better compatibility
-            $query = "SELECT 
-                        m.category,
-                        COUNT(DISTINCT m.id) as total_materials,
-                        COUNT(DISTINCT pm.material_id) as completed_materials,
-                        CASE 
-                            WHEN COUNT(DISTINCT m.id) > 0 
-                            THEN ROUND((COUNT(DISTINCT pm.material_id)::numeric / COUNT(DISTINCT m.id)::numeric) * 100, 2)
-                            ELSE 0 
-                        END as completion_percentage
-                      FROM materi m
-                      LEFT JOIN progres_materi pm ON m.id = pm.material_id AND pm.user_id = :uid
-                      WHERE m.status = 'active'
-                      GROUP BY m.category
-                      ORDER BY m.category";
+            // Perfect Sync: Get detailed material progress first
+            $materials = $this->getDetailedMaterialProgress($user_id);
             
-            $stmt = $this->db->prepare($query);
-            $stmt->execute(['uid' => $user_id]);
+            if (empty($materials)) return [];
 
-            return $stmt->fetchAll();
+            // Group by category
+            $categories = [];
+            foreach ($materials as $m) {
+                $catName = $m['category'];
+                if (!isset($categories[$catName])) {
+                    $categories[$catName] = [
+                        'category' => $catName,
+                        'total_materials' => 0,
+                        'total_percentage' => 0
+                    ];
+                }
+                $categories[$catName]['total_materials']++;
+                $categories[$catName]['total_percentage'] += $m['percentage'];
+            }
+
+            // Calculate average
+            return array_map(function($cat) {
+                return [
+                    'category' => $cat['category'],
+                    'total_materials' => $cat['total_materials'],
+                    'completed_materials' => 0, // No longer strictly needed but kept for BC
+                    'completion_percentage' => round($cat['total_percentage'] / $cat['total_materials'], 2)
+                ];
+            }, array_values($categories));
         } catch (Exception $e) {
             error_log("Get progress by category error: " . $e->getMessage());
             return [];
