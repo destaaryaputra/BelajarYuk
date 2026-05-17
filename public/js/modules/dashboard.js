@@ -30,34 +30,34 @@ export const Dashboard = {
             </div>
 
             <div class="stats-grid mb-32">
-                <div class="stat-card stat-card-info">
+                <div class="stat-card accent-blue">
                     <div class="stat-card-row">
                         <div>
-                            <h3>Modul Selesai</h3>
+                            <h3>Pencapaian Modul</h3>
                             <div class="value"><span id="dash-materials-completed">--</span><span id="dash-total-materials-suffix" class="value-suffix">...</span></div>
                         </div>
-                        <div class="stat-chip"><div class="css-art-book"></div></div>
+                        <div class="stat-chip"><i data-lucide="book-check"></i></div>
                     </div>
                 </div>
-                <div class="stat-card stat-card-primary">
+                <div class="stat-card accent-orange">
                     <div class="stat-card-row">
                         <div>
-                            <h3>Peringkat & Poin</h3>
+                            <h3>Peringkat Global</h3>
                             <div class="value">
                                 <span id="dash-rank">--</span>
                                 <span class="value-suffix" id="dash-points-suffix">... Poin</span>
                             </div>
                         </div>
-                        <div class="stat-chip"><div class="css-art-star"></div></div>
+                        <div class="stat-chip"><i data-lucide="trophy"></i></div>
                     </div>
                 </div>
-                <div class="stat-card stat-card-accent">
+                <div class="stat-card accent-green">
                     <div class="stat-card-row">
                         <div>
-                            <h3>Konsistensi Belajar</h3>
+                            <h3>Semangat Belajar</h3>
                             <div class="value"><span id="dash-learning-streak">--</span><span class="value-suffix">Hari</span></div>
                         </div>
-                        <div class="stat-chip"><div class="css-art-calendar"></div></div>
+                        <div class="stat-chip"><i data-lucide="flame"></i></div>
                     </div>
                 </div>
             </div>
