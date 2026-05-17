@@ -86,7 +86,7 @@ class AuthController {
 
     public function updateProfile(): void {
         AuthMiddleware::requireAuth();
-        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
             Response::error('Metode permintaan tidak valid.', null, 405);
         }
         CSRFMiddleware::verify();
@@ -94,16 +94,26 @@ class AuthController {
         try {
             $user = AuthMiddleware::getAuthUser();
             $data = json_decode(file_get_contents("php://input"), true);
-            $full_name = Security::sanitize($data['full_name'] ?? '');
-            $bio = Security::sanitize($data['bio'] ?? '');
+            
+            $updateData = [
+                'full_name' => Security::sanitize($data['full_name'] ?? ''),
+                'username' => Security::sanitize($data['username'] ?? ''),
+                'email' => Security::sanitize($data['email'] ?? ''),
+                'bio' => Security::sanitize($data['bio'] ?? ''),
+                'password' => $data['password'] ?? null
+            ];
 
-            if (empty($full_name)) throw new Exception('Nama lengkap tidak boleh kosong.', 400);
+            if (empty($updateData['full_name'])) throw new Exception('Nama lengkap tidak boleh kosong.', 400);
 
-            $result = $this->userModel->updateProfile($user['id'], $full_name, $bio);
+            $result = $this->userModel->updateProfile($user['id'], $updateData);
 
             if ($result['success']) {
                 $updatedUser = $this->userModel->getUserById($user['id']);
                 $updatedUser['role'] = $user['role'];
+                
+                // Update Session
+                $_SESSION['user'] = $updatedUser;
+                
                 Response::success($result['message'], ['user' => $updatedUser]);
             } else {
                 Response::error($result['message'], null, 400);

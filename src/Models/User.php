@@ -112,25 +112,50 @@ class User {
     }
 
     /**
-     * Update user profile
+     * Update user profile with safety checks
      */
-    public function updateProfile($user_id, $full_name, $bio = null, $avatar = null) {
+    public function updateProfile($user_id, $data) {
         try {
-            $query = "UPDATE pengguna SET full_name = ?, bio = ?";
-            $params = [$full_name, $bio];
+            $full_name = $data['full_name'] ?? null;
+            $username = $data['username'] ?? null;
+            $email = $data['email'] ?? null;
+            $password = $data['password'] ?? null;
+            $bio = $data['bio'] ?? null;
 
-            if ($avatar) {
-                $query .= ", avatar = ?";
-                $params[] = $avatar;
+            // Check uniqueness if username or email changes
+            if ($username || $email) {
+                $checkQuery = "SELECT id FROM pengguna WHERE (username = ? OR email = ?) AND id != ?";
+                $stmt = $this->db->prepare($checkQuery);
+                $stmt->execute([$username, $email, $user_id]);
+                if ($stmt->rowCount() > 0) {
+                    return ['success' => false, 'message' => 'Username atau email sudah digunakan pengguna lain.'];
+                }
             }
 
-            $query .= " WHERE id = ?";
-            $params[] = $user_id;
+            $fields = [];
+            $params = [];
 
+            if ($full_name) { $fields[] = "full_name = ?"; $params[] = $full_name; }
+            if ($username) { $fields[] = "username = ?"; $params[] = $username; }
+            if ($email) { $fields[] = "email = ?"; $params[] = $email; }
+            if ($bio !== null) { $fields[] = "bio = ?"; $params[] = $bio; }
+            
+            if ($password && !empty($password)) {
+                $fields[] = "password = ?";
+                $params[] = Security::hashPassword($password);
+            }
+
+            if (empty($fields)) {
+                return ['success' => true, 'message' => 'Tidak ada perubahan.'];
+            }
+
+            $params[] = $user_id;
+            $query = "UPDATE pengguna SET " . implode(", ", $fields) . " WHERE id = ?";
+            
             $stmt = $this->db->prepare($query);
             $stmt->execute($params);
 
-            return ['success' => true, 'message' => 'Profil berhasil diperbarui.'];
+            return ['success' => true, 'message' => 'Profil berhasil diperbarui!'];
         } catch (Exception $e) {
             error_log("Update profile error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal memperbarui profil.'];
