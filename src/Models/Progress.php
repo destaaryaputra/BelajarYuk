@@ -30,10 +30,11 @@ class Progress {
             $total_materials = count($materials);
             $materials_completed = 0;
             $total_points = 0;
-            $total_quiz_percentage = 0;
+            $sum_percentages = 0;
             
             foreach ($materials as $m) {
                 if ($m['percentage'] >= 100) $materials_completed++;
+                $sum_percentages += $m['percentage'];
             }
 
             // Quiz specific stats
@@ -48,7 +49,8 @@ class Progress {
             $stmt->execute(['uid' => $user_id, 'uid2' => $user_id, 'uid3' => $user_id]);
             $quizData = $stmt->fetch();
 
-            $completion_percentage = ($total_materials > 0) ? ($materials_completed / $total_materials) * 100 : 0;
+            // Overall percentage is now average of all material percentages
+            $completion_percentage = ($total_materials > 0) ? ($sum_percentages / $total_materials) : 0;
 
             return [
                 'materials_completed' => $materials_completed,
@@ -56,7 +58,7 @@ class Progress {
                 'quizzes_completed' => (int) ($quizData['quizzes_completed'] ?? 0),
                 'average_quiz_score' => round((float) ($quizData['average_quiz_score'] ?? 0), 2),
                 'total_points' => (int) ($quizData['total_points'] ?? 0),
-                'completion_percentage' => round($completion_percentage, 2)
+                'completion_percentage' => round($completion_percentage, 0)
             ];
         } catch (Exception $e) {
             error_log("Get user progress summary error: " . $e->getMessage());
