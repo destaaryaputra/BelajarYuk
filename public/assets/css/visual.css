@@ -67,24 +67,26 @@
     justify-content: center;
     align-items: center;
     z-index: 10000;
-    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
+    transition: opacity 0.68s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.68s;
     overflow: hidden;
+    will-change: opacity;
 }
 
 .splash-screen.hidden {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
 }
 
 /* Master zoom effect when hiding */
 .splash-screen.zoom-blur .splash-logo {
-    animation: splashZoomBlur 1.4s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    animation: splashZoomBlur 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes splashZoomBlur {
-    0% { transform: scale(1); filter: blur(0); opacity: 1; }
-    40% { transform: scale(1.5); filter: blur(4px); opacity: 0.8; }
-    100% { transform: scale(8); filter: blur(20px); opacity: 0; }
+    0% { transform: translateZ(0) scale(1); filter: blur(0); opacity: 1; }
+    36% { transform: translateZ(0) scale(1.08); filter: blur(0.6px); opacity: 0.98; }
+    100% { transform: translateZ(0) scale(1.9); filter: blur(7px); opacity: 0; }
 }
 
 .splash-logo {
@@ -92,6 +94,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform, opacity, filter;
 }
 
 .splash-logo h1 {

@@ -131,6 +131,8 @@ export const UI = {
     hideSplash() {
         const splash = document.getElementById('splash-screen');
         if (!splash) return;
+        const fadeDelay = 180;
+        const removeDelay = 980;
         
         // 1. Trigger the cinematic Zoom & Blur animation
         splash.classList.add('zoom-blur');
@@ -139,13 +141,13 @@ export const UI = {
         // 2. Fade out the entire overlay slightly after the zoom starts
         setTimeout(() => {
             splash.classList.add('hidden');
-        }, 600);
+        }, fadeDelay);
         
         // 3. Completely remove from DOM after all animations finish
         setTimeout(() => {
             splash.remove();
             console.log('🌊 Splash Screen Removed');
-        }, 1600); 
+        }, removeDelay); 
     },
 
     isSplashVisible() {
