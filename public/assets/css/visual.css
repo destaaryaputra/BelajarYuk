@@ -173,19 +173,76 @@
 }
 
 /* Splash Screen Specific Animation Scaling */
+/* Splash Screen (Premium Refinement) */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #ffffff 0%, #f4f6f9 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+}
+
+.splash-logo {
+    text-align: center;
+    animation: splashContentUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.splash-logo h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-top: 24px;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fadeInSlideUp 0.6s ease-out 0.4s forwards;
+    background: linear-gradient(135deg, var(--primary) 0%, #176f5a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Splash Specific Logo Enhancements */
 .splash-screen .css-art-logo {
-    transform: scale(1.4);
-    margin-bottom: 32px;
+    transform: scale(1.5);
+    margin-bottom: 40px;
+    box-shadow: 
+        0 20px 40px rgba(31, 138, 112, 0.15),
+        inset 0 -4px 0 rgba(0,0,0,0.2);
+}
+
+/* Shimmer effect for the logo */
+.splash-screen .css-art-logo::after {
+    z-index: 3;
+    animation: 
+        sweepBookPagesRightToLeft 2.2s cubic-bezier(0.22, 0.72, 0.16, 1) forwards 0.15s,
+        logoShimmer 3s infinite 2.5s;
+}
+
+@keyframes logoShimmer {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.15) contrast(1.05); }
+    100% { filter: brightness(1); }
+}
+
+@keyframes splashContentUp {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInSlideUp {
+    0% { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
 }
 
 .splash-screen .css-art-logo::before {
     animation: leftPageSettle 2.2s cubic-bezier(0.2, 0.82, 0.2, 1) forwards 0.2s;
 }
 
-.splash-screen .css-art-logo::after {
-    z-index: 3;
-    animation: sweepBookPagesRightToLeft 2.2s cubic-bezier(0.22, 0.72, 0.16, 1) forwards 0.15s;
-}
 @keyframes sweepBookPagesRightToLeft {
     0%, 26.8%, 53.6% {
         transform: perspective(420px) rotateY(-15deg) skewY(0deg) scaleX(1);
