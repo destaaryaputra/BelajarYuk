@@ -12,7 +12,6 @@
         0 12px 24px rgba(15, 118, 110, 0.25),
         inset 0 -4px 0 rgba(0,0,0,0.2), /* Bottom edge thickness */
         inset 0 1px 0 rgba(255,255,255,0.3);
-    animation: logoReveal 0.78s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     transform-style: preserve-3d;
 }
 
@@ -110,50 +109,43 @@
     opacity: 0;
 }
 
-/* 4x Page Flip Animation Logic */
+/* Splash-only logo animation */
 .splash-screen .css-art-logo {
     transform: scale(1.5);
     margin-bottom: 40px;
+    animation: splashLogoReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     box-shadow: 
         0 20px 40px rgba(31, 138, 112, 0.15),
         inset 0 -4px 0 rgba(0,0,0,0.2);
 }
 
-/* Right Page - Does 4 flips */
+/* Right page flips once in splash */
 .splash-screen .css-art-logo::after {
     z-index: 10;
-    animation: cinematicMultiFlip 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards 0.2s;
+    animation: cinematicMultiFlip 1.1s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards 0.2s;
     transform-origin: left center;
 }
 
-/* Left Page - Settles after flips */
+/* Left page follows the flip and settles */
 .splash-screen .css-art-logo::before {
-    animation: leftPageSettleCinematic 3.2s ease forwards 0.2s;
+    animation: leftPageSettleCinematic 1.1s ease forwards 0.2s;
     transform-origin: right center;
 }
 
 @keyframes cinematicMultiFlip {
-    /* Flip 1 */
-    0% { transform: perspective(600px) rotateY(-20deg) skewY(0); }
-    12% { transform: perspective(600px) rotateY(-170deg) skewY(-3deg); filter: brightness(0.9); }
-    23% { transform: perspective(600px) rotateY(-20deg) skewY(0); filter: brightness(1); }
-    /* Flip 2 */
-    25% { transform: perspective(600px) rotateY(-20deg) skewY(0); }
-    37% { transform: perspective(600px) rotateY(-170deg) skewY(-3deg); filter: brightness(0.9); }
-    48% { transform: perspective(600px) rotateY(-20deg) skewY(0); filter: brightness(1); }
-    /* Flip 3 */
-    50% { transform: perspective(600px) rotateY(-20deg) skewY(0); }
-    62% { transform: perspective(600px) rotateY(-170deg) skewY(-3deg); filter: brightness(0.9); }
-    73% { transform: perspective(600px) rotateY(-20deg) skewY(0); filter: brightness(1); }
-    /* Flip 4 (Final Settle) */
-    75% { transform: perspective(600px) rotateY(-20deg) skewY(0); }
-    87% { transform: perspective(600px) rotateY(-170deg) skewY(-3deg); filter: brightness(0.9); }
+    0% { transform: perspective(600px) rotateY(-20deg) skewY(0); filter: brightness(1); }
+    52% { transform: perspective(600px) rotateY(-170deg) skewY(-3deg); filter: brightness(0.88); }
     100% { transform: perspective(150px) rotateY(-20deg) skewY(0); filter: brightness(1); }
 }
 
 @keyframes leftPageSettleCinematic {
-    0%, 75% { transform: perspective(600px) rotateY(15deg); }
+    0%, 55% { transform: perspective(600px) rotateY(15deg); }
     100% { transform: perspective(150px) rotateY(20deg); }
+}
+
+@keyframes splashLogoReveal {
+    0% { transform: translateY(16px) scale(1.15); opacity: 0; filter: blur(8px); }
+    100% { transform: scale(1.5); opacity: 1; filter: blur(0); }
 }
 
 @keyframes fadeInSlideUp {

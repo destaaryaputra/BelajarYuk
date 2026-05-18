@@ -57,9 +57,11 @@ nav {
 
 .nav-logo-wrapper .css-art-logo {
     margin: 0;
-    animation: none;
+    animation: none !important;
     transform: scale(0.47);
     transform-origin: top left;
+    opacity: 1;
+    filter: none;
 }
 
 nav button {
