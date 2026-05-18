@@ -1,119 +1,3 @@
-/** CSS art untuk logo, splash, dan empty state tanpa class icon dekoratif. */
-.css-art-empty-box {
-    width: 64px;
-    height: 48px;
-    margin: 0 auto 16px;
-    border: 3px solid #cbd5e1;
-    border-top: none;
-    border-radius: 0 0 12px 12px;
-    position: relative;
-}
-.css-art-empty-box::before {
-    content: '';
-    position: absolute;
-    top: -14px;
-    left: -3px;
-    width: 30px;
-    height: 12px;
-    border: 3px solid #cbd5e1;
-    border-radius: 4px;
-    transform: skewX(-25deg);
-    transform-origin: bottom left;
-}
-.css-art-empty-box::after {
-    content: '';
-    position: absolute;
-    top: -14px;
-    right: -3px;
-    width: 30px;
-    height: 12px;
-    border: 3px solid #cbd5e1;
-    border-radius: 4px;
-    transform: skewX(25deg);
-    transform-origin: bottom right;
-}
-.css-art-empty-list {
-    width: 48px;
-    height: 60px;
-    margin: 0 auto 16px;
-    border: 3px solid #cbd5e1;
-    border-radius: 8px;
-    position: relative;
-}
-.css-art-empty-list::before {
-    content: '';
-    position: absolute;
-    top: 12px;
-    left: 16px;
-    width: 20px;
-    height: 3px;
-    background: #cbd5e1;
-    box-shadow: 0 12px 0 #cbd5e1, 0 24px 0 #cbd5e1;
-    border-radius: 2px;
-}
-.css-art-empty-list::after {
-    content: '';
-    position: absolute;
-    top: 11px;
-    left: 8px;
-    width: 5px;
-    height: 5px;
-    border: 2px solid #cbd5e1;
-    border-radius: 50%;
-    box-shadow: 0 12px 0 #cbd5e1, 0 24px 0 #cbd5e1;
-}
-.css-art-trophy {
-    width: 40px;
-    height: 36px;
-    margin: 0 auto 16px;
-    border: 4px solid var(--primary);
-    border-radius: 0 0 20px 20px;
-    position: relative;
-}
-.css-art-trophy::before {
-    content: '';
-    position: absolute;
-    top: 4px;
-    left: -16px;
-    width: 64px;
-    height: 16px;
-    border: 4px solid var(--primary);
-    border-radius: 12px;
-    z-index: -1;
-}
-.css-art-trophy::after {
-    content: '';
-    position: absolute;
-    bottom: -18px;
-    left: 12px;
-    width: 8px;
-    height: 14px;
-    background: var(--primary);
-    box-shadow: 0 12px 0 4px var(--primary);
-}
-.css-art-fail {
-    width: 56px;
-    height: 56px;
-    margin: 0 auto 16px;
-    border: 4px solid #ef4444;
-    border-radius: 50%;
-    position: relative;
-}
-.css-art-fail::before,
-.css-art-fail::after {
-    content: '';
-    position: absolute;
-    top: 14px;
-    left: 24px;
-    width: 4px;
-    height: 20px;
-    background: #ef4444;
-    border-radius: 2px;
-    transform: rotate(45deg);
-}
-.css-art-fail::after {
-    transform: rotate(-45deg);
-}
 .css-art-logo {
     width: 76px;
     height: 54px;
@@ -172,7 +56,6 @@
         1px 2px 0 rgba(0,0,0,0.1);
 }
 
-/* Splash Screen Specific Animation Scaling */
 /* Splash Screen (Premium Refinement) */
 .splash-screen {
     position: fixed;
@@ -244,167 +127,41 @@
 }
 
 @keyframes sweepBookPagesRightToLeft {
-    0%, 26.8%, 53.6% {
-        transform: perspective(420px) rotateY(-15deg) skewY(0deg) scaleX(1);
-        filter: brightness(1);
-        opacity: 1;
-        box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.06), 1px 2px 0 #f1f5f9, 2px 4px 0 #cbd5e1;
-    }
-    8%, 34.8%, 61.6% {
-        transform: perspective(420px) rotateY(-58deg) skewY(3deg) scaleX(0.96);
-        filter: brightness(1.06);
-        opacity: 1;
-        box-shadow: inset 12px 0 16px rgba(0, 0, 0, 0.08), -7px 6px 12px rgba(15, 23, 42, 0.10);
-    }
-    16%, 42.8%, 69.6% {
-        transform: perspective(420px) rotateY(-118deg) skewY(5deg) scaleX(0.86);
-        filter: brightness(0.96);
-        opacity: 0.96;
-        box-shadow: inset -10px 0 18px rgba(0, 0, 0, 0.12), -16px 8px 18px rgba(15, 23, 42, 0.14);
-    }
-    24%, 50.8%, 77.6% {
-        transform: perspective(420px) rotateY(-172deg) skewY(-2deg) scaleX(0.94);
-        filter: brightness(1.02);
-        opacity: 0.24;
-        box-shadow: inset -4px 0 10px rgba(0, 0, 0, 0.08), -5px 5px 10px rgba(15, 23, 42, 0.08);
-    }
-    25%, 51.8%, 78.6% {
-        transform: perspective(420px) rotateY(-15deg) skewY(0deg) scaleX(1);
-        filter: brightness(1);
-        opacity: 0.86;
-        box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.06), 1px 2px 0 #f1f5f9, 2px 4px 0 #cbd5e1;
-    }
-    82% {
-        transform: perspective(420px) rotateY(-42deg) skewY(2deg) scaleX(0.98);
-        opacity: 1;
-        filter: brightness(1.04);
-    }
-    92% {
-        transform: perspective(420px) rotateY(-140deg) skewY(3deg) scaleX(0.9);
-        opacity: 0.92;
-    }
-    98% {
-        transform: perspective(420px) rotateY(-170deg) skewY(-1deg) scaleX(0.96);
-        opacity: 0.2;
-    }
-    100% {
-        transform: perspective(420px) rotateY(-165deg) skewY(0deg) scaleX(1);
-        filter: brightness(1);
-        opacity: 0;
-        box-shadow: inset -4px 0 10px rgba(0, 0, 0, 0.08), -2px 3px 8px rgba(15, 23, 42, 0.06);
-    }
-}
-@keyframes leftPageSettle {
     0% {
-        transform: perspective(360px) rotateY(20deg);
+        transform: perspective(600px) rotateY(-15deg) skewY(0deg) scaleX(1);
+        filter: brightness(1);
+        box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.06), 1px 2px 0 rgba(0,0,0,0.05);
+    }
+    15% {
+        transform: perspective(600px) rotateY(-45deg) skewY(6deg) scaleX(0.98) translateY(-2px);
+        filter: brightness(1.15);
+        box-shadow: inset 10px 0 20px rgba(0, 0, 0, 0.08), -10px 15px 25px rgba(0, 0, 0, 0.1);
     }
     45% {
-        transform: perspective(360px) rotateY(8deg) scaleX(1.02);
+        transform: perspective(600px) rotateY(-110deg) skewY(2deg) scaleX(0.9) translateY(0);
+        filter: brightness(0.9);
+        box-shadow: inset -15px 0 30px rgba(0, 0, 0, 0.12), -25px 10px 30px rgba(0, 0, 0, 0.15);
     }
-    72% {
-        transform: perspective(360px) rotateY(18deg);
+    75% {
+        transform: perspective(600px) rotateY(-165deg) skewY(-3deg) scaleX(0.96);
+        filter: brightness(1.05);
+        box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.05), -1px 2px 0 rgba(0,0,0,0.1);
     }
     100% {
-        transform: perspective(360px) rotateY(15deg);
+        transform: perspective(150px) rotateY(-20deg);
+        filter: brightness(1);
+        box-shadow: inset 8px 0 12px rgba(0,0,0,0.05), 1px 2px 0 rgba(0,0,0,0.1);
     }
 }
 
-/* Custom CSS Art Icons for Dashboard Stats */
-.css-art-book {
-    width: 24px;
-    height: 18px;
-    border: 2px solid currentColor;
-    border-radius: 2px 4px 4px 2px;
-    position: relative;
-}
-.css-art-book::before {
-    content: '';
-    position: absolute;
-    left: 2px;
-    top: 3px;
-    width: 12px;
-    height: 2px;
-    background: currentColor;
-    box-shadow: 0 4px 0 currentColor, 0 8px 0 currentColor;
-    opacity: 0.5;
-}
-.css-art-book::after {
-    content: '';
-    position: absolute;
-    right: -4px;
-    top: -2px;
-    width: 6px;
-    height: 18px;
-    border: 2px solid currentColor;
-    border-left: none;
-    border-radius: 0 4px 4px 0;
-}
-
-.css-art-star {
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 20px solid currentColor;
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-}
-.css-art-star::before {
-    content: '';
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-top: 20px solid currentColor;
-    position: absolute;
-    top: 6px;
-    left: -12px;
-}
-
-.css-art-calendar {
-    width: 22px;
-    height: 20px;
-    border: 2px solid currentColor;
-    border-top-width: 5px;
-    border-radius: 3px;
-    position: relative;
-}
-.css-art-calendar::before,
-.css-art-calendar::after {
-    content: '';
-    position: absolute;
-    top: -8px;
-    width: 2px;
-    height: 6px;
-    background: currentColor;
-    border-radius: 1px;
-}
-.css-art-calendar::before { left: 4px; }
-.css-art-calendar::after { right: 4px; }
-
-/* --- Refactor: Replacement for inline styles --- */
-.p-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-}
-.dot-red { background: #ff5f56; }
-.dot-yellow { background: #ffbd2e; }
-.dot-green { background: #27c93f; }
-
-.play-icon-large {
-    width: 64px;
-    height: 64px;
-    color: white;
-}
-
-.icon-sm { width: 16px; height: 16px; }
-.icon-md { width: 18px; height: 18px; }
-
-.ai-header-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+@keyframes leftPageSettle {
+    0% {
+        transform: perspective(600px) rotateY(15deg) skewY(0deg);
+    }
+    30% {
+        transform: perspective(600px) rotateY(25deg) skewY(-2deg);
+    }
+    100% {
+        transform: perspective(150px) rotateY(20deg);
+    }
 }
