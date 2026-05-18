@@ -1,7 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Background Circle for Visibility -->
-  <circle cx="16" cy="16" r="14" fill="#1f8a70" />
-  <!-- White Book Icon -->
-  <path d="M8 9h6a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H8z" fill="white" />
-  <path d="M24 9h-6a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h7z" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 54">
+  <!-- Book Cover (Base) -->
+  <rect x="0" y="0" width="76" height="54" rx="12" fill="#f8fafc" />
+  
+  <!-- Spine Shadow -->
+  <rect x="36" y="0" width="4" height="54" fill="#94a3b8" opacity="0.4" />
+  
+  <!-- Pages Group -->
+  <g transform="translate(4, 4)">
+    <!-- Left Page -->
+    <path d="M0 4 C 0 1, 1 0, 4 0 L 27 0 C 30 0, 31 1, 31 4 L 31 38 C 31 41, 30 42, 27 42 L 4 42 C 1 42, 0 41, 0 38 Z" fill="white" />
+    <!-- Lines on Left Page -->
+    <rect x="8" y="12" width="16" height="2" fill="#cbd5e1" rx="1" />
+    <rect x="8" y="20" width="16" height="2" fill="#cbd5e1" rx="1" />
+    <rect x="8" y="28" width="16" height="2" fill="#cbd5e1" rx="1" />
+    
+    <!-- Right Page -->
+    <path d="M37 4 C 37 1, 38 0, 41 0 L 64 0 C 67 0, 68 1, 68 4 L 68 38 C 68 41, 67 42, 64 42 L 41 42 C 38 42, 37 41, 37 38 Z" fill="white" />
+    <!-- Lines on Right Page -->
+    <rect x="45" y="12" width="16" height="2" fill="#cbd5e1" rx="1" />
+    <rect x="45" y="20" width="16" height="2" fill="#cbd5e1" rx="1" />
+    <rect x="45" y="28" width="16" height="2" fill="#cbd5e1" rx="1" />
+  </g>
 </svg>
