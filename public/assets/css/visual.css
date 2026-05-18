@@ -1,3 +1,61 @@
+.css-art-logo {
+    width: 76px;
+    height: 54px;
+    margin: 10px auto 20px;
+    position: relative;
+    border-radius: 8px;
+    /* Richer Cover Color with Gradient for 3D depth */
+    background-color: var(--primary);
+    background-image:
+        linear-gradient(to right, rgba(0,0,0,0.1) 0%, transparent 45%, rgba(255,255,255,0.2) 48%, rgba(0,0,0,0.2) 50%, rgba(255,255,255,0.2) 52%, transparent 55%, rgba(0,0,0,0.1) 100%);
+    box-shadow:
+        0 12px 24px rgba(15, 118, 110, 0.25),
+        inset 0 -4px 0 rgba(0,0,0,0.2), /* Bottom edge thickness */
+        inset 0 1px 0 rgba(255,255,255,0.3);
+    animation: logoReveal 0.78s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-style: preserve-3d;
+}
+
+/* Global Logo Pages (Artistic Book Style) */
+.css-art-logo::before,
+.css-art-logo::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    width: 30px;
+    height: 38px;
+    background-color: #ffffff;
+    background-image:
+        linear-gradient(#e2e8f0 2px, transparent 2px),
+        linear-gradient(#e2e8f0 2px, transparent 2px),
+        linear-gradient(#e2e8f0 2px, transparent 2px);
+    background-size: 18px 2px;
+    background-repeat: no-repeat;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.css-art-logo::before {
+    left: 6px;
+    background-position: 6px 10px, 6px 18px, 6px 26px;
+    border-radius: 2px 6px 6px 2px;
+    transform: perspective(150px) rotateY(20deg);
+    transform-origin: right center;
+    box-shadow: 
+        inset -8px 0 12px rgba(0,0,0,0.05),
+        -1px 2px 0 rgba(0,0,0,0.1);
+}
+
+.css-art-logo::after {
+    right: 6px;
+    background-position: 6px 10px, 6px 18px, 6px 26px;
+    border-radius: 6px 2px 2px 6px;
+    transform: perspective(150px) rotateY(-20deg);
+    transform-origin: left center;
+    box-shadow: 
+        inset 8px 0 12px rgba(0,0,0,0.05),
+        1px 2px 0 rgba(0,0,0,0.1);
+}
+
 /* Splash Screen (Cinematic Cinematic Upgrade) */
 .splash-screen {
     position: fixed;
@@ -46,6 +104,8 @@
     animation: fadeInSlideUp 0.8s ease-out 0.4s forwards;
     background: linear-gradient(135deg, var(--primary) 0%, #176f5a 100%);
     -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     -webkit-text-fill-color: transparent;
     opacity: 0;
 }
