@@ -84,16 +84,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 5. Initial Load
     try {
+        console.log('🔗 Handling Initial Route...');
         await Router.handleInitialRoute();
         console.log('✨ Initial Route Ready');
     } catch (err) {
         console.error('❌ Failed to load initial route:', err);
     } finally {
-        // 6. Always hide splash to prevent white screen lock
-        // Reduced delay for better UX
+        // 6. Hide splash screen after initial route is loaded
+        // We use a small delay to let the initial page render before fading out
         setTimeout(() => {
             UI.hideSplash();
             console.log('✅ Bootstrapping Finished');
-        }, 400);
+        }, 600);
     }
 });

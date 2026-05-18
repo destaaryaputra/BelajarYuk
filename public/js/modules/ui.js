@@ -130,11 +130,27 @@ export const UI = {
 
     hideSplash() {
         const splash = document.getElementById('splash-screen');
-        if (splash) splash.classList.add('hidden');
-        setTimeout(() => splash?.remove(), 800);
+        if (!splash) return;
+        
+        // Add hidden class to trigger CSS transition
+        splash.classList.add('hidden');
+        
+        // Remove from DOM after transition finishes (matching visual.css transition time)
+        setTimeout(() => {
+            splash.remove();
+            console.log('🌊 Splash Screen Removed');
+        }, 850); 
+    },
+
+    isSplashVisible() {
+        const splash = document.getElementById('splash-screen');
+        return splash && !splash.classList.contains('hidden');
     },
 
     showLoading() {
+        // Guard: Don't show loading if splash screen is still active to prevent "collision"
+        if (this.isSplashVisible()) return;
+        
         document.getElementById('loading')?.classList.remove('d-none');
     },
 
