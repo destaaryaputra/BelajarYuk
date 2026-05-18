@@ -119,21 +119,15 @@
     height: 54px;
     margin: 10px auto 20px;
     position: relative;
-    border-radius: 12px;
-    background-color: #f8fafc;
+    border-radius: 8px;
+    /* Richer Cover Color with Gradient for 3D depth */
+    background-color: var(--primary);
     background-image:
-        linear-gradient(to right, transparent 0 47%, #dbeafe 47% 49%, #94a3b8 49% 51%, #dbeafe 51% 53%, transparent 53% 100%),
-        linear-gradient(#dbe3ef 2px, transparent 2px),
-        linear-gradient(#dbe3ef 2px, transparent 2px),
-        linear-gradient(#dbe3ef 2px, transparent 2px),
-        linear-gradient(#dbe3ef 2px, transparent 2px);
-    background-size: 100% 100%, 18px 2px, 16px 2px, 18px 2px, 14px 2px;
-    background-position: center, 11px 16px, 45px 15px, 11px 28px, 45px 27px;
-    background-repeat: no-repeat;
+        linear-gradient(to right, rgba(0,0,0,0.1) 0%, transparent 45%, rgba(255,255,255,0.2) 48%, rgba(0,0,0,0.2) 50%, rgba(255,255,255,0.2) 52%, transparent 55%, rgba(0,0,0,0.1) 100%);
     box-shadow:
-        0 10px 20px rgba(15, 118, 110, 0.16),
-        inset -3px -3px 0 #e2e8f0,
-        inset 3px 3px 0 rgba(255, 255, 255, 0.9);
+        0 12px 24px rgba(15, 118, 110, 0.25),
+        inset 0 -4px 0 rgba(0,0,0,0.2), /* Bottom edge thickness */
+        inset 0 1px 0 rgba(255,255,255,0.3);
     animation: logoReveal 0.78s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     transform-style: preserve-3d;
 }
@@ -143,42 +137,39 @@
 .css-art-logo::after {
     content: '';
     position: absolute;
-    top: 4px;
-    width: 31px;
-    height: 42px;
-    background-color: white;
+    top: 5px;
+    width: 30px;
+    height: 38px;
+    background-color: #ffffff;
     background-image:
-        linear-gradient(#cbd5e1 2px, transparent 2px),
-        linear-gradient(#cbd5e1 2px, transparent 2px),
-        linear-gradient(#cbd5e1 2px, transparent 2px);
-    background-size: 16px 2px;
+        linear-gradient(#e2e8f0 2px, transparent 2px),
+        linear-gradient(#e2e8f0 2px, transparent 2px),
+        linear-gradient(#e2e8f0 2px, transparent 2px);
+    background-size: 18px 2px;
     background-repeat: no-repeat;
-    border-radius: 4px;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .css-art-logo::before {
-    left: 4px;
-    background-position: 8px 12px, 8px 20px, 8px 28px;
-    border-radius: 4px 9px 9px 4px;
-    transform: perspective(150px) rotateY(15deg);
+    left: 6px;
+    background-position: 6px 10px, 6px 18px, 6px 26px;
+    border-radius: 2px 6px 6px 2px;
+    transform: perspective(150px) rotateY(20deg);
     transform-origin: right center;
     box-shadow: 
-        inset -5px 0 10px rgba(15, 23, 42, 0.07),
-        -1px 2px 0 #f8fafc,
-        -3px 5px 0 #dbe3ef;
+        inset -8px 0 12px rgba(0,0,0,0.05),
+        -1px 2px 0 rgba(0,0,0,0.1);
 }
 
 .css-art-logo::after {
-    right: 4px;
-    background-position: 7px 12px, 7px 20px, 7px 28px;
-    border-radius: 9px 4px 4px 9px;
-    transform: perspective(150px) rotateY(-15deg);
+    right: 6px;
+    background-position: 6px 10px, 6px 18px, 6px 26px;
+    border-radius: 6px 2px 2px 6px;
+    transform: perspective(150px) rotateY(-20deg);
     transform-origin: left center;
     box-shadow: 
-        inset 5px 0 10px rgba(15, 23, 42, 0.07),
-        1px 2px 0 #f8fafc,
-        3px 5px 0 #dbe3ef;
+        inset 8px 0 12px rgba(0,0,0,0.05),
+        1px 2px 0 rgba(0,0,0,0.1);
 }
 
 /* Splash Screen Specific Animation Scaling */
