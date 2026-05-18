@@ -37,17 +37,19 @@
         --container-padding: 16px;
     }
 
-    /* Global Page Padding for Bottom Nav */
+    /* Global Page Padding for Fixed Header + Bottom Nav */
     :where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div, .page:not(#admin-page):not(#landing-page) > form) {
-        padding-top: 24px;
+        padding-top: 84px; /* Fix: Header is 60px, so 84px gives it breathing room */
         /* Reserved space for bottom navigation + safe area */
-        padding-bottom: calc(90px + env(safe-area-inset-bottom, 16px));
+        padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
+        width: 100%;
+        overflow-x: hidden;
     }
 
     /* Top Navigation Shell on Mobile */
     .nav-top-bar {
         padding: 8px 16px !important;
-        height: 62px;
+        height: 60px;
     }
 
     .nav-brand-logo {

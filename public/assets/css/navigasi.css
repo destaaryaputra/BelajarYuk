@@ -128,30 +128,24 @@ nav button svg {
 
 @media (max-width: 768px) {
     nav {
-        box-shadow: 0 8px 20px -18px rgba(15, 23, 42, 0.45);
+        position: fixed; /* Senior Fix: Ensure header is ALWAYS visible on top in mobile */
+        width: 100%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        z-index: 1100; /* Higher than page content but below AI chat */
     }
 
     .nav-top-bar {
-        padding: 10px 16px 10px;
-        border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+        padding: 8px 16px;
+        min-height: 60px;
     }
 
     .nav-brand-logo span {
         font-size: 1rem;
     }
 
+    /* Bottom Navigation Styling Moved to responsif.css for better control */
     .nav-menu-main {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--surface);
-        border-top: 1px solid var(--border);
-        padding: 8px 12px;
-        justify-content: space-between;
-        gap: 4px;
-        z-index: 100;
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+        display: flex; /* Ensure it stays visible if used as tab bar */
     }
 
     .nav-divider {
@@ -163,20 +157,8 @@ nav button svg {
     }
 
     nav button {
-        flex: 1 1 0;
-        min-width: 0;
-        min-height: 52px;
-        border-radius: 12px;
-        font-size: 0.74rem;
-        padding: 6px 4px;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    nav button i,
-    nav button svg {
-        width: 18px;
-        height: 18px;
+        min-height: 40px;
+        padding: 8px 12px;
     }
 
     .nav-actions .btn-outline {
