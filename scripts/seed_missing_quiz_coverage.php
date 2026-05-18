@@ -16,6 +16,73 @@ function normalizeTitle(string $title): string
     return trim(preg_replace('/^\d+[\.\s\-]+/', '', $title));
 }
 
+function normalizeText(?string $text): string
+{
+    $plain = html_entity_decode(strip_tags((string) $text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $plain = preg_replace('/\s+/u', ' ', $plain);
+    return trim((string) $plain);
+}
+
+function buildSnippet(?string $content, int $maxLen = 90): string
+{
+    $text = normalizeText($content);
+    if ($text === '') {
+        return 'Penjelasan inti pada video episode ini.';
+    }
+    if (mb_strlen($text) <= $maxLen) {
+        return $text;
+    }
+    return rtrim(mb_substr($text, 0, $maxLen - 1)) . '…';
+}
+
+function uniqueOptions(string $correct, array $candidates, int $target = 4): array
+{
+    $options = [$correct];
+    foreach ($candidates as $c) {
+        $c = trim((string) $c);
+        if ($c === '' || in_array($c, $options, true)) {
+            continue;
+        }
+        $options[] = $c;
+        if (count($options) >= $target) break;
+    }
+
+    $fallback = [
+        'Ringkasan umum di luar topik episode',
+        'Pembahasan yang tidak muncul pada video ini',
+        'Topik dari modul lain yang berbeda',
+        'Materi pengantar yang tidak dibahas di sini'
+    ];
+    foreach ($fallback as $f) {
+        if (count($options) >= $target) break;
+        if (!in_array($f, $options, true)) $options[] = $f;
+    }
+
+    shuffle($options);
+    return array_slice($options, 0, $target);
+}
+
+function buildOrderOptions(int $order, int $total): array
+{
+    $pool = [$order];
+    for ($i = 1; $i <= 3; $i++) {
+        $up = $order + $i;
+        $down = $order - $i;
+        if ($up <= $total) $pool[] = $up;
+        if ($down >= 1) $pool[] = $down;
+    }
+    $pool = array_values(array_unique($pool));
+
+    while (count($pool) < 4) {
+        $pool[] = min($total, max(1, count($pool) + 1));
+        $pool = array_values(array_unique($pool));
+    }
+
+    $opts = array_slice($pool, 0, 4);
+    shuffle($opts);
+    return $opts;
+}
+
 function ensureQuizColumns(PDO $db): void
 {
     $db->exec("
@@ -37,49 +104,58 @@ function insertQuizQuestion(PDO $db, int $quizId, int $order, string $question, 
     $stmt->execute([$quizId, $question, json_encode($options, JSON_UNESCAPED_UNICODE), $correct, $order]);
 }
 
-function seedQuestionsForQuiz(PDO $db, int $quizId, string $materialTitle, ?string $episodeTitle, string $quizType): int
+function seedQuestionsForQuiz(
+    PDO $db,
+    int $quizId,
+    string $materialTitle,
+    ?string $episodeTitle,
+    string $quizType,
+    array $context = [],
+    bool $forceReseed = false
+): int
 {
     $countStmt = $db->prepare("SELECT COUNT(*) FROM pertanyaan WHERE quiz_id = ?");
     $countStmt->execute([$quizId]);
     $existing = (int) $countStmt->fetchColumn();
-    if ($existing > 0) {
+    if ($existing > 0 && !$forceReseed) {
         return $existing;
+    }
+    if ($existing > 0 && $forceReseed) {
+        $del = $db->prepare("DELETE FROM pertanyaan WHERE quiz_id = ?");
+        $del->execute([$quizId]);
     }
 
     $cleanMaterial = normalizeTitle($materialTitle);
     $cleanEpisode = $episodeTitle ? normalizeTitle($episodeTitle) : null;
 
     if ($quizType === 'mini' && $cleanEpisode) {
+        $episodeSnippet = (string) ($context['episode_snippet'] ?? 'Penjelasan inti pada video episode ini.');
+        $titleDistractors = (array) ($context['title_distractors'] ?? []);
+        $snippetDistractors = (array) ($context['snippet_distractors'] ?? []);
+        $episodeOrder = (int) ($context['episode_order'] ?? 1);
+        $totalEpisodes = max(1, (int) ($context['total_episodes'] ?? 1));
+
+        $q1Options = uniqueOptions($cleanEpisode, $titleDistractors);
+        $q2Options = uniqueOptions($episodeSnippet, $snippetDistractors);
+        $q3OptionsNum = buildOrderOptions($episodeOrder, $totalEpisodes);
+        $q3Options = array_map(static fn($n) => "Episode ke-{$n}", $q3OptionsNum);
+        $q3Correct = "Episode ke-{$episodeOrder}";
+
         $questions = [
             [
-                "Topik utama yang dibahas pada episode \"{$cleanEpisode}\" adalah...",
-                [
-                    $cleanEpisode,
-                    "Ringkasan akhir seluruh modul",
-                    "Evaluasi performa sistem",
-                    "Topik di luar pembelajaran"
-                ],
+                "Pada video episode ini, topik yang dibahas adalah...",
+                $q1Options,
                 $cleanEpisode
             ],
             [
-                "Langkah terbaik setelah mempelajari \"{$cleanEpisode}\" adalah...",
-                [
-                    "Mencoba praktik langsung dari materi tersebut",
-                    "Langsung melewati semua latihan",
-                    "Mengabaikan rangkuman dan catatan",
-                    "Berhenti belajar total"
-                ],
-                "Mencoba praktik langsung dari materi tersebut"
+                "Cuplikan isi yang paling sesuai dengan episode \"{$cleanEpisode}\" adalah...",
+                $q2Options,
+                $episodeSnippet
             ],
             [
-                "Tujuan mini kuis setelah episode adalah...",
-                [
-                    "Mengecek pemahaman sebelum lanjut ke episode berikutnya",
-                    "Mengganti seluruh materi teori",
-                    "Menentukan nilai akhir modul",
-                    "Menghapus progres belajar"
-                ],
-                "Mengecek pemahaman sebelum lanjut ke episode berikutnya"
+                "Dalam urutan modul, episode \"{$cleanEpisode}\" berada di...",
+                $q3Options,
+                $q3Correct
             ]
         ];
     } else {
@@ -158,12 +234,24 @@ try {
 
     $materials = $db->query("SELECT id, title FROM materi WHERE status = 'active' ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
     $subs = $db->query("
-        SELECT sm.id, sm.material_id, sm.title
+        SELECT sm.id, sm.material_id, sm.title, sm.content, sm.order_number
         FROM sub_materi sm
         JOIN materi m ON m.id = sm.material_id
         WHERE m.status = 'active'
         ORDER BY sm.material_id, sm.order_number
     ")->fetchAll(PDO::FETCH_ASSOC);
+
+    $episodeMap = [];
+    foreach ($subs as $s) {
+        $mId = (int) $s['material_id'];
+        if (!isset($episodeMap[$mId])) $episodeMap[$mId] = [];
+        $episodeMap[$mId][] = [
+            'id' => (int) $s['id'],
+            'title' => normalizeTitle((string) $s['title']),
+            'snippet' => buildSnippet($s['content'] ?? null),
+            'order' => (int) ($s['order_number'] ?? 1)
+        ];
+    }
 
     $createdFinal = 0;
     $createdMini = 0;
@@ -233,7 +321,33 @@ try {
             echo "Created mini quiz for sub-material #{$subId}" . PHP_EOL;
         }
 
-        $questionCount = seedQuestionsForQuiz($db, (int) $quizId, $materialTitle, $episodeTitle, 'mini');
+        $episodeList = $episodeMap[$materialId] ?? [];
+        $thisEpisode = null;
+        foreach ($episodeList as $ep) {
+            if ((int) $ep['id'] === $subId) {
+                $thisEpisode = $ep;
+                break;
+            }
+        }
+
+        $titleDistractors = [];
+        $snippetDistractors = [];
+        foreach ($episodeList as $ep) {
+            if ((int) $ep['id'] === $subId) continue;
+            $titleDistractors[] = $ep['title'];
+            $snippetDistractors[] = $ep['snippet'];
+        }
+
+        $context = [
+            'episode_snippet' => $thisEpisode['snippet'] ?? 'Penjelasan inti pada video episode ini.',
+            'title_distractors' => $titleDistractors,
+            'snippet_distractors' => $snippetDistractors,
+            'episode_order' => (int) ($thisEpisode['order'] ?? 1),
+            'total_episodes' => max(1, count($episodeList))
+        ];
+
+        // Refresh mini quiz questions so they always match the latest episode context
+        $questionCount = seedQuestionsForQuiz($db, (int) $quizId, $materialTitle, $episodeTitle, 'mini', $context, true);
         if ($questionCount > 0) {
             $seededQuestionSets++;
             $totalQuestionsInserted += $questionCount;
