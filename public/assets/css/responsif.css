@@ -192,6 +192,67 @@
         gap: 12px;
     }
 
+    /* Prevent overflow in grid/flex children */
+    .content-card > *,
+    .dashboard-layout > *,
+    .learning-detail-layout > *,
+    .profile-header-main > *,
+    .mpc-info > * {
+        min-width: 0;
+    }
+
+    /* Long text safety on mobile */
+    .content-card h1,
+    .content-card h2,
+    .content-card h3,
+    .content-card h4,
+    .content-card p,
+    .detail-value,
+    .roadmap-title,
+    .mpc-text h4,
+    .comment-text,
+    .comment-author,
+    .category-tag {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    /* Controls and form rows */
+    .d-flex.justify-between,
+    .action-buttons,
+    .modal-actions,
+    .input-with-btn {
+        flex-wrap: wrap;
+    }
+
+    .search-bar {
+        gap: 10px;
+    }
+
+    .search-input-wrapper,
+    .search-select-wrapper,
+    .custom-dropdown {
+        min-width: 0;
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .custom-dropdown-menu {
+        min-width: 0;
+        width: 100%;
+    }
+
+    /* Better mobile table handling */
+    .admin-table {
+        min-width: 520px;
+    }
+
+    .leaderboard-table-wrapper,
+    .admin-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .toolbar-info {
         font-size: 0.85rem;
         text-align: center;
@@ -239,6 +300,28 @@
 
     .section-eyebrow {
         display: none;
+    }
+
+    .nav-actions .btn-outline {
+        display: none;
+    }
+
+    .nav-top-bar {
+        gap: 10px;
+    }
+
+    .content-card {
+        border-radius: 14px;
+    }
+
+    .admin-table {
+        min-width: 460px;
+    }
+
+    .modal-actions button,
+    .action-buttons button,
+    .input-with-btn button {
+        width: 100%;
     }
 }
 

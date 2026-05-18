@@ -71,6 +71,8 @@ CREATE TABLE IF NOT EXISTS progres_materi (
 CREATE TABLE IF NOT EXISTS kuis (
     id SERIAL PRIMARY KEY,
     material_id INT REFERENCES materi(id) ON DELETE CASCADE,
+    sub_material_id INT REFERENCES sub_materi(id) ON DELETE CASCADE,
+    quiz_type TEXT CHECK (quiz_type IN ('mini', 'final')) DEFAULT 'final',
     title VARCHAR(255) NOT NULL,
     description TEXT,
     passing_score INT DEFAULT 60,
@@ -146,6 +148,7 @@ CREATE INDEX IF NOT EXISTS idx_materi_category ON materi(category);
 -- Optimasi Relasi Parent-Child
 CREATE INDEX IF NOT EXISTS idx_sub_materi_material ON sub_materi(material_id);
 CREATE INDEX IF NOT EXISTS idx_kuis_material ON kuis(material_id);
+CREATE INDEX IF NOT EXISTS idx_kuis_sub_material ON kuis(sub_material_id);
 CREATE INDEX IF NOT EXISTS idx_pertanyaan_quiz ON pertanyaan(quiz_id);
 
 -- Optimasi Data User (Sering digunakan di Dashboard & Profile)
