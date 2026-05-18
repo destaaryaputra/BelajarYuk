@@ -39,6 +39,19 @@ body.dark-theme .welcome-marquee { background: var(--surface); border-color: var
 body.dark-theme .ai-chat-header,
 body.dark-theme .ai-chat-input-area,
 body.dark-theme .admin-topbar { background: var(--surface); border-color: var(--border); color: var(--text-main); }
+
+/* Mobile Navigation Dark Mode */
+body.dark-theme .nav-menu-main {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-top-color: var(--border);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-theme .nav-menu-main button.nav-active {
+    background: rgba(45, 212, 191, 0.12);
+    color: var(--primary);
+}
+
 body.dark-theme .ai-chat-messages,
 body.dark-theme .admin-content { background: var(--bg-body); }
 body.dark-theme .chat-message.ai-message,
