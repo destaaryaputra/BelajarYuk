@@ -132,14 +132,20 @@ export const UI = {
         const splash = document.getElementById('splash-screen');
         if (!splash) return;
         
-        // Add hidden class to trigger CSS transition
-        splash.classList.add('hidden');
+        // 1. Trigger the cinematic Zoom & Blur animation
+        splash.classList.add('zoom-blur');
+        console.log('🎥 Cinematic Zoom-Blur Started');
+
+        // 2. Fade out the entire overlay slightly after the zoom starts
+        setTimeout(() => {
+            splash.classList.add('hidden');
+        }, 600);
         
-        // Remove from DOM after transition finishes (matching visual.css transition time)
+        // 3. Completely remove from DOM after all animations finish
         setTimeout(() => {
             splash.remove();
             console.log('🌊 Splash Screen Removed');
-        }, 850); 
+        }, 1600); 
     },
 
     isSplashVisible() {
