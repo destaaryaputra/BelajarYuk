@@ -13,7 +13,7 @@
     { "src": "/uploads/(.*)", "dest": "/public/uploads/$1" },
     { "src": "/public/assets/(.*)", "dest": "/public/assets/$1" },
     { "src": "/public/js/(.*)", "dest": "/public/js/$1" },
-    { "src": "/favicon.ico", "dest": "/public/favicon.ico" },
+    { "src": "/favicon.ico", "dest": "/public/assets/favicon.svg" },
     { "src": "/api/(.*)", "dest": "/api/index.php" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ],
