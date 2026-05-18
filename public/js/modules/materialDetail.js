@@ -355,8 +355,37 @@ export const MaterialDetail = {
         `;
 
         // 2. Setup listeners
+        const maybeRedirectToMiniQuiz = async () => {
+            if (active.isMain) return false;
+            try {
+                const quizRes = await API.getQuiz(materialId, active.id);
+                const miniQuiz = quizRes?.data;
+                if (!miniQuiz?.id) return false;
+
+                const resultRes = await API.getUserQuizResults(miniQuiz.id).catch(() => ({ data: null }));
+                const alreadyAttempted = !!resultRes?.data;
+                if (alreadyAttempted) return false;
+
+                localStorage.setItem('active_sub_material_id', String(active.id));
+                const goQuiz = await UI.confirm(
+                    'Ada kuis mini untuk episode ini. Kerjakan sekarang untuk membuka episode berikutnya?',
+                    'Uji Pemahaman'
+                );
+                if (goQuiz) {
+                    window.location.hash = 'quiz-page';
+                    return true;
+                }
+            } catch (error) {
+                console.error('Mini quiz check error:', error);
+            }
+            return false;
+        };
+
         const markCurrentComplete = async (silent = false) => {
-            if (isCompleted) return true;
+            if (isCompleted) {
+                const redirected = await maybeRedirectToMiniQuiz();
+                return !redirected;
+            }
             try {
                 const payload = { material_id: materialId };
                 if (!active.isMain) payload.sub_material_id = active.id;
@@ -371,18 +400,10 @@ export const MaterialDetail = {
                     this.state.material.is_completed = true;
                 }
 
-                // Check for Mini Quiz for this episode
+                // Check mini quiz right after this episode is completed
                 if (!active.isMain) {
-                    const quizRes = await API.getQuiz(materialId, active.id);
-                    if (quizRes.data) {
-                        // There is a mini quiz!
-                        localStorage.setItem('active_sub_material_id', active.id);
-                        const goQuiz = await UI.confirm('Ada kuis mini untuk episode ini. Kerjakan sekarang untuk membuka episode berikutnya?', 'Uji Pemahaman');
-                        if (goQuiz) {
-                            window.location.hash = 'quiz-page';
-                            return false; // Stop navigation, we are going to quiz
-                        }
-                    }
+                    const redirected = await maybeRedirectToMiniQuiz();
+                    if (redirected) return false;
                 }
 
                 // Senior UX: Check if 100% completed to fire confetti

@@ -149,7 +149,10 @@ class APIService {
     getQuizzesAdmin(materialId) { return this.get(`/quiz/list-admin?material_id=${materialId}`); }
     getQuizQuestions(quizId) { return this.get(`/quiz/questions?quiz_id=${quizId}`); }
     submitQuiz(data) { return this.post('/quiz/submit', data); }
-    getUserQuizResults() { return this.get('/quiz/results'); }
+    getUserQuizResults(quizId = null) {
+        const endpoint = quizId ? `/quiz/results?quiz_id=${quizId}` : '/quiz/results';
+        return this.get(endpoint);
+    }
     getAdminQuizReport() { return this.get('/quiz/admin-report'); }
 
     // --- AI Chat API ---
