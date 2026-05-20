@@ -38,6 +38,7 @@ export const UI = {
         // Update Header Visibility on Route Change
         this.updateHeaderVisibility();
         window.addEventListener('hashchange', () => this.updateHeaderVisibility());
+        window.addEventListener('page-loaded', () => this.updateHeaderVisibility());
     },
 
     applyTheme() {

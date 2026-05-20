@@ -59,6 +59,10 @@
         height: 60px !important;
     }
 
+    nav#global-nav.d-none {
+        display: none !important;
+    }
+
     /* Visibility Utilities */
     .desktop-only {
         display: none !important;
