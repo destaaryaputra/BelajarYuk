@@ -240,6 +240,7 @@
 @media (max-width: 480px) {
     .ai-chat-window.fullscreen,
     .ai-chat-window.open {
+        top: 0 !important;
         bottom: 0 !important; 
         right: 0 !important; 
         left: 0 !important;
@@ -248,6 +249,14 @@
         height: -webkit-fill-available !important;
         border-radius: 0 !important;
         z-index: 11005; /* Top level */
+        transform: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .ai-chat-messages {
+        flex: 1 !important;
+        height: auto !important;
     }
     
     .ai-chat-window.open {
@@ -257,6 +266,7 @@
     .ai-chat-input-area {
         padding: 12px 16px;
         padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        background: white;
     }
 
     .ai-chat-toggle {
