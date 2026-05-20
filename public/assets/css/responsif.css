@@ -102,43 +102,6 @@
         gap: 4px !important;
     }
 
-    /* Disable Bottom Bar logic */
-    .nav-bottom-bar {
-        display: none !important;
-    }
-
-    .nav-bottom-bar .nav-menu-main {
-        display: flex !important;
-        width: 100% !important;
-        justify-content: space-around !important;
-        align-items: center !important;
-        gap: 2px !important;
-    }
-
-    .nav-bottom-bar .nav-menu-main button {
-        flex: 1 !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-        min-height: 52px !important;
-        padding: 6px 2px !important;
-        font-size: 0.68rem !important;
-        border-radius: 12px !important;
-        color: var(--text-muted) !important;
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .nav-bottom-bar .nav-menu-main button i,
-    .nav-bottom-bar .nav-menu-main button svg {
-        width: 20px !important;
-        height: 20px !important;
-    }
-
-    .nav-bottom-bar .nav-menu-main button.nav-active {
-        color: var(--primary) !important;
-        background: var(--primary-light) !important;
-    }
-
     /* UI Layout Adjustments */
     .dashboard-header {
         flex-direction: column;

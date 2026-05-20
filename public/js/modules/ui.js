@@ -38,10 +38,6 @@ export const UI = {
         // Initialize Theme
         this.applyTheme();
 
-        // Initialize device mode
-        this.updateDeviceMode();
-        window.addEventListener('resize', () => this.updateDeviceMode());
-
         // Initialize Scroll Reveal Observer
         this.initScrollReveal();
 
@@ -82,28 +78,6 @@ export const UI = {
         if (window.lucide) window.lucide.createIcons();
     },
 
-    updateDeviceMode() {
-        const uaMobile = navigator.userAgentData?.mobile || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-        const widthCandidates = [
-            window.innerWidth,
-            document.documentElement?.clientWidth,
-            window.screen?.width,
-            window.screen?.availWidth
-        ].filter(value => Number.isFinite(value) && value > 0);
-        const minWidth = widthCandidates.length ? Math.min(...widthCandidates) : window.innerWidth;
-        const isSmall = minWidth <= 1024;
-        const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches
-            || window.matchMedia('(any-pointer: coarse)').matches
-            || navigator.maxTouchPoints > 0
-            || 'ontouchstart' in window;
-        const isMobile = uaMobile || isSmall || isTouch;
-
-        document.body.classList.toggle('mobile-nav', isMobile);
-
-        const globalNav = document.getElementById('global-nav');
-        if (!globalNav) return;
-    },
-
     updateHeaderVisibility() {
         const globalNav = document.getElementById('global-nav');
         if (!globalNav) return;
@@ -130,7 +104,6 @@ export const UI = {
                     btn.classList.remove('nav-active');
                 }
             });
-            this.updateDeviceMode();
         } else {
             globalNav.classList.add('d-none');
             this.closeSidebar(); // Ensure sidebar is closed when nav is hidden

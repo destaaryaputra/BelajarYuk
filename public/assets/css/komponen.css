@@ -26,11 +26,6 @@
 .admin-table tr { transition: background-color 0.2s ease; }
 .admin-table tr:hover td { background-color: rgba(15, 118, 110, 0.035); }
 
-@media (max-width: 768px) {
-    .course-layout { grid-template-columns: 1fr; }
-    .course-sidebar { width: 100%; position: static; padding: 20px; }
-}
-
 /* Layar Pemuatan (Loading Screen) */
 .loading-overlay {
     position: fixed;
@@ -426,7 +421,6 @@
 }
 
 .action-buttons { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap; }
-.action-buttons { background: transparent; border-radius: 0; padding: 14px 0 0; border: none; border-top: 1px solid var(--border); box-shadow: none; }
 .pdf-container { 
     margin-top: 20px; 
     border: 1px solid var(--border); 

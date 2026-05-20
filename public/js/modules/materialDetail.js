@@ -66,7 +66,6 @@ export const MaterialDetail = {
 
             this.renderSyllabus();
             this.renderContent();
-            this.bindDropdown();
 
             API.trackProgress(materialId).catch(() => {});
         } catch (error) {
