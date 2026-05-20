@@ -93,10 +93,21 @@ export const AIChat = {
         const windowEl = document.getElementById('ai-chat-window');
         if (!windowEl) return;
         
-        windowEl.classList.toggle('open');
-        if (windowEl.classList.contains('open')) {
+        const isOpen = windowEl.classList.toggle('open');
+
+        // Lock scroll on small mobile to prevent background scrolling
+        if (window.innerWidth <= 480) {
+            document.body.classList.toggle('sidebar-open', isOpen);
+        }
+        
+        if (isOpen) {
             this.loadHistory();
-            document.getElementById('ai-chat-input')?.focus();
+            setTimeout(() => {
+                const input = document.getElementById('ai-chat-input');
+                if (input) input.focus();
+                const container = document.getElementById('ai-chat-messages');
+                if (container) container.scrollTop = container.scrollHeight;
+            }, 100);
         } else {
             // Tutup fullscreen jika jendela chat ditutup
             windowEl.classList.remove('fullscreen');
