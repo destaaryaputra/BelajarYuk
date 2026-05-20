@@ -68,12 +68,9 @@ export const Profile = {
                     </div>
                 </div>
 
-                <div class="mt-32 pt-24 border-top d-flex gap-12">
+                <div class="mt-32 pt-24 border-top">
                     <button type="button" class="btn-primary" id="btn-edit-profile">
                         <i data-lucide="edit"></i> Edit Profil
-                    </button>
-                    <button type="button" class="btn-outline btn-text-danger" id="btn-logout-profile">
-                        <i data-lucide="log-out"></i> Keluar Akun
                     </button>
                 </div>
             </div>
@@ -118,7 +115,6 @@ export const Profile = {
     setupListeners() {
         const editBtn = document.getElementById('btn-edit-profile');
         const cancelBtn = document.getElementById('btn-cancel-edit');
-        const logoutBtn = document.getElementById('btn-logout-profile');
         const form = document.getElementById('form-edit-profile');
         
         const displayView = document.getElementById('profile-display-view');
@@ -135,12 +131,6 @@ export const Profile = {
             cancelBtn.onclick = () => {
                 editView.classList.add('d-none');
                 displayView.classList.remove('d-none');
-            };
-        }
-
-        if (logoutBtn) {
-            logoutBtn.onclick = () => {
-                if (window.handleLogout) window.handleLogout();
             };
         }
 
