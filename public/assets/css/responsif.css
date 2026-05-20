@@ -53,21 +53,9 @@
         background: var(--surface); /* Ensure solid background */
     }
 
-    /* Keep actions visible but let menu-main be handled by fixed bottom positioning below */
+    /* Hide desktop menu from top bar, it's now in bottom bar */
     .nav-top-bar .nav-menu-main {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid var(--border);
-        padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 12px));
-        display: flex;
-        justify-content: space-around;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+        display: none !important;
     }
 
     .nav-brand-logo {
@@ -75,24 +63,31 @@
     }
 
     .nav-brand-logo span {
+        display: block !important; /* Ensure brand name is visible on mobile */
         font-size: 0.95rem;
     }
 
     /* Navigation Bottom Bar Style */
-    .nav-menu-main {
+    .nav-bottom-bar {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         z-index: 1000;
-        background: rgba(255, 255, 255, 0.88);
+        background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border-top: 1px solid var(--border);
         padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 12px));
-        display: flex;
+        display: flex !important; /* Force display on mobile */
         justify-content: space-around;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .nav-bottom-bar .nav-menu-main {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
     }
 
     .nav-menu-main button {
