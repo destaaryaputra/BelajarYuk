@@ -91,23 +91,6 @@ export const UI = {
 
         const globalNav = document.getElementById('global-nav');
         if (!globalNav) return;
-
-        const topMenu = globalNav.querySelector('.nav-top-bar .nav-menu-main');
-        const topDivider = globalNav.querySelector('.nav-top-bar .nav-divider');
-        const bottomBar = globalNav.querySelector('.nav-bottom-bar');
-        const desktopOnly = globalNav.querySelectorAll('.desktop-only');
-
-        if (isMobile) {
-            if (topMenu) topMenu.style.display = 'none';
-            if (topDivider) topDivider.style.display = 'none';
-            desktopOnly.forEach(el => { el.style.display = 'none'; });
-            if (bottomBar) bottomBar.style.display = 'flex';
-        } else {
-            if (topMenu) topMenu.style.display = '';
-            if (topDivider) topDivider.style.display = '';
-            desktopOnly.forEach(el => { el.style.display = ''; });
-            if (bottomBar) bottomBar.style.display = '';
-        }
     },
 
     updateHeaderVisibility() {

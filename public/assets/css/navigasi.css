@@ -128,7 +128,7 @@ nav button svg {
     display: none;
 }
 
-@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
     nav {
         position: fixed;
         top: 0;
