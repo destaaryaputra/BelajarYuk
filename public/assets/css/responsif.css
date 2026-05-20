@@ -50,10 +50,24 @@
     .nav-top-bar {
         padding: 8px 16px !important;
         height: 60px;
+        background: var(--surface); /* Ensure solid background */
     }
 
+    /* Keep actions visible but let menu-main be handled by fixed bottom positioning below */
     .nav-top-bar .nav-menu-main {
-        display: none !important; /* Hide desktop menu from top bar */
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid var(--border);
+        padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 12px));
+        display: flex;
+        justify-content: space-around;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
     }
 
     .nav-brand-logo {
