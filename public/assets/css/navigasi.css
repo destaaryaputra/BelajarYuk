@@ -131,7 +131,12 @@ nav button svg {
 @media (max-width: 768px) {
     nav {
         position: fixed; /* Senior Fix: Ensure header is ALWAYS visible on top in mobile */
+        top: 0;
+        left: 0;
+        right: 0;
         width: 100%;
+        background: var(--surface); /* Solid background on mobile */
+        border-bottom: 1px solid var(--border);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         z-index: 1100; /* Higher than page content but below AI chat */
     }
