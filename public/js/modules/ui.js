@@ -98,10 +98,10 @@ export const UI = {
         const desktopOnly = globalNav.querySelectorAll('.desktop-only');
 
         if (isMobile) {
-            if (topMenu) topMenu.style.display = 'none';
-            if (topDivider) topDivider.style.display = 'none';
+            if (topMenu) topMenu.style.display = 'flex';
+            if (topDivider) topDivider.style.display = '';
             desktopOnly.forEach(el => { el.style.display = 'none'; });
-            if (bottomBar) bottomBar.style.display = 'flex';
+            if (bottomBar) bottomBar.style.display = 'none';
         } else {
             if (topMenu) topMenu.style.display = '';
             if (topDivider) topDivider.style.display = '';
