@@ -46,9 +46,12 @@ export const MaterialDetail = {
                 this.state.material.is_completed = true;
             }
             
-            // UX Fix: Sembunyikan episode yang tidak punya video sesuai permintaan
+            // UX Fix: Tampilkan episode yang punya video ATAU dokumen PDF
             const rawSubs = Array.isArray(material.sub_materials) ? material.sub_materials : [];
-            this.state.subMaterials = rawSubs.filter(s => s.video_url && s.video_url.trim() !== '');
+            this.state.subMaterials = rawSubs.filter(s => 
+                (s.video_url && s.video_url.trim() !== '') || 
+                (s.document_url && s.document_url.trim() !== '')
+            );
             
             this.state.quiz = quizRes.data || null;
 
@@ -74,6 +77,29 @@ export const MaterialDetail = {
             detailContainer.innerHTML = '<p class="text-danger">Gagal memuat detail materi.</p>';
             syllabusContainer.innerHTML = '<p class="text-muted">Tidak dapat memuat episode.</p>';
         }
+    },
+
+    initTabs() {
+        const tabsContainer = document.getElementById('material-tabs');
+        const shell = document.querySelector('.learning-detail-page-shell');
+        if (!tabsContainer || !shell) return;
+
+        // Default tab
+        shell.setAttribute('data-active-tab', 'content');
+
+        const buttons = tabsContainer.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => {
+            btn.onclick = () => {
+                const tab = btn.getAttribute('data-tab');
+                shell.setAttribute('data-active-tab', tab);
+                
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Smooth scroll to top when switching tabs
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+        });
     },
 
     renderSyllabus() {
