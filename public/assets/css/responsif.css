@@ -368,15 +368,36 @@
         right: 0;
     }
 
-    /* Better mobile table handling */
-    .admin-table {
-        min-width: 520px;
+    .leaderboard-table-wrapper {
+        margin: 0 -16px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
     }
 
-    .leaderboard-table-wrapper,
-    .admin-table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .admin-table {
+        min-width: 480px;
+    }
+
+    .rank-badge {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .admin-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+
+    /* Leaderboard rank specific mobile padding */
+    .admin-table td:first-child {
+        padding-left: 16px;
+    }
+
+    .admin-table td:last-child {
+        padding-right: 16px;
     }
 
     .toolbar-info {
