@@ -322,20 +322,50 @@
     }
 
     .search-bar {
-        gap: 10px;
+        gap: 8px;
+        flex-wrap: nowrap;
+        padding: 8px;
+    }
+
+    .search-input-wrapper {
+        flex: 2;
+        min-width: 0;
+    }
+
+    .custom-dropdown {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .custom-dropdown-trigger {
+        padding: 0 10px;
+    }
+
+    .custom-dropdown-trigger span {
+        font-size: 0.85rem;
+    }
+
+    .search-input {
+        padding-left: 36px;
+        font-size: 0.9rem;
+    }
+
+    .search-icon {
+        left: 10px;
     }
 
     .search-input-wrapper,
     .search-select-wrapper,
     .custom-dropdown {
         min-width: 0;
-        width: 100%;
-        flex: 1 1 100%;
+        width: auto;
     }
 
     .custom-dropdown-menu {
-        min-width: 0;
-        width: 100%;
+        min-width: 200px;
+        width: auto;
+        left: auto;
+        right: 0;
     }
 
     /* Better mobile table handling */
