@@ -151,12 +151,7 @@ export const UI = {
 
         const isActive = sidebar.classList.toggle('is-active');
         overlay.classList.toggle('is-active', isActive);
-
-        if (isActive) {
-            document.body.style.overflow = 'hidden'; // Prevent scroll when open
-        } else {
-            document.body.style.overflow = '';
-        }
+        document.body.classList.toggle('sidebar-open', isActive);
     },
 
     closeSidebar() {
@@ -166,7 +161,7 @@ export const UI = {
 
         sidebar.classList.remove('is-active');
         overlay.classList.remove('is-active');
-        document.body.style.overflow = '';
+        document.body.classList.remove('sidebar-open');
     },
     
     initScrollReveal() {

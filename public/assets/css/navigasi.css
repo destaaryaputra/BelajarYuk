@@ -215,3 +215,21 @@ nav button svg {
 .text-danger {
     color: var(--danger) !important;
 }
+
+/* --- Sidebar Interactions --- */
+body.sidebar-open {
+    overflow: hidden !important;
+}
+
+@media (max-width: 1024px) {
+    body.sidebar-open .ai-chat-widget,
+    body.sidebar-open .ai-chat-toggle {
+        transform: translateX(-280px);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body.sidebar-open .ai-chat-window {
+        transform: translateX(-280px) scale(1) translateY(0);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    }
+}
