@@ -131,14 +131,23 @@ nav button svg {
 @media (max-width: 768px) {
     nav {
         position: fixed; /* Senior Fix: Ensure header is ALWAYS visible on top in mobile */
+        top: 0;
+        left: 0;
+        right: 0;
         width: 100%;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        background: var(--surface); /* Solid background on mobile */
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         z-index: 1100; /* Higher than page content but below AI chat */
     }
 
     .nav-top-bar {
         padding: 8px 16px;
+        height: 60px;
         min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .nav-brand-logo span {
