@@ -26,14 +26,23 @@ export const Materials = {
         `).join('');
 
         try {
-            const [matsRes, catsRes] = await Promise.all([
+            // Senior UX: Fetch materials and user progress in parallel
+            const [matsRes, catsRes, progressRes] = await Promise.all([
                 API.getMaterials(1, 200).catch(() => ({ data: { materials: [] } })),
-                API.get('/materials/categories').catch(() => ({ data: [] }))
+                API.get('/materials/categories').catch(() => ({ data: [] })),
+                API.getProgressByCategories().catch(() => ({ data: { materials: [] } }))
             ]);
 
             const rawMaterials = matsRes.data?.materials || matsRes.data || [];
             this.allMaterials = Array.isArray(rawMaterials) ? rawMaterials : [];
             
+            // Map progress to materials
+            const userDetailedProgress = progressRes.data?.materials || [];
+            this.allMaterials = this.allMaterials.map(m => {
+                const prog = userDetailedProgress.find(p => p.id == m.id);
+                return { ...m, progress_percentage: prog ? prog.percentage : 0 };
+            });
+
             const dbCategories = Array.isArray(catsRes.data) ? catsRes.data : (Array.isArray(catsRes) ? catsRes : []);
 
             this.renderCategoryOptions(dbCategories);

@@ -425,6 +425,32 @@
 .badge { padding: 2px 8px; border-radius: 99px; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; margin: 0; }
 .badge-admin { background: var(--danger-soft); color: var(--danger); }
 .badge-student { background: var(--info-soft); color: var(--info); }
+
+.card-completed-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(31, 138, 112, 0.95);
+    color: white;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    animation: slideInDown 0.4s ease forwards;
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.img-wrapper { position: relative; }
 .badge-video { background: var(--danger-soft); color: var(--danger); }
 .badge-pdf { background: var(--info-soft); color: var(--info); }
 

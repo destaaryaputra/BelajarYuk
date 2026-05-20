@@ -473,6 +473,45 @@
     gap: 14px;
 }
 
+/* Material Detail Tabs (Mobile) */
+.mobile-detail-tabs {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 6px;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.mobile-detail-tabs .tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobile-detail-tabs .tab-btn i {
+    width: 20px;
+    height: 20px;
+}
+
+.mobile-detail-tabs .tab-btn.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
 .material-detail-toolbar {
     display: flex;
     align-items: center;

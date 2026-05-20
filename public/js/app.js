@@ -16,8 +16,6 @@ import { MaterialDetail } from './modules/materialDetail.js';
 import { Quiz } from './modules/quiz.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Belajaryuk Bootstrapping...');
-    
     // 1. Initialize UI
     UI.init();
 
@@ -29,7 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 4. Setup Global Page Event Handlers
     window.addEventListener('page-loaded', (e) => {
-        console.log(`📄 Page Loaded: ${e.detail.pageId}`);
         const pageId = e.detail.pageId;
 
         // Ensure theme icons are correct for the new page
@@ -84,9 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 5. Initial Load
     try {
-        console.log('🔗 Handling Initial Route...');
         await Router.handleInitialRoute();
-        console.log('✨ Initial Route Ready');
     } catch (err) {
         console.error('❌ Failed to load initial route:', err);
     } finally {
@@ -94,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // We use a small delay to let the initial page render before fading out
         setTimeout(() => {
             UI.hideSplash();
-            console.log('✅ Bootstrapping Finished');
         }, 600);
     }
 });

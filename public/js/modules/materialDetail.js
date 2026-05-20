@@ -53,16 +53,17 @@ export const MaterialDetail = {
             this.state.quiz = quizRes.data || null;
 
             // Senior UX Logic: Selalu arahkan ke hal pertama yang BELUM selesai
-            // Urutan: Main Material -> Episode 1 -> Episode 2 -> ...
             if (!this.state.material.is_completed) {
                 this.state.activeItemId = 'main';
             } else if (this.state.subMaterials.length > 0) {
-                // Cari episode pertama yang belum ada di daftar completed
                 const firstIncomplete = this.state.subMaterials.find(s => !this.state.completedEpisodes.includes(String(s.id)));
                 this.state.activeItemId = firstIncomplete ? String(firstIncomplete.id) : 'main';
             } else {
                 this.state.activeItemId = 'main';
             }
+
+            // Initialize Mobile Tabs
+            this.initTabs();
 
             this.renderSyllabus();
             this.renderContent();
@@ -160,6 +161,20 @@ export const MaterialDetail = {
 
     selectItem(itemId) {
         this.state.activeItemId = itemId;
+
+        // Auto-switch to content tab on mobile after selecting an episode
+        if (window.innerWidth <= 1024) {
+            const shell = document.querySelector('.learning-detail-page-shell');
+            const tabsContainer = document.getElementById('material-tabs');
+            
+            if (shell) shell.setAttribute('data-active-tab', 'content');
+            if (tabsContainer) {
+                tabsContainer.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-tab') === 'content');
+                });
+            }
+        }
+
         this.renderSyllabus();
         this.renderContent();
     },
@@ -305,13 +320,18 @@ export const MaterialDetail = {
         if (active.document_url) {
             mediaHtml += `
                 <div class="pdf-container mb-24">
-                    <div class="pdf-header"><span class="pdf-title"><i data-lucide="file-text"></i> Dokumen PDF</span></div>
+                    <div class="pdf-header">
+                        <span class="pdf-title"><i data-lucide="file-text"></i> Dokumen PDF</span>
+                        <a href="/public/uploads/documents/${UI.escapeHtml(active.document_url)}" target="_blank" class="btn-text-info btn-small" download>
+                            <i data-lucide="download"></i> Download
+                        </a>
+                    </div>
                     <iframe class="pdf-iframe" src="/public/uploads/documents/${UI.escapeHtml(active.document_url)}" title="Dokumen materi" loading="lazy"></iframe>
                 </div>
             `;
         }
 
-        const showComments = !!embedVideo;
+        const showComments = true; // Senior UX: Discussion always active for collaboration
         
         container.innerHTML = `
             <article class="content-card">

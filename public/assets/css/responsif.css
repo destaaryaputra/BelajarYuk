@@ -26,12 +26,16 @@
     }
 
     .learning-detail-layout {
-        grid-template-columns: 1fr;
-        grid-template-areas: 
-            "video"
-            "syllabus";
-        gap: 20px;
+        display: block; /* Disable grid for tab-based view */
     }
+
+    /* Tab visibility logic */
+    .learning-detail-page-shell:not([data-active-tab="content"]) #material-detail article { display: none; }
+    .learning-detail-page-shell:not([data-active-tab="syllabus"]) #course-syllabus { display: none; }
+    .learning-detail-page-shell:not([data-active-tab="comments"]) #comments-section-container { display: none; }
+    
+    /* Ensure video player stays visible if it's the 'active' content */
+    .learning-detail-page-shell[data-active-tab="content"] #material-detail { display: flex; }
 
     #material-detail {
         min-height: auto;
@@ -41,6 +45,11 @@
     #course-syllabus {
         position: static;
         max-height: none;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+        border-top: none;
     }
 
     /* Global Page Padding for Fixed Header */
