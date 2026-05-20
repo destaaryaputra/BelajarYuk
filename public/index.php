@@ -25,6 +25,9 @@ if ($isProduction) {
 
 $assetVersion = getenv('APP_ASSET_VERSION');
 if (!$assetVersion) {
+    $assetVersion = getenv('VERCEL_GIT_COMMIT_SHA') ?: getenv('VERCEL_DEPLOYMENT_ID');
+}
+if (!$assetVersion) {
     $versionSources = [
         __DIR__ . '/layout.html',
         __DIR__ . '/assets/css/gaya.css',
@@ -32,10 +35,13 @@ if (!$assetVersion) {
         __DIR__ . '/js/app.js',
         __DIR__ . '/js/init.js'
     ];
-    $versionTimes = array_map(static function($file) {
-        return file_exists($file) ? filemtime($file) : 0;
-    }, $versionSources);
-    $assetVersion = max($versionTimes) ?: time();
+    $hashSeed = '';
+    foreach ($versionSources as $file) {
+        if (file_exists($file)) {
+            $hashSeed .= $file . ':' . sha1_file($file) . ';';
+        }
+    }
+    $assetVersion = $hashSeed ? substr(sha1($hashSeed), 0, 12) : (string) time();
 }
 
 $output = str_replace('{{CSRF_TOKEN}}', get_csrf_token(), $layout);
