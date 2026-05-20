@@ -2,6 +2,13 @@
  * Belajaryuk - Responsive styles (Cleaned and Optimized)
  */
 
+body.mobile-nav :where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div, .page:not(#admin-page):not(#landing-page) > form) {
+    padding-top: 84px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
+    width: 100%;
+    overflow-x: hidden;
+}
+
 /* --- Tablet / Large Mobile (max-width: 1024px) --- */
 @media (max-width: 1024px) {
     .stats-grid {

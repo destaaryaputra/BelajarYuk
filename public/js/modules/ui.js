@@ -28,6 +28,10 @@ export const UI = {
         // Initialize Theme
         this.applyTheme();
 
+        // Initialize device mode
+        this.updateDeviceMode();
+        window.addEventListener('resize', () => this.updateDeviceMode());
+
         // Initialize Scroll Reveal Observer
         this.initScrollReveal();
 
@@ -65,6 +69,13 @@ export const UI = {
             }
         });
         if (window.lucide) window.lucide.createIcons();
+    },
+
+    updateDeviceMode() {
+        const uaMobile = navigator.userAgentData?.mobile || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        const isSmall = window.matchMedia('(max-width: 900px)').matches;
+        const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        document.body.classList.toggle('mobile-nav', uaMobile || isSmall || isTouch);
     },
 
     updateHeaderVisibility() {
