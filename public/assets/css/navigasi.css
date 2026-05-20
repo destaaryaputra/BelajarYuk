@@ -217,8 +217,12 @@ nav button svg {
 }
 
 /* --- Sidebar Interactions --- */
+html.sidebar-open,
 body.sidebar-open {
     overflow: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed !important;
 }
 
 @media (max-width: 1024px) {

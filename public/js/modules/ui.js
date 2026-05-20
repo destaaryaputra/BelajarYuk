@@ -151,6 +151,9 @@ export const UI = {
 
         const isActive = sidebar.classList.toggle('is-active');
         overlay.classList.toggle('is-active', isActive);
+        
+        // Lock both html and body to be safe on mobile
+        document.documentElement.classList.toggle('sidebar-open', isActive);
         document.body.classList.toggle('sidebar-open', isActive);
     },
 
@@ -161,6 +164,8 @@ export const UI = {
 
         sidebar.classList.remove('is-active');
         overlay.classList.remove('is-active');
+        
+        document.documentElement.classList.remove('sidebar-open');
         document.body.classList.remove('sidebar-open');
     },
     
