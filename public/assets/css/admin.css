@@ -136,6 +136,19 @@ body.admin-mode {
     font-weight: 700;
 }
 
+/* Neutral Style for Topbar Buttons (No Green Background) */
+.admin-topbar .btn-icon-only {
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.admin-topbar .btn-icon-only:hover {
+    background: var(--surface-hover) !important;
+    color: var(--text-main) !important;
+}
+
 .admin-content {
     flex: 1;
     padding: 24px;
