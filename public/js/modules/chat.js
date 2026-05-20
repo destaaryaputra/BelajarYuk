@@ -74,6 +74,14 @@ export const AIChat = {
         if (sendBtn) {
             sendBtn.onclick = () => this.sendMessage();
         }
+
+        // Listen for back button on mobile to close chat
+        window.addEventListener('popstate', (e) => {
+            const windowEl = document.getElementById('ai-chat-window');
+            if (windowEl && windowEl.classList.contains('open')) {
+                this.toggle(true); // Close without triggering history.back()
+            }
+        });
     },
 
     updateVisibility() {
@@ -89,7 +97,7 @@ export const AIChat = {
         widget.classList.toggle('d-none', !shouldShow);
     },
 
-    toggle() {
+    toggle(fromPopState = false) {
         const windowEl = document.getElementById('ai-chat-window');
         if (!windowEl) return;
         
@@ -97,17 +105,35 @@ export const AIChat = {
 
         // Lock scroll on small mobile to prevent background scrolling
         if (window.innerWidth <= 480) {
-            document.body.classList.toggle('sidebar-open', isOpen);
+            document.documentElement.classList.toggle('ai-chat-open', isOpen);
+            document.body.classList.toggle('ai-chat-open', isOpen);
+
+            if (isOpen) {
+                // Push state so back button closes chat
+                history.pushState({ ai_chat: 'open' }, '');
+            } else if (!fromPopState) {
+                // If closed via button, remove the state we pushed
+                if (history.state && history.state.ai_chat === 'open') {
+                    history.back();
+                }
+            }
         }
         
         if (isOpen) {
             this.loadHistory();
+            // Senior UX: Focus input and scroll to bottom after transition
             setTimeout(() => {
                 const input = document.getElementById('ai-chat-input');
-                if (input) input.focus();
+                if (input) {
+                    input.focus();
+                    // On some mobile devices, we need to scroll the window to ensure input is visible
+                    if (window.innerWidth <= 480) {
+                        window.scrollTo(0, 0);
+                    }
+                }
                 const container = document.getElementById('ai-chat-messages');
                 if (container) container.scrollTop = container.scrollHeight;
-            }, 100);
+            }, 400); // Wait for transition (0.4s)
         } else {
             // Tutup fullscreen jika jendela chat ditutup
             windowEl.classList.remove('fullscreen');
