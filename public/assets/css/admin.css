@@ -1,6 +1,6 @@
 /* --- Admin Role Layout --- */
 body.admin-mode {
-    background-color: #f6f8fb;
+    background-color: var(--surface-muted);
     overflow-x: hidden;
 }
 
@@ -10,82 +10,86 @@ body.admin-mode {
     width: 100%;
 }
 
+/* Sidebar Styling (Matches Student Role) */
 .admin-sidebar {
     width: 260px;
-    background-color: #0f172a;
-    color: #fff;
+    background-color: var(--surface);
+    color: var(--text-main);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    transition: transform 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 2100;
+    border-right: 1px solid var(--border);
 }
 
 .admin-brand {
     height: 70px;
     display: flex;
     align-items: center;
-    gap: 12px;
     padding: 0 24px;
-    font-size: 1.25rem;
-    font-weight: 700;
-    border-bottom: 1px solid #1e293b;
+    border-bottom: 1px solid var(--border);
 }
 
 .admin-sidebar-nav {
     flex: 1;
-    padding: 16px 0;
+    padding: 16px 12px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
     overflow-y: auto;
 }
 
 .admin-sidebar-nav button {
     width: 100%;
     text-align: left;
-    padding: 14px 24px;
+    padding: 12px 16px;
     background: transparent;
-    color: #94a3b8;
-    border: none;
+    color: var(--text-muted);
+    border: 1px solid transparent;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 14px;
-    font-weight: 600;
-    font-size: 0.94rem;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 0;
+    transition: all 0.2s ease;
+    border-radius: 12px;
     min-height: 48px;
     box-shadow: none;
-    letter-spacing: 0.01em;
 }
 
 .admin-sidebar-nav button:hover {
-    background: #1e293b;
-    color: #fff;
+    background: var(--surface-hover);
+    color: var(--text-main);
 }
 
 .admin-sidebar-nav button.active {
-    background: rgba(31, 138, 112, 0.2);
-    color: #5eead4;
-    border-left: 4px solid var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.admin-sidebar-nav button i,
+.admin-sidebar-nav button svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.2px;
 }
 
 .admin-sidebar-footer {
     padding: 16px;
-    border-top: 1px solid #1e293b;
+    border-top: 1px solid var(--border);
 }
 
 .btn-logout-admin {
     width: 100%;
-    min-height: 40px;
-    padding: 10px 12px;
-    background: #ef4444;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
+    min-height: 44px;
+    padding: 10px 16px;
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid transparent;
+    border-radius: 12px;
     font-weight: 700;
     cursor: pointer;
     display: flex;
@@ -94,35 +98,42 @@ body.admin-mode {
     gap: 12px;
 }
 
+.btn-logout-admin:hover {
+    background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
+
 .admin-main {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0; /* Important for flex child overflow */
+    min-width: 0;
 }
 
 .admin-topbar {
     height: 70px;
-    background: #fff;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 0 28px;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 2000;
+    box-shadow: 0 4px 20px -10px rgba(0, 0, 0, 0.05);
 }
 
 .admin-topbar h2 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    font-weight: 800;
 }
 
 .admin-topbar-actions {
     color: var(--text-muted);
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .admin-content {
@@ -130,11 +141,7 @@ body.admin-mode {
     padding: 24px;
 }
 
-.admin-tab-content {
-    width: 100%;
-}
-
-/* Mobile Toggle */
+/* Mobile Adjustments (Mirroring Student Sidebar to the RIGHT) */
 .btn-toggle-admin-sidebar {
     display: none;
     background: transparent;
@@ -147,30 +154,41 @@ body.admin-mode {
 @media (max-width: 1024px) {
     .admin-sidebar {
         position: fixed;
-        left: 0;
+        right: -280px; /* Hidden on the RIGHT */
+        left: auto;
         top: 0;
         bottom: 0;
-        transform: translateX(-100%);
+        width: 280px;
+        border-right: none;
+        border-left: 1px solid var(--border);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
     }
 
     .admin-sidebar.is-active {
-        transform: translateX(0);
+        right: 0;
     }
 
     .admin-layout.sidebar-active::after {
         content: "";
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5);
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(4px);
         z-index: 2050;
     }
 
     .btn-toggle-admin-sidebar {
         display: block;
+        order: 2; /* Push toggle to the right in the flex container if needed, or just let it stay */
     }
 
     .admin-topbar {
         padding: 0 16px;
+    }
+    
+    .admin-topbar .d-flex {
+        width: 100%;
+        justify-content: space-between;
     }
 
     .admin-content {
