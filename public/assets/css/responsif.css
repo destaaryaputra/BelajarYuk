@@ -112,6 +112,14 @@
     .mobile-only {
         display: block !important;
     }
+    
+    .nav-bottom-bar.mobile-only {
+        display: flex !important;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
 
     .nav-menu-main button {
         flex: 1 !important;
