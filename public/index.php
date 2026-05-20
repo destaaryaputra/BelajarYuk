@@ -23,7 +23,23 @@ if ($isProduction) {
     $assetPath = rtrim($publicDir, '/\\');
 }
 
+$assetVersion = getenv('APP_ASSET_VERSION');
+if (!$assetVersion) {
+    $versionSources = [
+        __DIR__ . '/layout.html',
+        __DIR__ . '/assets/css/gaya.css',
+        __DIR__ . '/assets/css/responsif.css',
+        __DIR__ . '/js/app.js',
+        __DIR__ . '/js/init.js'
+    ];
+    $versionTimes = array_map(static function($file) {
+        return file_exists($file) ? filemtime($file) : 0;
+    }, $versionSources);
+    $assetVersion = max($versionTimes) ?: time();
+}
+
 $output = str_replace('{{CSRF_TOKEN}}', get_csrf_token(), $layout);
 $output = str_replace('{{ASSET_PATH}}', $assetPath, $output);
+$output = str_replace('{{ASSET_VERSION}}', $assetVersion, $output);
 
 echo $output;
