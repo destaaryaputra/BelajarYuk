@@ -37,21 +37,26 @@
         --container-padding: 16px;
     }
 
-    /* Global Page Padding for Fixed Header + Bottom Nav */
+    /* Global Page Padding for Fixed Header */
     :where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div, .page:not(#admin-page):not(#landing-page) > form) {
-        padding-top: 76px;
-        padding-bottom: calc(90px + env(safe-area-inset-bottom, 12px));
+        padding-top: 110px; /* Increased for double-row header */
+        padding-bottom: env(safe-area-inset-bottom, 24px);
         width: 100%;
         overflow-x: hidden;
     }
 
-    /* --- CLEAN MOBILE NAVIGATION --- */
+    /* --- TRADITIONAL MOBILE NAVIGATION (Below Header) --- */
     nav#global-nav {
-        position: static !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        z-index: 2200 !important;
+        background: var(--surface) !important;
+        border-bottom: 1px solid var(--border) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
         display: block !important;
-        background: none !important;
-        border: none !important;
-        box-shadow: none !important;
         height: auto !important;
     }
 
@@ -60,66 +65,72 @@
     }
 
     .nav-top-bar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
+        position: relative !important;
         width: 100% !important;
-        height: 60px !important;
+        height: 56px !important;
         padding: 0 16px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        background: var(--surface) !important;
-        border-bottom: 1px solid var(--border) !important;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
-        z-index: 2200 !important;
+        background: transparent !important;
+        border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent) !important;
+        box-shadow: none !important;
     }
 
-    /* Top Bar: Logo & Title ALWAYS visible */
+    /* Logo stays on top left */
     .nav-brand-logo {
         display: flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-        margin-right: auto !important;
-        z-index: 2201 !important;
     }
 
-    .nav-brand-logo span {
-        display: block !important;
-        font-size: 1.05rem !important;
-        font-weight: 800 !important;
-        color: var(--text-main) !important;
-    }
-
-    /* Top Bar: Hide main menu items */
-    .nav-top-bar .nav-menu-main,
-    .nav-top-bar .nav-divider {
-        display: none !important;
-    }
-
-    /* Top Bar Actions: Dark Mode & Logout */
-    .nav-actions {
+    /* Show main menu below the header row */
+    .nav-top-bar .nav-menu-main {
         display: flex !important;
-        gap: 8px !important;
-        margin-left: auto !important;
-        z-index: 2201 !important;
-    }
-
-    /* --- Bottom Navigation: Fixed & Clean --- */
-    .nav-bottom-bar {
-        position: fixed !important;
-        bottom: 0 !important;
+        position: absolute !important;
+        top: 56px !important;
         left: 0 !important;
         right: 0 !important;
         width: 100% !important;
-        z-index: 2200 !important;
         background: var(--surface) !important;
-        border-top: 1px solid var(--border) !important;
-        padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 8px)) !important;
+        padding: 4px 8px !important;
+        justify-content: space-around !important;
+        border-bottom: none !important;
+        gap: 2px !important;
+    }
+
+    .nav-top-bar .nav-menu-main button {
+        flex: 1 !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+        min-height: 48px !important;
+        padding: 4px 2px !important;
+        font-size: 0.7rem !important;
+        border-radius: 8px !important;
+        color: var(--text-muted) !important;
+    }
+
+    .nav-top-bar .nav-menu-main button i,
+    .nav-top-bar .nav-menu-main button svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .nav-top-bar .nav-menu-main button.nav-active {
+        color: var(--primary) !important;
+        background: var(--primary-light) !important;
+    }
+
+    /* Actions stay on top right */
+    .nav-actions {
         display: flex !important;
-        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.06) !important;
-        height: auto !important;
+    }
+
+    .nav-divider {
+        display: none !important;
+    }
+
+    /* Disable Bottom Bar logic */
+    .nav-bottom-bar {
+        display: none !important;
     }
 
     .nav-bottom-bar .nav-menu-main {
