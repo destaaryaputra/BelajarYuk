@@ -30,8 +30,8 @@
     }
 }
 
-/* --- Mobile (max-width: 768px) --- */
-@media (max-width: 768px) {
+/* --- Mobile & Tablet (max-width: 1024px) --- */
+@media (max-width: 1024px) {
     :root {
         font-size: 15px;
         --container-padding: 16px;
@@ -104,11 +104,6 @@
         gap: 8px !important;
         margin-left: auto !important;
         z-index: 2201 !important;
-    }
-
-    /* Top Bar: Dark Mode only on mobile header */
-    .nav-actions .desktop-only {
-        display: none !important;
     }
 
     /* --- Bottom Navigation: Fixed & Clean --- */
