@@ -4,37 +4,43 @@
 
 /* --- Tablet / Large Mobile (max-width: 1024px) --- */
 @media (max-width: 1024px) {
+    :root {
+        font-size: 15px;
+        --container-padding: 16px;
+    }
+
     .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .featured-course-card {
         grid-template-columns: 1fr;
+        display: flex !important;
+        flex-direction: column-reverse;
+        border-radius: 20px;
     }
 
     .featured-course-media {
-        min-height: 220px;
+        height: 160px;
+        min-height: unset;
     }
 
     .learning-detail-layout {
         grid-template-columns: 1fr;
+        grid-template-areas: 
+            "video"
+            "syllabus";
+        gap: 20px;
     }
 
     #material-detail {
-        min-height: 260px;
+        min-height: auto;
+        padding: 0 !important;
     }
 
     #course-syllabus {
         position: static;
         max-height: none;
-    }
-}
-
-/* --- Mobile & Tablet (max-width: 1024px) --- */
-@media (max-width: 1024px) {
-    :root {
-        font-size: 15px;
-        --container-padding: 16px;
     }
 
     /* Global Page Padding for Fixed Header */
@@ -227,8 +233,19 @@
     .material-detail-toolbar {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
-        margin-bottom: 20px;
+        gap: 10px;
+        margin-bottom: 24px;
+        text-align: left;
+    }
+
+    .toolbar-info {
+        padding: 12px;
+        background: var(--surface-muted);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .learning-detail-page-shell {
@@ -249,6 +266,7 @@
 
     .display-title {
         font-size: 1.6rem !important;
+        line-height: 1.2;
     }
 
     .pdf-container {
@@ -262,7 +280,13 @@
         padding: 14px;
         border-radius: 14px;
         background: var(--surface-muted);
-        margin-bottom: 4px;
+        margin-bottom: 6px;
+        align-items: flex-start;
+    }
+
+    .syllabus-title {
+        white-space: normal;
+        line-height: 1.4;
     }
 
     .syllabus-index {

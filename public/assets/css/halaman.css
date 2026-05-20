@@ -741,7 +741,26 @@
     font-size: 1.05rem;
     line-height: 1.8;
     color: #334155;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
+
+.material-rich-content p { margin-bottom: 1rem; }
+.material-rich-content img { max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; }
+.material-rich-content pre { 
+    background: #1e293b; color: #f8fafc; padding: 20px; border-radius: 12px; 
+    overflow-x: auto; margin: 16px 0; font-size: 0.9rem; line-height: 1.5;
+}
+.material-rich-content code { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-weight: 600; color: var(--primary); }
+.material-rich-content pre code { background: transparent; padding: 0; color: inherit; font-weight: 400; }
+.material-rich-content table { 
+    width: 100%; border-collapse: collapse; margin: 24px 0; 
+    display: block; overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.material-rich-content th, .material-rich-content td { border: 1px solid var(--border); padding: 12px 16px; text-align: left; }
+.material-rich-content th { background: var(--surface-muted); font-weight: 700; }
+.material-rich-content ul, .material-rich-content ol { margin-left: 24px; margin-bottom: 1.5rem; }
+.material-rich-content li { margin-bottom: 0.5rem; }
 
 .display-title {
     font-size: clamp(1.8rem, 4vw, 2.5rem) !important;
