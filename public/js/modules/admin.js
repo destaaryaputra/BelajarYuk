@@ -113,9 +113,13 @@ export const Admin = {
             container.innerHTML = `
                 <div class="profile-header-main mb-32">
                     <div class="profile-avatar-wrapper">
-                        <div class="profile-avatar-large">
+                        <div class="profile-avatar-large" id="admin-avatar-container">
                             ${avatarUrl ? `<img src="${UI.escapeHtml(avatarUrl)}" alt="Avatar">` : initials}
                         </div>
+                        <button type="button" class="btn-change-avatar" id="btn-admin-change-avatar" title="Ubah Foto Profil">
+                            <i data-lucide="camera"></i>
+                        </button>
+                        <input type="file" id="input-admin-avatar" class="d-none" accept="image/jpeg,image/png,image/webp">
                     </div>
                     <div class="profile-info-main">
                         <h2>${UI.escapeHtml(user.full_name || user.username)}</h2>
@@ -142,6 +146,32 @@ export const Admin = {
                     </div>
                 </div>
             `;
+
+            // Setup Admin Avatar Upload
+            const btnChange = document.getElementById('btn-admin-change-avatar');
+            const inputAvatar = document.getElementById('input-admin-avatar');
+            if (btnChange && inputAvatar) {
+                btnChange.onclick = () => inputAvatar.click();
+                inputAvatar.onchange = async () => {
+                    if (!inputAvatar.files || !inputAvatar.files[0]) return;
+                    const formData = new FormData();
+                    formData.append('avatar', inputAvatar.files[0]);
+                    UI.showLoading();
+                    try {
+                        const res = await API.post('/auth/avatar', formData);
+                        UI.showNotification(res.message, 'success');
+                        this.loadProfile();
+                        // Update name in topbar if needed
+                        const adminNameEl = document.getElementById('admin-user-name');
+                        if (adminNameEl) adminNameEl.textContent = user.full_name || 'Admin';
+                    } catch (e) {
+                        UI.showNotification(e.message || 'Gagal mengunggah foto.', 'error');
+                    } finally {
+                        UI.hideLoading();
+                    }
+                };
+            }
+
             if (window.lucide) window.lucide.createIcons();
         } catch (error) {
             console.error(error);

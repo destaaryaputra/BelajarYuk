@@ -172,7 +172,7 @@ export const Progress = {
             html += `
                 <div class="quiz-history-card">
                     <div class="qhc-header">
-                        <span class="badge ${isPassed ? 'badge-success' : 'badge-danger'}">${isPassed ? 'Lulus' : 'Gagal'}</span>
+                        <span class="badge ${isPassed ? 'badge-success' : 'badge-danger'}">${isPassed ? 'Lulus' : 'Belum Lulus'}</span>
                         <span class="qhc-date">${date}</span>
                     </div>
                     <h4>${UI.escapeHtml(title)}</h4>
