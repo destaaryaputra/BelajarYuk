@@ -473,57 +473,124 @@
     gap: 14px;
 }
 
-/* Material Detail Tabs (Mobile) */
-.mobile-detail-tabs {
+.material-detail-toolbar {
     display: flex;
-    flex-direction: row; /* Strict row */
-    flex-wrap: nowrap;   /* No wrapping allowed */
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 6px;
-    gap: 4px;            /* Tighter gap to save space */
-    margin-bottom: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 8px;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+    flex: 1;
+}
+
+.btn-back-material {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-back-material:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    transform: translateX(-3px);
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+.toolbar-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.toolbar-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+#current-episode-title {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Material Detail Tabs (Mobile) - Optimized Dual Tab */
+.mobile-detail-tabs {
+    display: flex;
+    flex-direction: row; 
+    flex-wrap: nowrap;   
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 4px;
+    gap: 4px;            
+    margin-bottom: 16px;
     width: 100%;
 }
 
 .mobile-detail-tabs .tab-btn {
     flex: 1;
-    min-width: 0;       /* Allow shrinking to fit */
+    min-width: 0;       
     display: flex;
     flex-direction: row; 
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 10px 4px;  /* Reduced padding */
+    gap: 8px;
+    padding: 12px 8px;  
     border: none;
     background: transparent;
     color: var(--text-muted);
-    font-size: 0.78rem; /* Optimized size for 3 items in a row */
+    font-size: 0.88rem; 
     font-weight: 700;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap; 
-    overflow: hidden;    /* Safety for very small screens */
 }
 
 .mobile-detail-tabs .tab-btn i {
-    width: 16px;        /* Smaller icons to save space */
-    height: 16px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
 }
 
 .mobile-detail-tabs .tab-btn.active {
-    background: var(--primary-light);
+    background: var(--surface);
     color: var(--primary);
-}
-
-.material-detail-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .learning-detail-layout {

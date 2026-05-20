@@ -1,25 +1,24 @@
 <main class="learning-detail-page-shell">
     <div class="material-detail-toolbar">
-        <button type="button" class="btn-back-material" data-page="materials-page">
-            <i data-lucide="arrow-left"></i>
-            Kembali ke Materi
-        </button>
-        <div class="toolbar-info">
-            <span class="text-muted">Materi Aktif:</span>
-            <strong id="current-episode-title">Memuat...</strong>
+        <div class="toolbar-left">
+            <button type="button" class="btn-back-material" data-page="materials-page" title="Kembali ke Daftar Materi">
+                <i data-lucide="arrow-left"></i>
+            </button>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-info">
+                <span class="toolbar-label">Materi Aktif</span>
+                <strong id="current-episode-title">Memuat...</strong>
+            </div>
         </div>
     </div>
 
-    <!-- Mobile Navigation Tabs -->
+    <!-- Mobile Navigation Tabs (Dual Mode: Materi & Episode) -->
     <div class="mobile-detail-tabs mobile-only" id="material-tabs">
         <button type="button" class="tab-btn active" data-tab="content">
-            <i data-lucide="book-open"></i> Materi
+            <i data-lucide="book-open"></i> Materi Utama
         </button>
         <button type="button" class="tab-btn" data-tab="syllabus">
-            <i data-lucide="list-video"></i> Episode
-        </button>
-        <button type="button" class="tab-btn" data-tab="comments">
-            <i data-lucide="message-square"></i> Diskusi
+            <i data-lucide="list-video"></i> Daftar Episode
         </button>
     </div>
 
