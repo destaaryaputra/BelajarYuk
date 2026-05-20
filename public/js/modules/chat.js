@@ -8,7 +8,7 @@ import { UI } from './ui.js';
 export const AIChat = {
     history: [],
     loaded: false,
-    systemPrompt: "Kamu adalah Asisten AI Belajaryuk. Jawab dalam bahasa Indonesia yang jelas, ramah, ringkas, dan membantu siswa belajar.",
+    systemPrompt: "Nama kamu adalah Yuki, Asisten AI Belajaryuk. Jawab dalam bahasa Indonesia yang jelas, ramah, ringkas, dan membantu siswa belajar. Selalu perkenalkan diri sebagai Yuki jika ditanya.",
 
     init() {
         this.updateVisibility();
