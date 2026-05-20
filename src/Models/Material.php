@@ -227,6 +227,10 @@ class Material {
             $stmt = $this->db->prepare($query);
             $stmt->execute([$user_id, $material_id]);
 
+            // Sync after marking main material as completed
+            $progressModel = new \App\Models\Progress();
+            $progressModel->syncMaterialProgress($user_id, $material_id);
+
             return ['success' => true, 'message' => 'Materi ditandai selesai.'];
         } catch (Exception $e) {
             error_log("Mark as completed error: " . $e->getMessage());
@@ -240,12 +244,24 @@ class Material {
     public function markSubMaterialCompleted(int $user_id, int $sub_material_id): array {
         try {
             $this->createSubMaterialProgressTable();
+            
+            // Get material_id first for sync
+            $stmtM = $this->db->prepare("SELECT material_id FROM sub_materi WHERE id = ?");
+            $stmtM->execute([$sub_material_id]);
+            $material_id = $stmtM->fetchColumn();
+
             $query = "INSERT INTO progres_sub_materi (user_id, sub_material_id, completed_at) 
                      VALUES (?, ?, NOW())
                      ON CONFLICT (user_id, sub_material_id) DO UPDATE SET completed_at = NOW()";
             
             $stmt = $this->db->prepare($query);
             $stmt->execute([$user_id, $sub_material_id]);
+
+            // Auto Sync Progress Percentage to progres_materi table
+            if ($material_id) {
+                $progressModel = new \App\Models\Progress();
+                $progressModel->syncMaterialProgress($user_id, (int)$material_id);
+            }
 
             return ['success' => true, 'message' => 'Episode ditandai selesai.'];
         } catch (Exception $e) {

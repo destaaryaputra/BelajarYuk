@@ -101,6 +101,9 @@ if (ENV === 'development') {
 }
 ini_set('log_errors', '1');
 
+// Timezone
+date_default_timezone_set('Asia/Jakarta');
+
 // Paths
 define('BASE_PATH', dirname(dirname(dirname(__FILE__))));
 define('PUBLIC_PATH', BASE_PATH . '/public');

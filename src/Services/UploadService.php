@@ -40,6 +40,33 @@ class UploadService {
         }
     }
 
+    public static function uploadAvatar(array $file): array {
+        try {
+            if (($file['size'] ?? 0) > 1 * 1024 * 1024) {
+                return ['success' => false, 'message' => 'Foto profil terlalu besar! Maksimal 1MB ya.'];
+            }
+
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+            $extension = strtolower(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
+            if (!in_array($extension, $allowedExtensions, true)) {
+                return ['success' => false, 'message' => 'Format file tidak didukung. Gunakan JPG, PNG, atau WEBP.'];
+            }
+
+            $mimeType = self::detectMimeType($file['tmp_name'] ?? '');
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!in_array($mimeType, $allowedMimes, true)) {
+                return ['success' => false, 'message' => 'File bukan gambar asli.'];
+            }
+
+            $filename = 'avatars/av_' . bin2hex(random_bytes(8)) . '.' . $extension;
+            return self::uploadToSupabase($file['tmp_name'], $filename, $mimeType);
+
+        } catch (Exception $e) {
+            error_log('Avatar upload error: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Gagal memproses foto profil.'];
+        }
+    }
+
     public static function uploadPdf(array $file): array {
         try {
             $mimeType = self::detectMimeType($file['tmp_name'] ?? '');

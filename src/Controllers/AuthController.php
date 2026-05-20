@@ -92,6 +92,35 @@ class AuthController {
         Response::success('Data pengguna berhasil dimuat', $freshUser);
     }
 
+    public function updateAvatar(): void {
+        AuthMiddleware::requireAuth();
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Metode permintaan tidak valid.', null, 405);
+        }
+        CSRFMiddleware::verify();
+
+        try {
+            $user = AuthMiddleware::getAuthUser();
+            if (!isset($_FILES['avatar']) || $_FILES['avatar']['size'] === 0) {
+                Response::error('Pilih file foto profil dulu ya.', null, 400);
+            }
+
+            $upload_result = \App\Services\UploadService::uploadAvatar($_FILES['avatar']);
+            if (!$upload_result['success']) {
+                Response::error($upload_result['message'], null, 400);
+            }
+
+            $result = $this->userModel->updateAvatar($user['id'], $upload_result['filename']);
+            if ($result['success']) {
+                Response::success($result['message'], ['avatar' => $upload_result['filename']]);
+            } else {
+                Response::error($result['message'], null, 500);
+            }
+        } catch (Exception $e) {
+            Response::error($e->getMessage(), null, 500);
+        }
+    }
+
     public function updateProfile(): void {
         AuthMiddleware::requireAuth();
         if ($_SERVER['REQUEST_METHOD'] !== 'PUT' && $_SERVER['REQUEST_METHOD'] !== 'POST') {

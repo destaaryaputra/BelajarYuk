@@ -22,6 +22,9 @@
             <button id="btn-tab-diskusi" type="button" onclick="switchAdminTab('diskusi')">
                 <i data-lucide="message-square"></i> Diskusi
             </button>
+            <button id="btn-tab-profil" type="button" onclick="switchAdminTab('profil')">
+                <i data-lucide="user"></i> Profil
+            </button>
             <button id="btn-tab-pengaturan" type="button" onclick="switchAdminTab('pengaturan')">
                 <i data-lucide="settings"></i> Pengaturan
             </button>
@@ -36,7 +39,12 @@
 
     <main class="admin-main">
         <header class="admin-topbar">
-            <h2 id="admin-page-title">Panel Admin</h2>
+            <div class="d-flex align-center gap-12">
+                <button type="button" class="btn-toggle-admin-sidebar" onclick="Admin.toggleSidebar(true)">
+                    <i data-lucide="menu"></i>
+                </button>
+                <h2 id="admin-page-title">Panel Admin</h2>
+            </div>
             <div class="admin-topbar-actions">
                 <span id="admin-user-name">Admin</span>
             </div>
@@ -246,6 +254,12 @@
             <div id="admin-tab-laporan" class="admin-tab-content d-none"></div>
 
             <div id="admin-tab-diskusi" class="admin-tab-content d-none"></div>
+
+            <div id="admin-tab-profil" class="admin-tab-content d-none">
+                <div class="content-card profile-container" id="admin-profile-content">
+                    <!-- Profile content loaded via JS -->
+                </div>
+            </div>
 
             <div id="admin-tab-pengaturan" class="admin-tab-content d-none"></div>
         </div>

@@ -30,6 +30,10 @@ class ProgressController {
         try {
             $user = AuthMiddleware::getAuthUser();
             
+            // Sync Learning Streak
+            $userModel = new \App\Models\User();
+            $userModel->updateStreak($user['id']);
+
             // Parallel fetching at DB level or sequential but in one request
             $summary = $this->progressModel->getUserProgressSummary($user['id']) ?: [];
             $streakData = $this->progressModel->getLearningStreak($user['id']) ?: [];

@@ -35,7 +35,14 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div id="loading" class="loading-overlay d-none"></div>
+    <div id="loading" class="loading-overlay d-none">
+        <div class="loading-spinner-wrapper">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+        <div class="loading-text">Menyiapkan materi...</div>
+    </div>
 
     <!-- Notifications -->
     <div id="notification-toast" class="notification-toast"></div>
@@ -68,6 +75,7 @@
                     <button type="button" data-page="dashboard-page"><i data-lucide="home"></i> Beranda</button>
                     <button type="button" data-page="materials-page"><i data-lucide="book-open"></i> Materi</button>
                     <button type="button" data-page="progress-page"><i data-lucide="line-chart"></i> Progress</button>
+                    <button type="button" data-page="leaderboard-page"><i data-lucide="trophy"></i> Leaderboard</button>
                     <button type="button" data-page="profile-page"><i data-lucide="user"></i> Profil</button>
                 </div>
                 <div class="nav-divider desktop-only"></div>
@@ -108,6 +116,7 @@
                     <button type="button" data-page="dashboard-page"><i data-lucide="home"></i> Beranda</button>
                     <button type="button" data-page="materials-page"><i data-lucide="book-open"></i> Materi</button>
                     <button type="button" data-page="progress-page"><i data-lucide="line-chart"></i> Progress</button>
+                    <button type="button" data-page="leaderboard-page"><i data-lucide="trophy"></i> Leaderboard</button>
                     <button type="button" data-page="profile-page"><i data-lucide="user"></i> Profil</button>
                     <div class="sidebar-divider"></div>
                     <button type="button" data-action="logout" class="text-danger"><i data-lucide="log-out"></i> Keluar</button>
@@ -125,6 +134,7 @@
         <section id="materials-page" class="page d-none"></section>
         <section id="material-detail-page" class="page d-none"></section>
         <section id="progress-page" class="page d-none"></section>
+        <section id="leaderboard-page" class="page d-none"></section>
         <section id="profile-page" class="page d-none"></section>
         <section id="quiz-page" class="page d-none"></section>
         <section id="admin-page" class="page d-none"></section>

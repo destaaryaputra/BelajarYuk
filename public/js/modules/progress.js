@@ -16,20 +16,17 @@ export const Progress = {
         const materialsContainer = document.getElementById('material-progress-list');
         if (catsContainer) catsContainer.innerHTML = '<div class="skeleton-box" style="height: 200px; width: 100%;"></div>';
         if (materialsContainer) materialsContainer.innerHTML = '<div class="skeleton-box" style="height: 200px; width: 100%;"></div>';
-        document.getElementById('leaderboard-list').innerHTML = '<div class="skeleton-box" style="height: 300px; width: 100%;"></div>';
 
         try {
             // Fetch all data in parallel
-            const [summaryRes, detailedRes, leaderboardRes, quizRes] = await Promise.all([
+            const [summaryRes, detailedRes, quizRes] = await Promise.all([
                 API.getProgressSummary(),
                 API.getProgressByCategories(),
-                API.getLeaderboard(),
                 API.getQuizPerformance()
             ]);
 
             const progressData = detailedRes.data || {};
             this.renderSummary(summaryRes.data || {});
-            this.renderLeaderboard(leaderboardRes.data || []);
             this.renderQuizHistory(quizRes.data || []);
 
             if (materialsContainer) {
@@ -151,46 +148,6 @@ export const Progress = {
             `;
         });
         container.innerHTML = html + '</div>';
-    },
-
-    renderLeaderboard(users) {
-        const container = document.getElementById('leaderboard-list');
-        if (!container) return;
-
-        if (users.length === 0) {
-            container.innerHTML = '<p class="text-muted">Papan peringkat masih kosong.</p>';
-            return;
-        }
-
-        // Get current user ID
-        const userData = localStorage.getItem(Config.STORAGE_KEYS.USER_DATA);
-        const currentUserId = userData ? JSON.parse(userData).id : null;
-
-        let html = '<div class="leaderboard-table-wrapper"><table class="admin-table"><thead><tr><th>Rank</th><th>Siswa</th><th>Poin</th></tr></thead><tbody>';
-        
-        users.forEach((user, index) => {
-            const isMe = user.id == currentUserId;
-            const rank = index + 1;
-            let rankClass = '';
-            if (rank === 1) rankClass = 'rank-gold';
-            else if (rank === 2) rankClass = 'rank-silver';
-            else if (rank === 3) rankClass = 'rank-bronze';
-
-            html += `
-                <tr class="${isMe ? 'is-me' : ''}">
-                    <td><span class="rank-badge ${rankClass}">${rank}</span></td>
-                    <td>
-                        <div class="d-flex align-center gap-12">
-                            <div class="admin-avatar">${(user.full_name || user.username || '?')[0].toUpperCase()}</div>
-                            <strong>${UI.escapeHtml(user.full_name || user.username)} ${isMe ? '(Kamu)' : ''}</strong>
-                        </div>
-                    </td>
-                    <td><strong>${user.total_points}</strong></td>
-                </tr>
-            `;
-        });
-
-        container.innerHTML = html + '</tbody></table></div>';
     },
 
     renderQuizHistory(results) {

@@ -318,14 +318,17 @@ export const MaterialDetail = {
             `;
         } else if (active.isMain && this.state.subMaterials.length > 0) {
             // Tampilan "Peta Belajar" otomatis jika di halaman Pengenalan
-            let roadmapHtml = this.state.subMaterials.map((s, i) => `
+            let roadmapHtml = this.state.subMaterials.map((s, i) => {
+                const cleanRoadmapTitle = (s.title || '').replace(/^\d+[\.\s\-]+/, '');
+                return `
                 <div class="roadmap-item">
                     <div class="roadmap-num">${i + 1}</div>
                     <div class="roadmap-info">
-                        <span class="roadmap-title">${UI.escapeHtml(s.title)}</span>
+                        <span class="roadmap-title">${UI.escapeHtml(cleanRoadmapTitle || s.title)}</span>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
 
             mediaHtml = `
                 <div class="roadmap-container mb-32">

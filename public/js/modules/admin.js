@@ -46,7 +46,7 @@ export const Admin = {
     },
 
     switchTab(tabId) {
-        const allTabs = ['dashboard', 'materi', 'pengguna', 'laporan', 'diskusi', 'pengaturan'];
+        const allTabs = ['dashboard', 'materi', 'pengguna', 'laporan', 'diskusi', 'profil', 'pengaturan'];
         allTabs.forEach(t => {
             document.getElementById(`btn-tab-${t}`)?.classList.remove('active');
             document.getElementById(`admin-tab-${t}`)?.classList.add('d-none');
@@ -65,6 +65,7 @@ export const Admin = {
             'pengguna': 'Data Siswa',
             'laporan': 'Laporan & Analitik Nilai',
             'diskusi': 'Moderasi Forum',
+            'profil': 'Profil Administrator',
             'pengaturan': 'Pengaturan Platform'
         };
         const titleEl = document.getElementById('admin-page-title');
@@ -75,9 +76,77 @@ export const Admin = {
         else if (tabId === 'pengguna') this.loadUsers();
         else if (tabId === 'laporan') this.loadReports();
         else if (tabId === 'diskusi') this.loadDiscussions();
+        else if (tabId === 'profil') this.loadProfile();
         else if (tabId === 'pengaturan') this.loadSettings();
         
+        // Auto close sidebar on mobile
+        this.toggleSidebar(false);
+        
         if (window.lucide) window.lucide.createIcons();
+    },
+
+    toggleSidebar(show) {
+        const sidebar = document.querySelector('.admin-sidebar');
+        const layout = document.querySelector('.admin-layout');
+        if (!sidebar || !layout) return;
+
+        if (show) {
+            sidebar.classList.add('is-active');
+            layout.classList.add('sidebar-active');
+        } else {
+            sidebar.classList.remove('is-active');
+            layout.classList.remove('sidebar-active');
+        }
+    },
+
+    async loadProfile() {
+        const container = document.getElementById('admin-profile-content');
+        if (!container) return;
+
+        try {
+            const response = await API.getCurrentUser();
+            const user = response.data || {};
+            
+            const initials = (user.full_name || user.username || '?')[0].toUpperCase();
+            const avatarUrl = user.avatar ? (user.avatar.startsWith('http') ? user.avatar : `/public/uploads/${user.avatar}`) : null;
+
+            container.innerHTML = `
+                <div class="profile-header-main mb-32">
+                    <div class="profile-avatar-wrapper">
+                        <div class="profile-avatar-large">
+                            ${avatarUrl ? `<img src="${UI.escapeHtml(avatarUrl)}" alt="Avatar">` : initials}
+                        </div>
+                    </div>
+                    <div class="profile-info-main">
+                        <h2>${UI.escapeHtml(user.full_name || user.username)}</h2>
+                        <p class="text-muted">Administrator • ${UI.escapeHtml(user.email)}</p>
+                    </div>
+                </div>
+
+                <div class="profile-details-grid">
+                    <div class="detail-group">
+                        <label>Nama Lengkap</label>
+                        <div class="detail-value">${UI.escapeHtml(user.full_name)}</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Email</label>
+                        <div class="detail-value">${UI.escapeHtml(user.email)}</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Username</label>
+                        <div class="detail-value">${UI.escapeHtml(user.username)}</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Role</label>
+                        <div class="detail-value">Administrator</div>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) window.lucide.createIcons();
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = '<p class="text-danger">Gagal memuat profil admin.</p>';
+        }
     },
 
     // --- DASHBOARD ---
@@ -209,13 +278,13 @@ export const Admin = {
             const container = document.getElementById('admin-materials-table');
             if (!container) return;
 
-            let html = '<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>ID</th><th>Judul</th><th>Kategori</th><th class="text-right">Aksi</th></tr></thead><tbody>';
+            let html = '<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>No</th><th>Judul</th><th>Kategori</th><th class="text-right">Aksi</th></tr></thead><tbody>';
             if (materials.length === 0) html += '<tr><td colspan="4" class="text-center">Kosong.</td></tr>';
             else {
-                materials.forEach(m => {
+                materials.forEach((m, i) => {
                     html += `
                         <tr>
-                            <td class="text-muted">#${m.id}</td>
+                            <td class="text-muted">${i + 1}</td>
                             <td class="font-medium">${UI.escapeHtml(m.title)}</td>
                             <td><span class="badge badge-student">${UI.escapeHtml(m.category || 'Umum')}</span></td>
                             <td class="text-right">
@@ -888,9 +957,9 @@ export const Admin = {
             this.charts.reports.destroy();
         }
 
-        const labels = perQuiz.slice(0, 8).map(row => row.quiz_title || 'Kuis');
-        const scores = perQuiz.slice(0, 8).map(row => Math.round(Number(row.avg_score || 0)));
-        const attempts = perQuiz.slice(0, 8).map(row => Number(row.attempts || 0));
+        const labels = perQuiz.slice(0, 10).map(row => row.quiz_title || 'Kuis');
+        const scores = perQuiz.slice(0, 10).map(row => Math.round(Number(row.avg_score || 0)));
+        const attempts = perQuiz.slice(0, 10).map(row => Number(row.attempts || 0));
 
         if (labels.length === 0) {
             labels.push('Belum ada data');
@@ -904,16 +973,25 @@ export const Admin = {
                 labels,
                 datasets: [
                     {
+                        type: 'line',
                         label: 'Rata-rata Nilai (%)',
                         data: scores,
-                        backgroundColor: 'rgba(31, 138, 112, 0.8)',
-                        borderRadius: 8
+                        borderColor: '#1f8a70',
+                        backgroundColor: 'rgba(31, 138, 112, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.3,
+                        yAxisID: 'y'
                     },
                     {
-                        label: 'Jumlah Percobaan',
+                        type: 'bar',
+                        label: 'Total Percobaan',
                         data: attempts,
-                        backgroundColor: 'rgba(37, 99, 167, 0.7)',
-                        borderRadius: 8
+                        backgroundColor: 'rgba(37, 99, 167, 0.6)',
+                        borderRadius: 6,
+                        maxBarThickness: 30,
+                        yAxisID: 'y1'
                     }
                 ]
             },
@@ -923,8 +1001,26 @@ export const Admin = {
                 animation: false,
                 scales: {
                     y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
                         beginAtZero: true,
-                        ticks: { precision: 0 }
+                        max: 100,
+                        title: { display: true, text: 'Nilai (%)', font: { size: 10 } }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: 'Percobaan', font: { size: 10 } }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { boxWidth: 12, font: { size: 11 } }
                     }
                 }
             }

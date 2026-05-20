@@ -37,14 +37,23 @@ export const Profile = {
         const container = document.getElementById('profile-content');
         if (!container) return;
 
+        const initials = (user.full_name || user.username || '?')[0].toUpperCase();
+        const avatarUrl = user.avatar ? (user.avatar.startsWith('http') ? user.avatar : `/public/uploads/${user.avatar}`) : null;
+        
         container.innerHTML = `
             <div class="profile-header-main mb-32">
-                <div class="profile-avatar-large">
-                    ${(user.full_name || user.username || '?')[0].toUpperCase()}
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar-large" id="profile-avatar-container">
+                        ${avatarUrl ? `<img src="${UI.escapeHtml(avatarUrl)}" alt="Avatar" id="profile-avatar-img">` : initials}
+                    </div>
+                    <button type="button" class="btn-change-avatar" id="btn-change-avatar" title="Ubah Foto Profil">
+                        <i data-lucide="camera"></i>
+                    </button>
+                    <input type="file" id="input-avatar" class="d-none" accept="image/jpeg,image/png,image/webp">
                 </div>
                 <div class="profile-info-main">
                     <h2>${UI.escapeHtml(user.full_name || user.username)}</h2>
-                    <p class="text-muted">@${UI.escapeHtml(user.username)} • ${user.role === 'admin' ? 'Administrator' : 'Siswa Belajaryuk'}</p>
+                    <p class="text-muted">${UI.escapeHtml(user.username)}</p>
                 </div>
             </div>
 
@@ -60,7 +69,7 @@ export const Profile = {
                     </div>
                     <div class="detail-group">
                         <label>Username</label>
-                        <div class="detail-value">@${UI.escapeHtml(user.username)}</div>
+                        <div class="detail-value">${UI.escapeHtml(user.username)}</div>
                     </div>
                     <div class="detail-group">
                         <label>Tanggal Bergabung</label>
@@ -116,9 +125,34 @@ export const Profile = {
         const editBtn = document.getElementById('btn-edit-profile');
         const cancelBtn = document.getElementById('btn-cancel-edit');
         const form = document.getElementById('form-edit-profile');
+        const btnChangeAvatar = document.getElementById('btn-change-avatar');
+        const inputAvatar = document.getElementById('input-avatar');
         
         const displayView = document.getElementById('profile-display-view');
         const editView = document.getElementById('profile-edit-view');
+
+        if (btnChangeAvatar && inputAvatar) {
+            btnChangeAvatar.onclick = () => inputAvatar.click();
+            
+            inputAvatar.onchange = async () => {
+                if (!inputAvatar.files || !inputAvatar.files[0]) return;
+                
+                const file = inputAvatar.files[0];
+                const formData = new FormData();
+                formData.append('avatar', file);
+
+                UI.showLoading();
+                try {
+                    const response = await API.post('/auth/avatar', formData);
+                    UI.showNotification(response.message, 'success');
+                    this.load(); // Refresh to show new avatar
+                } catch (error) {
+                    UI.showNotification(error.message || 'Gagal mengunggah foto.', 'error');
+                } finally {
+                    UI.hideLoading();
+                }
+            };
+        }
 
         if (editBtn) {
             editBtn.onclick = () => {
@@ -142,10 +176,9 @@ export const Profile = {
 
                 UI.showLoading();
                 try {
-                    // We use POST because some servers block PUT or have issues with it in PHP
                     const response = await API.post('/auth/profile/update', data);
                     UI.showNotification(response.message, 'success');
-                    this.load(); // Reload data
+                    this.load();
                 } catch (error) {
                     UI.showNotification(error.message || 'Gagal memperbarui profil.', 'error');
                 } finally {

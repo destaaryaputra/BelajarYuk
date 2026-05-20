@@ -20,6 +20,50 @@ class Progress {
     }
 
     /**
+     * Sync material progress percentage manually
+     */
+    public function syncMaterialProgress(int $user_id, int $material_id): void {
+        try {
+            // Count total sub materials
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM sub_materi WHERE material_id = ?");
+            $stmt->execute([$material_id]);
+            $totalSub = (int) $stmt->fetchColumn();
+
+            // Count completed sub materials
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM progres_sub_materi psm 
+                                       JOIN sub_materi sm ON psm.sub_material_id = sm.id 
+                                       WHERE sm.material_id = ? AND psm.user_id = ?");
+            $stmt->execute([$material_id, $user_id]);
+            $completedSub = (int) $stmt->fetchColumn();
+
+            // Check if main material is completed
+            $stmt = $this->db->prepare("SELECT 1 FROM progres_materi WHERE user_id = ? AND material_id = ? AND completed_at IS NOT NULL");
+            $stmt->execute([$user_id, $material_id]);
+            $mainDone = (bool) $stmt->fetchColumn();
+
+            // Adjusted logic matching getDetailedMaterialProgress
+            $adjTotal = $totalSub + 1;
+            $adjCompleted = $completedSub + ($mainDone ? 1 : 0);
+            $percentage = ($adjTotal > 0) ? round(($adjCompleted / $adjTotal) * 100) : 0;
+            $percentage = min(100, $percentage);
+
+            // Update progres_materi
+            $query = "INSERT INTO progres_materi (user_id, material_id, progress_percentage, last_accessed_at) 
+                      VALUES (:uid, :mid, :pct, NOW())
+                      ON CONFLICT (user_id, material_id) 
+                      DO UPDATE SET progress_percentage = :pct, last_accessed_at = NOW()";
+            
+            $this->db->prepare($query)->execute([
+                'uid' => $user_id, 
+                'mid' => $material_id, 
+                'pct' => $percentage
+            ]);
+        } catch (Exception $e) {
+            error_log("Sync material progress error: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Get user learning progress summary
      */
     public function getUserProgressSummary(int $user_id): ?array {
@@ -246,9 +290,9 @@ class Progress {
                         COALESCE(ucm.completed_count, 0) as materials_completed
                       FROM pengguna u
                       LEFT JOIN (
-                        SELECT user_id, SUM(max_score) as total_points
+                        SELECT user_id, SUM(max_points) as total_points
                         FROM (
-                            SELECT user_id, quiz_id, MAX(score) as max_score
+                            SELECT user_id, quiz_id, MAX(total_points) as max_points
                             FROM hasil_kuis
                             GROUP BY user_id, quiz_id
                         ) t

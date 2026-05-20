@@ -140,6 +140,21 @@ class User {
     }
 
     /**
+     * Update user avatar
+     */
+    public function updateAvatar(int $user_id, string $avatar_filename): array {
+        try {
+            $query = "UPDATE pengguna SET avatar = ? WHERE id = ?";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$avatar_filename, $user_id]);
+            return ['success' => true, 'message' => 'Foto profil berhasil diperbarui!'];
+        } catch (Exception $e) {
+            error_log("Update avatar error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Gagal memperbarui foto profil.'];
+        }
+    }
+
+    /**
      * Get user by ID
      */
     public function getUserById(int $id): ?array {

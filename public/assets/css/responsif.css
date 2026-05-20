@@ -240,21 +240,34 @@
     }
 
     .material-detail-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        margin-bottom: 24px;
-        text-align: left;
+        padding: 6px 10px;
+        margin-bottom: 16px;
+    }
+
+    .toolbar-left {
+        gap: 8px;
+    }
+
+    .mobile-detail-tabs.mobile-only {
+        max-width: none;
+    }
+
+    .mobile-detail-tabs .tab-btn {
+        padding: 6px 4px;
+        font-size: 0.78rem;
+    }
+
+    .toolbar-divider {
+        height: 16px;
+    }
+
+    .btn-back-material {
+        width: 34px;
+        height: 34px;
     }
 
     .toolbar-info {
-        padding: 12px;
-        background: var(--surface-muted);
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
+        display: none; /* Hide on mobile to save space since tabs are used */
     }
 
     .learning-detail-page-shell {

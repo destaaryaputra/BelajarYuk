@@ -11,6 +11,7 @@ import { Materials } from './modules/materials.js';
 import { Admin } from './modules/admin.js';
 import { Profile } from './modules/profile.js';
 import { Progress } from './modules/progress.js';
+import { Leaderboard } from './modules/leaderboard.js';
 import { AIChat } from './modules/chat.js';
 import { MaterialDetail } from './modules/materialDetail.js';
 import { Quiz } from './modules/quiz.js';
@@ -58,6 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (pageId === 'progress-page') {
             Progress.load();
+        }
+        if (pageId === 'leaderboard-page') {
+            Leaderboard.load();
         }
 
         // Admin Handlers

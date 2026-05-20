@@ -16,6 +16,7 @@ export const Router = {
             'material-detail-page': `${base}/pages/material-detail.html`,
             'quiz-page': `${base}/pages/quiz.html`,
             'progress-page': `${base}/pages/progress.html`,
+            'leaderboard-page': `${base}/pages/leaderboard.html`,
             'profile-page': `${base}/pages/profile.html`,
             'admin-page': `${base}/pages/admin.html`
         };

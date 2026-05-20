@@ -119,7 +119,7 @@ class APIService {
     getDashboardData() { return this.get('/progress/dashboard'); }
     getProgressSummary() { return this.get('/progress/summary'); }
     getProgressByCategories() { return this.get('/progress/categories'); }
-    getLeaderboard() { return this.get('/progress/leaderboard'); }
+    getLeaderboard(limit = 10) { return this.get(`/progress/leaderboard?limit=${limit}`); }
     getQuizPerformance() { return this.get('/progress/quiz-performance'); }
     trackProgress(materialId) { return this.post('/progress/track', { material_id: materialId }); }
     

@@ -1,0 +1,93 @@
+<main>
+    <div class="header-section">
+        <h1>Papan Peringkat</h1>
+        <p>Lihat siapa yang paling giat belajar di Belajaryuk!</p>
+    </div>
+
+    <div class="content-card">
+        <div class="leaderboard-premium-wrapper">
+            <div class="leaderboard-header-info mb-24">
+                <div class="d-flex align-center gap-12">
+                    <div class="stat-chip accent-blue"><i data-lucide="award"></i></div>
+                    <div>
+                        <h3 class="mb-0">Top 50 Siswa</h3>
+                        <p class="text-muted small mb-0">Berdasarkan akumulasi nilai kuis</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-table-wrapper leaderboard-table-wrapper">
+                <table class="admin-table" id="leaderboard-table-full">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Peringkat</th>
+                            <th>Siswa</th>
+                            <th>Materi Selesai</th>
+                            <th class="text-right">Total Poin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body-full">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    .leaderboard-table-wrapper {
+        border: none;
+        box-shadow: none;
+    }
+    
+    .leaderboard-table-wrapper .admin-table tr.is-me {
+        background: #f0fdf4;
+    }
+    
+    .leaderboard-table-wrapper .admin-table tr.is-me td {
+        color: #065f46;
+        font-weight: 600;
+    }
+
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar-small {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--primary-light);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    .user-info-cell {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .user-username {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .total-points-cell {
+        font-weight: 800;
+        color: var(--primary);
+        font-size: 1.1rem;
+    }
+</style>

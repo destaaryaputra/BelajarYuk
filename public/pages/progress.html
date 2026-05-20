@@ -7,30 +7,21 @@
     <!-- Ringkasan Statistik -->
     <div id="progress-summary" class="mb-32"></div>
 
-    <div class="dashboard-layout">
-        <div class="dashboard-main-col">
-            <!-- Progres Per Materi (Detail) -->
-            <div id="material-progress-list" class="mb-24"></div>
+    <div class="dashboard-layout-single">
+        <!-- Progres Per Materi (Detail) -->
+        <div id="material-progress-list" class="mb-24"></div>
 
-            <!-- Riwayat Kuis Terakhir -->
-            <div class="content-card">
-                <h3 class="mb-16">Riwayat Kuis Terakhir</h3>
-                <div id="quiz-performance"></div>
-            </div>
-        </div>
-
-        <div class="dashboard-side-col">
-            <!-- Leaderboard -->
-            <div class="content-card">
-                <h3 class="mb-16">Papan Peringkat</h3>
-                <div id="leaderboard-list"></div>
-            </div>
+        <!-- Riwayat Kuis Terakhir -->
+        <div class="content-card">
+            <h3 class="mb-16">Riwayat Kuis Terakhir</h3>
+            <div id="quiz-performance"></div>
         </div>
     </div>
 </main>
 
 <style>
-    @media (max-width: 1024px) {
-        .dashboard-layout { grid-template-columns: 1fr !important; }
+    .dashboard-layout-single {
+        max-width: 900px;
+        margin: 0 auto;
     }
 </style>
