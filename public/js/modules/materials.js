@@ -179,19 +179,26 @@ export const Materials = {
 
         container.innerHTML = materials.map((m, index) => {
             const difficulty = diffMap[m.difficulty] || 'Pemula';
+            const isCompleted = (m.progress_percentage || 0) >= 100;
+
             return `
                 <div class="material-card reveal-on-scroll is-visible" style="transition-delay: ${index * 0.05}s">
                     <div class="img-wrapper" data-id="${m.id}">
                         <img src="${getThumb(m.thumbnail)}" alt="${UI.escapeHtml(m.title)}" loading="lazy">
+                        ${isCompleted ? '<div class="card-completed-badge"><i data-lucide="check-circle-2"></i> Selesai</div>' : ''}
                     </div>
                     <div class="material-card-content">
-                        <span class="category-tag">${UI.escapeHtml(m.category || 'Umum')}</span>
-                        <span class="meta-tag">• ${difficulty}</span>
+                        <div class="d-flex justify-between align-center mb-8">
+                            <span class="category-tag">${UI.escapeHtml(m.category || 'Umum')}</span>
+                            <span class="meta-tag">${difficulty}</span>
+                        </div>
                         <h3 data-id="${m.id}">${UI.escapeHtml(m.title)}</h3>
                         <p>${UI.escapeHtml(m.description ? m.description.substring(0, 80) + '...' : '...')}</p>
                     </div>
                     <div class="material-card-footer">
-                        <button type="button" class="btn-full" data-id="${m.id}">Mulai Belajar</button>
+                        <button type="button" class="btn-full ${isCompleted ? 'btn-outline' : ''}" data-id="${m.id}">
+                            ${isCompleted ? 'Lihat Kembali' : 'Mulai Belajar'}
+                        </button>
                     </div>
                 </div>
             `;

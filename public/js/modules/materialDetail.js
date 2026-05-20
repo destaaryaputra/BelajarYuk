@@ -13,7 +13,6 @@ export const MaterialDetail = {
         activeItemId: 'main',
         quiz: null
     },
-    dropdownBound: false,
 
     async load() {
         const detailContainer = document.getElementById('material-detail');
@@ -179,10 +178,6 @@ export const MaterialDetail = {
         });
 
         if (window.lucide) window.lucide.createIcons();
-    },
-
-    bindDropdown() {
-        // Dropdown removed for cleaner UI
     },
 
     selectItem(itemId) {
