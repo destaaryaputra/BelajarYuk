@@ -2,13 +2,6 @@
  * Belajaryuk - Responsive styles (Cleaned and Optimized)
  */
 
-body.mobile-nav :where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div, .page:not(#admin-page):not(#landing-page) > form) {
-    padding-top: 84px;
-    padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
-    width: 100%;
-    overflow-x: hidden;
-}
-
 /* --- Tablet / Large Mobile (max-width: 1024px) --- */
 @media (max-width: 1024px) {
     .stats-grid {
@@ -46,11 +39,113 @@ body.mobile-nav :where(.page:not(#admin-page):not(#landing-page) > main, .page:n
 
     /* Global Page Padding for Fixed Header + Bottom Nav */
     :where(.page:not(#admin-page):not(#landing-page) > main, .page:not(#admin-page):not(#landing-page) > div, .page:not(#admin-page):not(#landing-page) > form) {
-        padding-top: 84px; /* Fix: Header is 60px, so 84px gives it breathing room */
-        /* Reserved space for bottom navigation + safe area */
-        padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
+        padding-top: 76px;
+        padding-bottom: calc(90px + env(safe-area-inset-bottom, 12px));
         width: 100%;
         overflow-x: hidden;
+    }
+
+    /* --- CLEAN MOBILE NAVIGATION --- */
+    nav#global-nav {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        background: var(--surface) !important;
+        border-bottom: 1px solid var(--border) !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+        z-index: 1100 !important;
+        height: 60px !important;
+        display: block !important;
+    }
+
+    .nav-top-bar {
+        padding: 0 16px !important;
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+
+    /* Top Bar: Logo & Title ALWAYS visible */
+    .nav-brand-logo {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-right: auto !important;
+    }
+
+    .nav-brand-logo span {
+        display: block !important;
+        font-size: 1.05rem !important;
+        font-weight: 800 !important;
+        color: var(--text-main) !important;
+    }
+
+    /* Top Bar: Hide main menu items */
+    .nav-top-bar .nav-menu-main,
+    .nav-top-bar .nav-divider {
+        display: none !important;
+    }
+
+    /* Top Bar Actions: Dark Mode & Logout */
+    .nav-actions {
+        display: flex !important;
+        gap: 8px !important;
+        margin-left: auto !important;
+    }
+
+    .nav-actions .btn-outline,
+    .nav-actions .btn-small:not([data-action="logout"]) {
+        display: none !important;
+    }
+
+    /* --- Bottom Navigation: Fixed & Clean --- */
+    .nav-bottom-bar {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        z-index: 1100 !important;
+        background: var(--surface) !important;
+        border-top: 1px solid var(--border) !important;
+        padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 8px)) !important;
+        display: flex !important;
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .nav-bottom-bar .nav-menu-main {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        gap: 4px !important;
+    }
+
+    .nav-bottom-bar .nav-menu-main button {
+        flex: 1 !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+        min-height: 52px !important;
+        padding: 6px !important;
+        font-size: 0.72rem !important;
+        border-radius: 12px !important;
+        color: var(--text-muted) !important;
+        background: transparent !important;
+        border: none !important;
+    }
+
+    .nav-bottom-bar .nav-menu-main button i,
+    .nav-bottom-bar .nav-menu-main button svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    .nav-bottom-bar .nav-menu-main button.nav-active {
+        color: var(--primary) !important;
+        background: var(--primary-light) !important;
     }
 
     /* UI Layout Adjustments */
@@ -229,7 +324,7 @@ body.mobile-nav :where(.page:not(#admin-page):not(#landing-page) > main, .page:n
     }
 
     .nav-brand-logo span {
-        display: block !important; /* Keep brand text visible even on small mobile as requested */
+        display: block !important;
     }
 
     .material-card .img-wrapper {
