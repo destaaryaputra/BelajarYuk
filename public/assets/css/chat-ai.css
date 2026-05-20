@@ -108,6 +108,9 @@
 .chat-message {
     max-width: 85%; padding: 12px 18px; font-size: 0.92rem; line-height: 1.6;
     position: relative; transition: all 0.3s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .chat-message.ai-message {
@@ -193,10 +196,26 @@
 /* Markdown styling inside AI messages */
 .ai-message p { margin-bottom: 8px; }
 .ai-message p:last-child { margin-bottom: 0; }
-.ai-message pre { margin: 12px 0; border-radius: 12px; background: #1e293b !important; padding: 12px; overflow-x: auto; }
-.ai-message code { font-weight: 600; color: #059669; font-family: monospace; background: rgba(5, 150, 105, 0.05); padding: 2px 4px; border-radius: 4px; }
+.ai-message pre { 
+    margin: 12px 0; border-radius: 12px; background: #1e293b !important; padding: 12px; 
+    overflow-x: auto; max-width: 100%;
+}
+.ai-message code { 
+    font-weight: 600; color: #059669; font-family: monospace; 
+    background: rgba(5, 150, 105, 0.05); padding: 2px 4px; border-radius: 4px;
+    word-break: break-all;
+}
 .ai-message ul, .ai-message ol { margin-left: 20px; margin-bottom: 8px; }
 .ai-message li { margin-bottom: 4px; }
+.ai-message img { max-width: 100%; height: auto; border-radius: 8px; }
+.ai-message table { 
+    width: 100%; border-collapse: collapse; margin: 12px 0; 
+    display: block; overflow-x: auto; 
+}
+.ai-message th, .ai-message td { 
+    border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; 
+}
+.ai-message th { background: #f9fafb; font-weight: 600; }
 
 /* Scroll Lock for AI Chat */
 html.ai-chat-open,
