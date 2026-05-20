@@ -35,7 +35,6 @@ body.dark-theme { background-image: linear-gradient(180deg, var(--surface-strong
 body.dark-theme nav { background: color-mix(in srgb, var(--surface) 94%, transparent); border-bottom-color: var(--border); }
 body.dark-theme .empty-state.bg-white { background: var(--surface); }
 body.dark-theme .welcome-container { background: linear-gradient(160deg, var(--surface) 0%, var(--surface-strong) 100%); }
-body.dark-theme .welcome-marquee { background: var(--surface); border-color: var(--border); }
 body.dark-theme .ai-chat-header,
 body.dark-theme .ai-chat-input-area,
 body.dark-theme .admin-topbar { background: var(--surface); border-color: var(--border); color: var(--text-main); }

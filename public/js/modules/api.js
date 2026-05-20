@@ -69,7 +69,6 @@ class APIService {
             try {
                 data = text ? JSON.parse(text) : {};
             } catch (parseError) {
-                console.error("DEBUG: Server Response (Bukan JSON):", text);
                 throw new Error("Server error (Bukan JSON).");
             }
 

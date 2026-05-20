@@ -174,18 +174,17 @@ export const UI = {
         
         // 1. Trigger the cinematic Zoom & Blur animation
         splash.classList.add('zoom-blur');
-        console.log('🎥 Cinematic Zoom-Blur Started');
 
         // 2. Fade out the entire overlay slightly after the zoom starts
         setTimeout(() => {
             splash.classList.add('hidden');
         }, fadeDelay);
-        
+
         // 3. Completely remove from DOM after all animations finish
         setTimeout(() => {
             splash.remove();
-            console.log('🌊 Splash Screen Removed');
-        }, removeDelay); 
+        }, removeDelay);
+ 
     },
 
     isSplashVisible() {
