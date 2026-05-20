@@ -723,18 +723,73 @@ export const Admin = {
         UI.showLoading();
         try {
             const res = await API.getAllUsers();
-            const users = (res.data?.users || []).filter(u => u.role === 'student');
+            const allUsers = (res.data?.users || res.data || []).filter(u => u.role === 'student');
             const container = document.getElementById('admin-users-table');
-            let html = '<table class="admin-table"><thead><tr><th>Siswa</th><th>Email</th><th>Aksi</th></tr></thead><tbody>';
-            if (users.length === 0) html += '<tr><td colspan="3" class="text-center">Belum ada siswa.</td></tr>';
-            else {
-                users.forEach(u => {
-                    html += `<tr><td><strong>${UI.escapeHtml(u.full_name)}</strong><br>@${UI.escapeHtml(u.username)}</td><td>${UI.escapeHtml(u.email)}</td>
-                    <td><button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteUser(${u.id})">Hapus</button></td></tr>`;
+            if (!container) return;
+
+            // Creative Initiative: Live Search for Students
+            container.innerHTML = `
+                <div class="mb-16">
+                    <div class="input-with-icon">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="student-search" placeholder="Cari nama atau username siswa..." class="admin-search-input">
+                    </div>
+                </div>
+                <div id="student-list-container"></div>
+            `;
+
+            this.renderStudentList(allUsers);
+
+            const searchInput = document.getElementById('student-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    const filtered = allUsers.filter(u => 
+                        (u.full_name || '').toLowerCase().includes(query) || 
+                        (u.username || '').toLowerCase().includes(query) ||
+                        (u.email || '').toLowerCase().includes(query)
+                    );
+                    this.renderStudentList(filtered);
                 });
             }
-            container.innerHTML = html + '</tbody></table>';
-        } catch (error) { console.error(error); } finally { UI.hideLoading(); }
+
+            if (window.lucide) window.lucide.createIcons();
+        } catch (error) { 
+            console.error(error); 
+        } finally { 
+            UI.hideLoading(); 
+        }
+    },
+
+    renderStudentList(users) {
+        const container = document.getElementById('student-list-container');
+        if (!container) return;
+
+        let html = '<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>No</th><th>Siswa</th><th>Email</th><th class="text-right">Aksi</th></tr></thead><tbody>';
+        if (users.length === 0) {
+            html += '<tr><td colspan="4" class="text-center">Siswa tidak ditemukan.</td></tr>';
+        } else {
+            users.forEach((u, i) => {
+                html += `
+                    <tr>
+                        <td class="text-muted">${i + 1}</td>
+                        <td>
+                            <div class="d-flex align-center gap-12">
+                                <div class="admin-avatar">${(u.full_name || u.username || '?')[0].toUpperCase()}</div>
+                                <div>
+                                    <div class="font-bold">${UI.escapeHtml(u.full_name || u.username)}</div>
+                                    <div class="text-muted small">@${UI.escapeHtml(u.username)}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${UI.escapeHtml(u.email)}</td>
+                        <td class="text-right">
+                            <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteUser(${u.id})">Hapus</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+        container.innerHTML = html + '</tbody></table></div>';
     },
 
     async handleDeleteUser(id) {

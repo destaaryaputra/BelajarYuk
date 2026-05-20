@@ -57,6 +57,28 @@ export const Profile = {
                 </div>
             </div>
 
+            <!-- Creative Initiative: Stats Grid in Profile -->
+            <div class="stats-grid mb-32">
+                <div class="stat-card accent-orange">
+                    <div class="stat-card-row">
+                        <div>
+                            <h3>Semangat Belajar</h3>
+                            <div class="value">${user.streak_count || 0} <span class="value-suffix">Hari</span></div>
+                        </div>
+                        <div class="stat-chip"><i data-lucide="zap"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card accent-blue">
+                    <div class="stat-card-row">
+                        <div>
+                            <h3>Akumulasi Poin</h3>
+                            <div class="value">${user.total_points || 0}</div>
+                        </div>
+                        <div class="stat-chip"><i data-lucide="award"></i></div>
+                    </div>
+                </div>
+            </div>
+
             <div id="profile-display-view">
                 <div class="profile-details-grid">
                     <div class="detail-group">
