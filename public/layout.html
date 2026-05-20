@@ -63,30 +63,57 @@
                 <span>Belajaryuk</span>
             </div>
             <div class="nav-actions">
-                <div class="nav-menu-main">
+                <!-- Desktop Menu -->
+                <div class="nav-menu-main desktop-only">
                     <button type="button" data-page="dashboard-page"><i data-lucide="home"></i> Beranda</button>
                     <button type="button" data-page="materials-page"><i data-lucide="book-open"></i> Materi</button>
                     <button type="button" data-page="progress-page"><i data-lucide="line-chart"></i> Progress</button>
                     <button type="button" data-page="profile-page"><i data-lucide="user"></i> Profil</button>
                 </div>
-                <div class="nav-divider"></div>
+                <div class="nav-divider desktop-only"></div>
+                
                 <button type="button" class="btn-ghost btn-icon-only" data-action="toggle-theme" title="Ganti Tema">
                     <i data-lucide="moon"></i>
                 </button>
-                <button type="button" class="btn-ghost btn-icon-only" data-action="logout" title="Keluar">
+                
+                <!-- Mobile Menu Trigger -->
+                <button type="button" class="btn-ghost btn-icon-only mobile-only" data-action="toggle-sidebar" title="Menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                
+                <button type="button" class="btn-ghost btn-icon-only desktop-only" data-action="logout" title="Keluar">
                     <i data-lucide="log-out"></i>
                 </button>
             </div>
         </div>
-        <div class="nav-bottom-bar mobile-only">
-            <div class="nav-menu-main">
-                <button type="button" data-page="dashboard-page"><i data-lucide="home"></i> Beranda</button>
-                <button type="button" data-page="materials-page"><i data-lucide="book-open"></i> Materi</button>
-                <button type="button" data-page="progress-page"><i data-lucide="line-chart"></i> Progress</button>
-                <button type="button" data-page="profile-page"><i data-lucide="user"></i> Profil</button>
-                <button type="button" data-action="logout"><i data-lucide="log-out"></i> Keluar</button>
+
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebar-overlay" class="sidebar-overlay mobile-only"></div>
+        
+        <!-- Mobile Sidebar -->
+        <aside id="mobile-sidebar" class="mobile-sidebar mobile-only">
+            <div class="sidebar-header">
+                <div class="nav-brand-logo">
+                    <div class="nav-logo-wrapper">
+                        <div class="css-art-logo"></div>
+                    </div>
+                    <span>Menu</span>
+                </div>
+                <button type="button" class="btn-ghost btn-icon-only" data-action="toggle-sidebar">
+                    <i data-lucide="x"></i>
+                </button>
             </div>
-        </div>
+            <div class="sidebar-content">
+                <div class="nav-menu-vertical">
+                    <button type="button" data-page="dashboard-page"><i data-lucide="home"></i> Beranda</button>
+                    <button type="button" data-page="materials-page"><i data-lucide="book-open"></i> Materi</button>
+                    <button type="button" data-page="progress-page"><i data-lucide="line-chart"></i> Progress</button>
+                    <button type="button" data-page="profile-page"><i data-lucide="user"></i> Profil</button>
+                    <div class="sidebar-divider"></div>
+                    <button type="button" data-action="logout" class="text-danger"><i data-lucide="log-out"></i> Keluar</button>
+                </div>
+            </div>
+        </aside>
     </nav>
 
     <!-- Main App Container -->

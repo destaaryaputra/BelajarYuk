@@ -10,12 +10,22 @@ export const UI = {
             if (navBtn) {
                 const pageId = navBtn.getAttribute('data-page');
                 window.location.hash = pageId;
+                
+                // Close sidebar if a link is clicked
+                this.closeSidebar();
             }
 
             // Theme Toggle Listener
             const themeBtn = e.target.closest('[data-action="toggle-theme"]');
             if (themeBtn) {
                 this.toggleTheme();
+            }
+
+            // Sidebar Toggle Listener
+            const sidebarBtn = e.target.closest('[data-action="toggle-sidebar"]');
+            const overlay = e.target.closest('#sidebar-overlay');
+            if (sidebarBtn || overlay) {
+                this.toggleSidebar();
             }
 
             // Password Toggle Listener
@@ -111,7 +121,7 @@ export const UI = {
             document.body.classList.remove('admin-mode');
 
             // Update active state in student navigation
-            const navButtons = globalNav.querySelectorAll('.nav-menu-main button');
+            const navButtons = globalNav.querySelectorAll('.nav-menu-main button, .nav-menu-vertical button');
             navButtons.forEach(btn => {
                 const btnPage = btn.getAttribute('data-page');
                 if (btnPage === hash) {
@@ -123,6 +133,7 @@ export const UI = {
             this.updateDeviceMode();
         } else {
             globalNav.classList.add('d-none');
+            this.closeSidebar(); // Ensure sidebar is closed when nav is hidden
 
             // Tambahkan admin-mode class ke body jika di halaman admin
             if (isAdminPage) {
@@ -132,6 +143,32 @@ export const UI = {
             }
         }
     },
+
+    toggleSidebar() {
+        const sidebar = document.getElementById('mobile-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (!sidebar || !overlay) return;
+
+        const isActive = sidebar.classList.toggle('is-active');
+        overlay.classList.toggle('is-active', isActive);
+
+        if (isActive) {
+            document.body.style.overflow = 'hidden'; // Prevent scroll when open
+        } else {
+            document.body.style.overflow = '';
+        }
+    },
+
+    closeSidebar() {
+        const sidebar = document.getElementById('mobile-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (!sidebar || !overlay) return;
+
+        sidebar.classList.remove('is-active');
+        overlay.classList.remove('is-active');
+        document.body.style.overflow = '';
+    },
+    
     initScrollReveal() {
         const observerOptions = {
             threshold: 0.1,
