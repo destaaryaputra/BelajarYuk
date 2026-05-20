@@ -487,24 +487,25 @@
 .mobile-detail-tabs .tab-btn {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Aligned in one row */
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 10px 4px;
+    gap: 8px;
+    padding: 12px 6px;
     border: none;
     background: transparent;
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.82rem; /* Slightly larger for better readability in row layout */
     font-weight: 700;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
+    white-space: nowrap; /* Prevent text wrapping */
 }
 
 .mobile-detail-tabs .tab-btn i {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .mobile-detail-tabs .tab-btn.active {
