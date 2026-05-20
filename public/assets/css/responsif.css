@@ -105,14 +105,61 @@
     /* UI Layout Adjustments */
     .dashboard-header {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        margin-bottom: 20px;
+        align-items: stretch;
+        gap: 16px;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+        margin-top: 4px;
     }
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .stat-card h3 {
+        font-size: 0.7rem;
+        margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+        font-size: 1.4rem;
+    }
+
+    .stat-chip {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    /* Handle 3rd stat card full width or adjust grid */
+    .stats-grid > div:last-child:nth-child(odd) {
+        grid-column: span 2;
+    }
+
+    .featured-course-card {
+        display: flex !important;
+        flex-direction: column-reverse;
+        border-radius: 20px;
+    }
+
+    .featured-course-copy {
+        padding: 20px 16px;
+    }
+
+    .featured-course-media {
+        height: 160px;
+        min-height: unset;
     }
 
     #materials-list,
@@ -181,6 +228,64 @@
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .learning-detail-page-shell {
+        gap: 0;
+    }
+
+    #material-detail {
+        min-height: auto;
+        padding: 0 !important;
+    }
+
+    #material-detail article.content-card {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        padding: 24px 16px;
+    }
+
+    .display-title {
+        font-size: 1.6rem !important;
+    }
+
+    .pdf-container {
+        margin: 0 -16px 24px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .syllabus-item {
+        padding: 14px;
+        border-radius: 14px;
+        background: var(--surface-muted);
+        margin-bottom: 4px;
+    }
+
+    .syllabus-index {
+        width: 32px;
+        height: 32px;
+    }
+
+    .discussion-section {
+        padding: 24px 16px !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    .comment-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+
+    .input-with-btn {
+        padding: 8px 12px;
+        border-radius: 14px;
     }
 
     /* Prevent overflow in grid/flex children */
