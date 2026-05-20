@@ -19,15 +19,6 @@ nav {
     gap: 16px;
 }
 
-.nav-bottom-bar {
-    display: none; /* Hidden by default, shown on mobile via responsif.css */
-    max-width: var(--container-width);
-    margin: 0 auto;
-    padding: 0 var(--container-padding) 12px;
-    align-items: center;
-    gap: 8px;
-}
-
 .nav-brand-logo {
     display: flex;
     align-items: center;
@@ -135,8 +126,4 @@ nav button svg {
     height: 24px;
     background: var(--border);
     margin: 0 4px;
-}
-
-.mobile-only {
-    display: none;
 }

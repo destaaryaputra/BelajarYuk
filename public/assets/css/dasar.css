@@ -211,3 +211,13 @@ p {
 .text-center { text-align: center !important; }
 .text-right { text-align: right !important; }
 .w-full { width: 100% !important; }
+
+/* --- Visibility Utilities --- */
+.desktop-only { display: flex !important; }
+@media (max-width: 1024px) {
+    .desktop-only { display: none !important; }
+}
+.mobile-only { display: none !important; }
+@media (max-width: 1024px) {
+    .mobile-only { display: block !important; }
+}
