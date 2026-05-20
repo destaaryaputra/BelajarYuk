@@ -111,6 +111,19 @@ nav button svg {
     margin-left: auto;
 }
 
+.nav-actions .btn-icon-only {
+    padding: 0;
+    min-height: 40px;
+    width: 40px;
+    border-radius: 50%;
+}
+
+.nav-actions .btn-icon-only i,
+.nav-actions .btn-icon-only svg {
+    width: 20px;
+    height: 20px;
+}
+
 .nav-menu-main {
     display: flex;
     align-items: center;
