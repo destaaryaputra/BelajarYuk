@@ -535,6 +535,12 @@
     flex-wrap: nowrap; /* keep back button and tabs on same line */
 }
 
+/* Group for material and episode buttons placed beside back button */
+.tab-group {
+    display: flex;
+    gap: 4px;
+}
+
 .btn-back-material {
     width: 38px;
     height: 38px;
@@ -564,6 +570,13 @@
 }
 
 /* Integrated Mobile Tabs */
+@media (max-width: 1024px) {
+  .mobile-detail-tabs .tab-btn {
+    padding: 4px 4px !important;
+    font-size: 0.76rem !important;
+    border-radius: 6px !important;
+  }
+}
 .mobile-detail-tabs.mobile-only {
     display: flex;
     flex-direction: row; 
