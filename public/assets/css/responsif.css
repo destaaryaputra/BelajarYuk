@@ -248,15 +248,7 @@
         gap: 4px !important; /* ensure reduced spacing on mobile */
     }
 
-    .mobile-detail-tabs.mobile-only {
-        max-width: none;
-    }
-
-    .mobile-detail-tabs .tab-btn {
-        padding: 4px 4px !important; /* tighter button */
-        font-size: 0.76rem !important;
-        border-radius: 6px !important;
-    }
+    
 
     .toolbar-divider {
         height: 16px;
