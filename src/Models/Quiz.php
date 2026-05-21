@@ -67,7 +67,7 @@ class Quiz {
      */
     public function getQuestionsByQuizId(int $quiz_id): array {
         try {
-            $query = "SELECT id, quiz_id, question_text, question_type, options, correct_answer, points 
+            $query = "SELECT id, quiz_id, question_text, question_type, options, correct_answer, COALESCE(points,0) AS points 
                      FROM pertanyaan 
                      WHERE quiz_id = ? AND status = 'active' 
                      ORDER BY order_number ASC";
