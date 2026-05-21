@@ -400,6 +400,9 @@ export const MaterialDetail = {
 
         // 2. Setup listeners
         const maybeRedirectToMiniQuiz = async () => {
+            // Avoid repeated prompts if user previously declined the mini‑quiz for this sub‑material
+            const skipKey = `mini_quiz_skipped_${active.id}`;
+            if (localStorage.getItem(skipKey)) return false;
             if (active.isMain) return false;
             try {
                 const quizRes = await API.getQuiz(materialId, active.id);
@@ -418,6 +421,9 @@ export const MaterialDetail = {
                 if (goQuiz) {
                     window.location.hash = 'quiz-page';
                     return true;
+                } else {
+                    // Record that user declined the mini‑quiz for this episode
+                    localStorage.setItem(`mini_quiz_skipped_${active.id}`, '1');
                 }
             } catch (error) {
                 console.error('Mini quiz check error:', error);
