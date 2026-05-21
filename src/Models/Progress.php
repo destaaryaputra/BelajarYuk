@@ -67,6 +67,14 @@ class Progress {
      * Get user learning progress summary
      */
     public function getUserProgressSummary(int $user_id): ?array {
+        // Simple APCu cache (30 seconds) to reduce DB load on frequent dashboard loads
+        $cacheKey = "progress_summary_{$user_id}";
+        if (function_exists('apcu_fetch')) {
+            $cached = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($cached)) {
+                return $cached;
+            }
+        }
         try {
             // New Sync Logic: Get all detailed material progress first
             $materials = $this->getDetailedMaterialProgress($user_id);
@@ -99,7 +107,7 @@ class Progress {
             // Overall percentage is now average of all material percentages
             $completion_percentage = ($total_materials > 0) ? ($sum_percentages / $total_materials) : 0;
 
-            return [
+            $summaryData = [
                 'materials_completed' => $materials_completed,
                 'total_materials' => $total_materials,
                 'quizzes_completed' => (int) ($quizData['quizzes_completed'] ?? 0),
@@ -107,6 +115,11 @@ class Progress {
                 'total_points' => (int) ($quizData['total_points'] ?? 0),
                 'completion_percentage' => round($completion_percentage, 0)
             ];
+            // Store in APCu cache for 30 seconds to reduce DB load on frequent dashboard calls
+            if (function_exists('apcu_store')) {
+                apcu_store($cacheKey, $summaryData, 30);
+            }
+            return $summaryData;
         } catch (Exception $e) {
             error_log("Get user progress summary error: " . $e->getMessage());
             return null;

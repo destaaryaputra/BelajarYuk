@@ -432,7 +432,15 @@ export const MaterialDetail = {
             try {
                 const payload = { material_id: materialId };
                 if (!active.isMain) payload.sub_material_id = active.id;
-                await API.post('/materials/mark-completed', payload);
+                // Wrap API call to catch network or validation errors
+                try {
+                    await API.post('/materials/mark-completed', payload);
+                } catch (apiErr) {
+                    console.error('Mark completed API error:', apiErr);
+                    // Notify user of failure; keep UI loading hidden by returning false
+                    UI.showNotification(apiErr.message || 'Gagal menandai materi selesai.', 'error');
+                    return false;
+                }
                 
                 // Update local state
                 if (!active.isMain) {
@@ -461,6 +469,7 @@ export const MaterialDetail = {
                 return true;
             } catch (error) {
                 console.error('Auto-complete error:', error);
+                UI.showNotification('Terjadi kesalahan saat menyimpan progres.', 'error');
                 return false;
             }
         };
