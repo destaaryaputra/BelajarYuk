@@ -249,16 +249,21 @@ export const Admin = {
         }
         let html = '<div class="admin-mini-list">';
         users.forEach(u => {
+            const initial = (u.full_name || u.username || '?')[0].toUpperCase();
             html += `
                 <div class="admin-mini-item">
-                    <div class="admin-avatar">${(u.full_name || u.username || '?')[0].toUpperCase()}</div>
+                    <div class="admin-avatar">${UI.escapeHtml(initial)}</div>
                     <div class="admin-mini-main">
                         <strong>${UI.escapeHtml(u.full_name || u.username)}</strong>
                         <span>${UI.escapeHtml(u.email)}</span>
                     </div>
+                    <div class="text-muted small ml-auto desktop-only">
+                        <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                    </div>
                 </div>`;
         });
         container.innerHTML = html + '</div>';
+        if (window.lucide) window.lucide.createIcons();
     },
 
     renderRecentMaterials(materials) {
@@ -272,7 +277,7 @@ export const Admin = {
         materials.forEach(m => {
             html += `
                 <div class="admin-mini-item">
-                    <div class="admin-course-mark">M</div>
+                    <span class="admin-course-mark"><i data-lucide="book-open"></i></span>
                     <div class="admin-mini-main">
                         <strong>${UI.escapeHtml(m.title)}</strong>
                         <span>${UI.escapeHtml(m.category || 'Umum')}</span>
@@ -280,6 +285,7 @@ export const Admin = {
                 </div>`;
         });
         container.innerHTML = html + '</div>';
+        if (window.lucide) window.lucide.createIcons();
     },
 
     async renderRecentComments() {
@@ -300,14 +306,18 @@ export const Admin = {
                 const initial = (author && author[0] ? author[0] : '?').toUpperCase();
                 html += `
                     <div class="admin-mini-item">
-                        <div class="admin-avatar">${UI.escapeHtml(initial)}</div>
+                        <div class="admin-avatar admin-avatar-bg"><i data-lucide="message-square" style="width: 14px; height: 14px;"></i></div>
                         <div class="admin-mini-main">
-                            <strong>${UI.escapeHtml(author)}</strong>
+                            <div class="d-flex align-center gap-8">
+                                <strong>${UI.escapeHtml(author)}</strong>
+                                <span class="text-muted small">• ${c.created_at ? new Date(c.created_at).toLocaleDateString() : ''}</span>
+                            </div>
                             <span>${UI.escapeHtml(c.comment_text || '').slice(0, 80)}</span>
                         </div>
                     </div>`;
             });
             container.innerHTML = html + '</div>';
+            if (window.lucide) window.lucide.createIcons();
         } catch (error) {
             console.error(error);
             container.innerHTML = '<p class="text-muted">Gagal memuat diskusi terbaru.</p>';
@@ -334,10 +344,10 @@ export const Admin = {
                             <td><span class="badge badge-student">${UI.escapeHtml(m.category || 'Umum')}</span></td>
                             <td class="text-right">
                                 <div class="d-flex justify-end gap-8">
-                                    <button class="btn-outline btn-small" onclick="Admin.openQuizView(${m.id}, '${UI.escapeHtml(m.title)}')">Kuis</button>
-                                    <button class="btn-outline btn-small" onclick="Admin.openSubMaterialView(${m.id}, '${UI.escapeHtml(m.title)}')">Episode</button>
-                                    <button class="btn-outline btn-small" onclick="Admin.handleEditMaterial(${m.id})">Edit</button>
-                                    <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteMaterial(${m.id})">Hapus</button>
+                                    <button class="btn-outline btn-small" onclick="Admin.openQuizView(${m.id}, '${UI.escapeHtml(m.title)}')" title="Kelola Kuis"><i data-lucide="help-circle"></i></button>
+                                    <button class="btn-outline btn-small" onclick="Admin.openSubMaterialView(${m.id}, '${UI.escapeHtml(m.title)}')" title="Kelola Episode"><i data-lucide="layers"></i></button>
+                                    <button class="btn-outline btn-small" onclick="Admin.handleEditMaterial(${m.id})" title="Edit Materi"><i data-lucide="edit-3"></i></button>
+                                    <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteMaterial(${m.id})" title="Hapus Materi"><i data-lucide="trash-2"></i></button>
                                 </div>
                             </td>
                         </tr>`;
@@ -414,17 +424,20 @@ export const Admin = {
             const res = await API.getSubMaterialsAdmin(materialId);
             this.currentSubMaterials = res.data || [];
             const container = document.getElementById('admin-submaterials-table');
-            let html = '<table class="admin-table"><thead><tr><th>Part</th><th>Judul</th><th>Aksi</th></tr></thead><tbody>';
+            let html = '<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>Part</th><th>Judul</th><th class="text-right">Aksi</th></tr></thead><tbody>';
             if (this.currentSubMaterials.length === 0) html += '<tr><td colspan="3" class="text-center">Kosong.</td></tr>';
             else {
                 this.currentSubMaterials.forEach((s, i) => {
-                    html += `<tr><td>${i+1}</td><td>${UI.escapeHtml(s.title)}</td><td>
-                        <button class="btn-outline btn-small" onclick="Admin.handleEditSubMat(${s.id})">Edit</button>
-                        <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteSubMat(${s.id}, ${materialId})">Hapus</button>
+                    html += `<tr><td class="text-muted">${i+1}</td><td class="font-medium">${UI.escapeHtml(s.title)}</td><td class="text-right">
+                        <div class="d-flex justify-end gap-8">
+                            <button class="btn-outline btn-small" onclick="Admin.handleEditSubMat(${s.id})" title="Edit Episode"><i data-lucide="edit-3"></i></button>
+                            <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteSubMat(${s.id}, ${materialId})" title="Hapus Episode"><i data-lucide="trash-2"></i></button>
+                        </div>
                     </td></tr>`;
                 });
             }
-            container.innerHTML = html + '</tbody></table>';
+            container.innerHTML = html + '</tbody></table></div>';
+            if (window.lucide) window.lucide.createIcons();
         } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
 
@@ -522,8 +535,8 @@ export const Admin = {
                         <td>${q.total_questions} Soal</td>
                         <td class="text-right">
                             <div class="d-flex justify-end gap-8">
-                                <button class="btn-outline btn-small" onclick="Admin.manageQuizQuestions(${q.id}, '${UI.escapeHtml(q.title)}')">Kelola Soal</button>
-                                <button class="btn-outline btn-small" onclick="Admin.editQuizConfig(${q.id})">Setting</button>
+                                <button class="btn-outline btn-small" onclick="Admin.manageQuizQuestions(${q.id}, '${UI.escapeHtml(q.title)}')" title="Kelola Soal"><i data-lucide="list"></i></button>
+                                <button class="btn-outline btn-small" onclick="Admin.editQuizConfig(${q.id})" title="Pengaturan Kuis"><i data-lucide="settings"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -661,15 +674,16 @@ export const Admin = {
         try {
             const res = await API.getQuizQuestions(quizId);
             const qs = res.data || [];
-            let html = '<table class="admin-table"><thead><tr><th>No</th><th>Soal</th><th class="text-right">Aksi</th></tr></thead><tbody>';
+            let html = '<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>No</th><th>Soal</th><th class="text-right">Aksi</th></tr></thead><tbody>';
             
             if (qs.length === 0) html += '<tr><td colspan="3" class="text-center p-24 text-muted">Belum ada soal. Klik Tambah Soal untuk memulai.</td></tr>';
             else {
                 qs.forEach((q, i) => {
-                    html += `<tr><td>${i+1}</td><td>${UI.escapeHtml(q.question_text)}</td><td class="text-right"><button class="btn-outline btn-text-danger btn-small" onclick="Admin.deleteQuestion(${q.id}, ${quizId})">Hapus</button></td></tr>`;
+                    html += `<tr><td class="text-muted">${i+1}</td><td>${UI.escapeHtml(q.question_text)}</td><td class="text-right"><button class="btn-outline btn-text-danger btn-small" onclick="Admin.deleteQuestion(${q.id}, ${quizId})" title="Hapus Soal"><i data-lucide="trash-2"></i></button></td></tr>`;
                 });
             }
-            container.innerHTML = html + '</tbody></table>';
+            container.innerHTML = html + '</tbody></table></div>';
+            if (window.lucide) window.lucide.createIcons();
         } catch (error) { 
             console.error(error);
             container.innerHTML = '<p class="text-danger">Gagal memuat soal.</p>';
@@ -784,27 +798,32 @@ export const Admin = {
         if (users.length === 0) {
             html += '<tr><td colspan="4" class="text-center">Siswa tidak ditemukan.</td></tr>';
         } else {
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
             users.forEach((u, i) => {
+                const color = colors[u.id % colors.length];
                 html += `
                     <tr>
                         <td class="text-muted">${i + 1}</td>
                         <td>
                             <div class="d-flex align-center gap-12">
-                                <div class="admin-avatar">${(u.full_name || u.username || '?')[0].toUpperCase()}</div>
+                                <div class="admin-avatar" style="background: ${color}20; color: ${color}; border-color: ${color}40">
+                                    ${UI.escapeHtml((u.full_name || u.username || '?')[0].toUpperCase())}
+                                </div>
                                 <div>
                                     <div class="font-bold">${UI.escapeHtml(u.full_name || u.username)}</div>
                                     <div class="text-muted small">@${UI.escapeHtml(u.username)}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>${UI.escapeHtml(u.email)}</td>
+                        <td><span class="text-muted">${UI.escapeHtml(u.email)}</span></td>
                         <td class="text-right">
-                            <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteUser(${u.id})">Hapus</button>
+                            <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteUser(${u.id})" title="Hapus Siswa"><i data-lucide="user-minus"></i></button>
                         </td>
                     </tr>`;
             });
         }
         container.innerHTML = html + '</tbody></table></div>';
+        if (window.lucide) window.lucide.createIcons();
     },
 
     async handleDeleteUser(id) {
@@ -821,12 +840,12 @@ export const Admin = {
             const comments = res.data || [];
             const container = document.getElementById('admin-tab-diskusi');
             if (!container) return;
-            let html = '<div class="content-card"><h3>Moderasi Forum</h3><p class="text-muted mb-16">Pantau komentar siswa dan hapus konten yang tidak sesuai.</p><div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>Siswa</th><th>Komentar</th><th>Aksi</th></tr></thead><tbody>';
+            let html = '<div class="content-card"><h3>Moderasi Forum</h3><p class="text-muted mb-16">Pantau komentar siswa dan hapus konten yang tidak sesuai.</p><div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>Siswa</th><th>Komentar</th><th class="text-right">Aksi</th></tr></thead><tbody>';
             if (comments.length === 0) html += '<tr><td colspan="3" class="text-center">Kosong.</td></tr>';
             else {
                 comments.forEach(c => {
-                    html += `<tr><td>${UI.escapeHtml(c.username)}</td><td>${UI.escapeHtml(c.comment_text)}</td>
-                    <td><button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteComment(${c.id})">Hapus</button></td></tr>`;
+                    html += `<tr><td class="font-bold">${UI.escapeHtml(c.username)}</td><td>${UI.escapeHtml(c.comment_text)}</td>
+                    <td class="text-right"><button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteComment(${c.id})" title="Hapus Komentar"><i data-lucide="trash-2"></i></button></td></tr>`;
                 });
             }
             container.innerHTML = html + '</tbody></table></div></div>';
@@ -852,9 +871,24 @@ export const Admin = {
 
             let html = `
                 <div class="stats-grid admin-primary-metrics mb-16">
-                    <div class="stat-card"><h3>Total Percobaan</h3><div class="value">${Number(summary.total_attempts || 0)}</div></div>
-                    <div class="stat-card"><h3>Rata-rata Nilai</h3><div class="value">${Math.round(Number(summary.avg_score || 0))}%</div></div>
-                    <div class="stat-card"><h3>Nilai Tertinggi</h3><div class="value">${Math.round(Number(summary.highest_score || 0))}%</div></div>
+                    <div class="stat-card">
+                        <div class="stat-card-row">
+                            <div><h3>Total Percobaan</h3><div class="value">${Number(summary.total_attempts || 0)}</div></div>
+                            <div class="stat-chip accent-blue"><i data-lucide="activity"></i></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-row">
+                            <div><h3>Rata-rata Nilai</h3><div class="value">${Math.round(Number(summary.avg_score || 0))}%</div></div>
+                            <div class="stat-chip accent-green"><i data-lucide="line-chart"></i></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-row">
+                            <div><h3>Nilai Tertinggi</h3><div class="value">${Math.round(Number(summary.highest_score || 0))}%</div></div>
+                            <div class="stat-chip accent-orange"><i data-lucide="trophy"></i></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="admin-dashboard-grid mb-16">
                     <div class="content-card chart-card">
@@ -865,21 +899,21 @@ export const Admin = {
                         <h3>Insight Cepat</h3>
                         <div class="admin-mini-list">
                             <div class="admin-mini-item">
-                                <span class="admin-course-mark"><i data-lucide="award"></i></span>
+                                <span class="admin-course-mark accent-orange-bg"><i data-lucide="award"></i></span>
                                 <div class="admin-mini-main">
                                     <strong>${UI.escapeHtml(topQuiz.quiz_title || 'Belum ada data')}</strong>
                                     <span>Kuis dengan rata-rata tertinggi (${Math.round(Number(topQuiz.avg_score || 0))}%)</span>
                                 </div>
                             </div>
                             <div class="admin-mini-item">
-                                <span class="admin-course-mark"><i data-lucide="check-circle-2"></i></span>
+                                <span class="admin-course-mark accent-green-bg"><i data-lucide="check-circle-2"></i></span>
                                 <div class="admin-mini-main">
                                     <strong>${totalPassed}</strong>
                                     <span>Total kelulusan dari seluruh kuis</span>
                                 </div>
                             </div>
                             <div class="admin-mini-item">
-                                <span class="admin-course-mark"><i data-lucide="activity"></i></span>
+                                <span class="admin-course-mark accent-blue-bg"><i data-lucide="users"></i></span>
                                 <div class="admin-mini-main">
                                     <strong>${averageAttempts}</strong>
                                     <span>Rata-rata percobaan per kuis</span>
