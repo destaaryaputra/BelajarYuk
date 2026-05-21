@@ -414,6 +414,10 @@ export const MaterialDetail = {
                 if (alreadyAttempted) return false;
 
                 localStorage.setItem('active_sub_material_id', String(active.id));
+                
+                // CRITICAL FIX: Hide loading BEFORE showing the confirm dialog
+                UI.hideLoading();
+                
                 const goQuiz = await UI.confirm(
                     'Ada kuis mini untuk episode ini. Kerjakan sekarang untuk membuka episode berikutnya?',
                     'Uji Pemahaman'
