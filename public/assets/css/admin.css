@@ -184,6 +184,13 @@ body.admin-mode {
     color: var(--danger) !important;
 }
 
+/* Force hide mobile-only buttons in admin topbar on desktop */
+@media (min-width: 1025px) {
+    .admin-topbar .btn-icon-only.mobile-only {
+        display: none !important;
+    }
+}
+
 .admin-content {
     flex: 1;
     padding: 24px;
