@@ -177,7 +177,37 @@ export const Quiz = {
         document.getElementById('result-icon-box').innerHTML = `<i data-lucide="${isPassed ? 'award' : 'alert-circle'}" class="icon-xl"></i>`;
         
         document.getElementById('result-points').textContent = `+ ${data.total_points || 0}`;
-        document.getElementById('btn-finish-quiz').textContent = isPassed ? 'Lanjut Belajar' : 'Kembali ke Materi';
+        const finishBtn = document.getElementById('btn-finish-quiz');
+        finishBtn.textContent = isPassed ? 'Lanjut Belajar' : 'Kembali ke Materi';
+
+        finishBtn.onclick = async () => {
+            if (isPassed && this.state.quiz.quiz_type === 'mini') {
+                // Smart Navigation: Find next episode after mini quiz success
+                try {
+                    const res = await API.getMaterialDetail(this.state.materialId);
+                    const material = res.data?.material || {};
+                    const subs = Array.isArray(material.sub_materials) ? material.sub_materials : [];
+                    
+                    // Filter based on UI logic (video or doc)
+                    const validSubs = subs.filter(s => 
+                        (s.video_url && s.video_url.trim() !== '') || 
+                        (s.document_url && s.document_url.trim() !== '')
+                    );
+
+                    const currentIndex = validSubs.findIndex(s => String(s.id) === String(this.state.subMaterialId));
+                    if (currentIndex !== -1 && currentIndex < validSubs.length - 1) {
+                        const nextEpisode = validSubs[currentIndex + 1];
+                        localStorage.setItem('active_sub_material_id', String(nextEpisode.id));
+                    } else {
+                        // If no next episode, clear sub_id to let MaterialDetail pick logic
+                        localStorage.removeItem('active_sub_material_id');
+                    }
+                } catch (e) {
+                    console.error('Failed to find next episode:', e);
+                }
+            }
+            window.location.hash = 'material-detail-page';
+        };
 
         if (window.lucide) window.lucide.createIcons();
         

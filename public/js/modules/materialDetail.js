@@ -54,8 +54,13 @@ export const MaterialDetail = {
             
             this.state.quiz = quizRes.data || null;
 
-            // Senior UX Logic: Selalu arahkan ke hal pertama yang BELUM selesai
-            if (!this.state.material.is_completed) {
+            // Senior UX Logic: Selalu arahkan ke episode yang sedang aktif di localStorage (jika ada)
+            // Ini penting agar saat kembali dari kuis mini, user tetap di episode tersebut.
+            const storedSubId = localStorage.getItem('active_sub_material_id');
+            
+            if (storedSubId && this.state.subMaterials.some(s => String(s.id) === String(storedSubId))) {
+                this.state.activeItemId = String(storedSubId);
+            } else if (!this.state.material.is_completed) {
                 this.state.activeItemId = 'main';
             } else if (this.state.subMaterials.length > 0) {
                 const firstIncomplete = this.state.subMaterials.find(s => !this.state.completedEpisodes.includes(String(s.id)));
