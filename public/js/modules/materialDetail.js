@@ -431,7 +431,7 @@ export const MaterialDetail = {
             return false;
         };
 
-        const markCurrentComplete = async (silent = false) => {
+        const markCurrentComplete = async (silent = false, checkMiniQuiz = true) => {
             if (isCompleted) {
                 const redirected = await maybeRedirectToMiniQuiz();
                 return !redirected;
@@ -458,8 +458,8 @@ export const MaterialDetail = {
                     this.state.material.is_completed = true;
                 }
 
-                // Check mini quiz right after this episode is completed
-                if (!active.isMain) {
+                // Optionally check mini quiz after completing this episode
+                if (!active.isMain && checkMiniQuiz) {
                     const redirected = await maybeRedirectToMiniQuiz();
                     if (redirected) return false;
                 }
