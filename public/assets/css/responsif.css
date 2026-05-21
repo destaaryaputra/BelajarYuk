@@ -330,8 +330,14 @@
     }
 
     .input-with-btn {
+        align-items: center; /* center button vertically */
         padding: 8px 12px;
         border-radius: 14px;
+    }
+    .comment-submit-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
     }
 
     /* Prevent overflow in grid/flex children */
