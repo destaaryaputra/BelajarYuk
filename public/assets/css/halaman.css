@@ -593,8 +593,6 @@
     flex-shrink: 0;
 }
 
-/* Integrated Mobile Tabs removed - no longer needed */
-
  .toolbar-info {
     display: flex;
     flex-direction: column;

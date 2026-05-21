@@ -32,7 +32,6 @@
     /* Tab visibility logic */
     .learning-detail-page-shell:not([data-active-tab="content"]) #material-detail article { display: none; }
     .learning-detail-page-shell:not([data-active-tab="syllabus"]) #course-syllabus { display: none; }
-    /* .learning-detail-page-shell:not([data-active-tab="comments"]) #comments-section-container { display: none; } */
     
     /* Ensure video player stays visible if it's the 'active' content */
     .learning-detail-page-shell[data-active-tab="content"] #material-detail { display: flex; }
