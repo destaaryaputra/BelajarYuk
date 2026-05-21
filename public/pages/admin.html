@@ -44,17 +44,28 @@
 
     <main class="admin-main">
         <header class="admin-topbar">
-            <div class="nav-brand-logo">
+            <!-- Desktop: Page Title -->
+            <h2 id="admin-page-title" class="desktop-only">Panel Admin</h2>
+
+            <!-- Mobile: Logo (Sidebar is hidden by default on mobile) -->
+            <div class="nav-brand-logo mobile-only">
                 <div class="nav-logo-wrapper">
                     <div class="css-art-logo"></div>
                 </div>
                 <span>Belajaryuk</span>
             </div>
+
             <div class="nav-actions">
                 <button type="button" class="btn-icon-only theme-toggle-btn" data-action="toggle-theme" title="Ganti Tema">
                     <i data-lucide="moon"></i>
                 </button>
-                <button type="button" class="btn-icon-only" onclick="Admin.toggleSidebar(true)" title="Buka Menu">
+                
+                <!-- Quick Logout Shortcut -->
+                <button type="button" class="btn-icon-only text-danger" data-action="logout" title="Keluar Panel">
+                    <i data-lucide="log-out"></i>
+                </button>
+
+                <button type="button" class="btn-icon-only mobile-only" onclick="Admin.toggleSidebar(true)" title="Buka Menu">
                     <i data-lucide="menu"></i>
                 </button>
             </div>

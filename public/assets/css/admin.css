@@ -84,6 +84,7 @@ body.admin-mode {
     stroke-width: 2.2px;
 }
 
+/* Sidebar Footer & Logout */
 .admin-sidebar-footer {
     padding: 16px;
     border-top: 1px solid var(--border);
@@ -91,9 +92,9 @@ body.admin-mode {
 
 .btn-logout-admin {
     width: 100%;
-    min-height: 44px;
+    min-height: 48px;
     padding: 10px 16px;
-    background: transparent;
+    background: var(--danger-soft);
     color: var(--danger);
     border: 1px solid transparent;
     border-radius: 12px;
@@ -103,10 +104,18 @@ body.admin-mode {
     align-items: center;
     justify-content: flex-start;
     gap: 12px;
+    transition: all 0.2s ease;
 }
 
 .btn-logout-admin:hover {
-    background: color-mix(in srgb, var(--danger) 8%, transparent);
+    background: var(--danger);
+    color: white;
+}
+
+.btn-logout-admin i,
+.btn-logout-admin svg {
+    width: 20px;
+    height: 20px;
 }
 
 .admin-main {
@@ -128,19 +137,20 @@ body.admin-mode {
     position: sticky;
     top: 0;
     z-index: 2000;
-    box-shadow: 0 4px 20px -10px rgba(0, 0, 0, 0.05);
 }
 
-.admin-topbar h2 {
+#admin-page-title {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.02em;
 }
 
-.admin-topbar-actions {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 700;
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Neutral Style for Admin Buttons (No Green Background) */
@@ -150,12 +160,28 @@ body.admin-mode {
     color: var(--text-muted) !important;
     border: none !important;
     box-shadow: none !important;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .admin-sidebar .btn-icon-only:hover,
 .admin-topbar .btn-icon-only:hover {
     background: var(--surface-hover) !important;
     color: var(--text-main) !important;
+}
+
+.admin-topbar .btn-icon-only.text-danger {
+    color: var(--danger) !important;
+}
+
+.admin-topbar .btn-icon-only.text-danger:hover {
+    background: var(--danger-soft) !important;
+    color: var(--danger) !important;
 }
 
 .admin-content {
