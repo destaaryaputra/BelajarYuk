@@ -253,8 +253,8 @@ class Progress {
                         pm.progress_percentage
                       FROM progres_materi pm
                       JOIN materi m ON pm.material_id = m.id
-                      WHERE pm.user_id = :uid AND m.status = 'active'
-                      ORDER BY pm.completed_at DESC
+                      WHERE pm.user_id = :uid AND m.status = 'active' AND pm.progress_percentage >= 100
+                      ORDER BY COALESCE(pm.completed_at, pm.last_accessed_at) DESC
                       LIMIT :limit";
 
             $stmt = $this->db->prepare($query);
@@ -312,11 +312,12 @@ class Progress {
                         GROUP BY user_id
                       ) utp ON u.id = utp.user_id
                       LEFT JOIN (
-SELECT user_id, COUNT(*) as completed_count
-                     FROM progres_materi
-                     WHERE completed_at IS NOT NULL
-                     GROUP BY user_id
+                        SELECT user_id, COUNT(*) as completed_count
+                        FROM progres_materi
+                        WHERE progress_percentage >= 100
+                        GROUP BY user_id
                       ) ucm ON u.id = ucm.user_id
+
                       WHERE u.role = 'student' AND u.is_active = TRUE
                       ORDER BY total_points DESC, materials_completed DESC, u.created_at ASC
                       LIMIT :limit";

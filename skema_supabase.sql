@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS progres_materi (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES pengguna(id) ON DELETE CASCADE,
     material_id INT REFERENCES materi(id) ON DELETE CASCADE,
-    completed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMPTZ NULL,
     progress_percentage INT DEFAULT 0,
     last_accessed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
