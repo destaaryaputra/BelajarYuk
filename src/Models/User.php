@@ -159,7 +159,10 @@ class User {
      */
     public function getUserById(int $id): ?array {
         try {
-            $query = "SELECT id, username, email, full_name, avatar, bio, created_at, streak_count FROM pengguna WHERE id = ?";
+            $query = "SELECT u.id, u.username, u.email, u.full_name, u.avatar, u.bio, u.created_at, u.streak_count,
+                        COALESCE((SELECT SUM(score) FROM hasil_kuis WHERE user_id = u.id), 0) as total_points
+                     FROM pengguna u 
+                     WHERE u.id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
 
