@@ -26,7 +26,7 @@ export const MaterialDetail = {
             return;
         }
 
-        detailContainer.innerHTML = '<div class="skeleton-box" style="height: 260px;"></div>';
+        // detailContainer.innerHTML = '<div class="skeleton-box" style="height: 260px;"></div>';
         syllabusContainer.innerHTML = '<div class="skeleton-box" style="height: 220px;"></div>';
 
         try {
