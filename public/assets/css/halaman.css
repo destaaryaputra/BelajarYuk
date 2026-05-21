@@ -519,6 +519,17 @@
     display: none;
 }
 
+/* Desktop layout: show comments beside material and syllabus */
+@media (min-width: 1025px) {
+    .learning-detail-layout {
+        display: flex;
+        gap: 24px;
+    }
+    #material-detail { flex: 2; }
+    #course-syllabus { flex: 1; max-height: none; }
+    #comments-section-container { flex: 1; }
+}
+
 .material-detail-toolbar {
     display: flex;
     align-items: center;
