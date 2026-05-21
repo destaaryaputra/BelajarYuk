@@ -41,16 +41,9 @@ export const Admin = {
             if (window.lucide) window.lucide.createIcons();
         };
 
-        themeBtn.onclick = () => {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const nextDark = !isDark;
-            document.documentElement.setAttribute('data-theme', nextDark ? 'dark' : 'light');
-            localStorage.setItem('theme', nextDark ? 'dark' : 'light');
-            updateIcon(nextDark);
-        };
-
-        // Initial Icon State
-        updateIcon(document.documentElement.getAttribute('data-theme') === 'dark');
+        // Initial Theme State Sync
+        const savedTheme = localStorage.getItem('belajaryuk_theme') || 'light';
+        updateIcon(savedTheme === 'dark');
     },
 
     setupFormListeners() {

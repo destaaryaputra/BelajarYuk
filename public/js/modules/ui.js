@@ -68,7 +68,7 @@ export const UI = {
 
     updateThemeIcons() {
         const isDark = document.body.classList.contains('dark-theme');
-        document.querySelectorAll('[data-action="toggle-theme"] i').forEach(icon => {
+        document.querySelectorAll('[data-action="toggle-theme"] [data-lucide]').forEach(icon => {
             if (isDark) {
                 icon.setAttribute('data-lucide', 'sun');
             } else {

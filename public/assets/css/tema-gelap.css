@@ -163,6 +163,20 @@ body.dark-theme.admin-mode {
     --admin-accent-bg: rgba(245, 158, 11, 0.18);
     --admin-accent-text: #fbbf24;
 }
+body.dark-theme.admin-mode .admin-sidebar,
+body.dark-theme.admin-mode .admin-topbar {
+    background-color: var(--admin-sidebar);
+    border-color: var(--border);
+}
+body.dark-theme.admin-mode .admin-content {
+    background-color: var(--admin-shell);
+}
+body.dark-theme.admin-mode .admin-sidebar-nav button:hover {
+    background: var(--admin-sidebar-hover);
+}
+body.dark-theme.admin-mode .admin-sidebar-nav button.active {
+    background: var(--admin-sidebar-active);
+}
 body.dark-theme .admin-dashboard-hero,
 body.dark-theme .admin-mini-item,
 body.dark-theme .admin-comment-preview {

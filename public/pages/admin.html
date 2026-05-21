@@ -1,13 +1,13 @@
 <div class="admin-layout">
     <aside class="admin-sidebar">
         <div class="sidebar-header">
-            <div class="nav-brand-logo">
+            <div class="nav-brand-logo admin-brand">
                 <div class="nav-logo-wrapper">
                     <div class="css-art-logo"></div>
                 </div>
                 <span>Belajaryuk</span>
             </div>
-            <button type="button" class="btn-icon-only" onclick="Admin.toggleSidebar(false)" title="Tutup Menu">
+            <button type="button" class="btn-icon-only mobile-only" onclick="Admin.toggleSidebar(false)" title="Tutup Menu">
                 <i data-lucide="x"></i>
             </button>
         </div>
@@ -51,7 +51,7 @@
                 <span>Belajaryuk</span>
             </div>
             <div class="nav-actions">
-                <button type="button" class="btn-icon-only theme-toggle-btn" title="Ganti Tema">
+                <button type="button" class="btn-icon-only theme-toggle-btn" data-action="toggle-theme" title="Ganti Tema">
                     <i data-lucide="moon"></i>
                 </button>
                 <button type="button" class="btn-icon-only" onclick="Admin.toggleSidebar(true)" title="Buka Menu">
