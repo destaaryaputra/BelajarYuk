@@ -25,7 +25,7 @@ export const Quiz = {
         this.state.answers = {};
         content.classList.add('d-none');
         result.classList.add('d-none');
-        loading.classList.remove('d-none');
+        // loading indicator removed
 
         // Check if we have sub_material_id (Mini Quiz) or material_id (Final Quiz)
         this.state.materialId = localStorage.getItem('active_material_id');
@@ -63,7 +63,7 @@ export const Quiz = {
             this.renderQuiz();
             this.setupListeners();
 
-            loading.classList.add('d-none');
+            // loading indicator removed
             content.classList.remove('d-none');
             if (window.lucide) window.lucide.createIcons();
 

@@ -73,6 +73,7 @@ export const MaterialDetail = {
             API.trackProgress(materialId).catch(() => {});
         } catch (error) {
             console.error('Material detail load error:', error);
+            UI.hideLoading();
             detailContainer.innerHTML = '<p class="text-danger">Gagal memuat detail materi.</p>';
             syllabusContainer.innerHTML = '<p class="text-muted">Tidak dapat memuat episode.</p>';
         }
