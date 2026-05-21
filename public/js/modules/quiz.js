@@ -64,6 +64,8 @@ export const Quiz = {
             this.setupListeners();
 
             // loading indicator removed
+            // Ensure loading spinner for quiz is hidden
+            loading?.classList?.add('d-none');
             content.classList.remove('d-none');
             if (window.lucide) window.lucide.createIcons();
 
