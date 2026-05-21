@@ -142,12 +142,17 @@ class QuizController {
         AuthMiddleware::requireAuth();
 
         try {
-            $user = AuthMiddleware::getAuthUser();
-            $quiz_id = isset($_GET['quiz_id']) ? intval($_GET['quiz_id']) : null;
+        $user = AuthMiddleware::getAuthUser();
+        if (!$user) {
+            // Should not happen if AuthMiddleware works, but guard against null
+            Response::error('Unauthorized. Please login.', null, 401);
+            return;
+        }
+        $quiz_id = isset($_GET['quiz_id']) ? intval($_GET['quiz_id']) : null;
 
-            $results = $this->quizModel->getUserQuizResults($user['id'], $quiz_id);
+        $results = $this->quizModel->getUserQuizResults($user['id'], $quiz_id);
 
-            Response::success('Hasil kuis berhasil dimuat', $results);
+        Response::success('Hasil kuis berhasil dimuat', $results);
         } catch (Exception $e) {
             error_log("Get user results error: " . $e->getMessage());
             Response::error('Ups, riwayat kuismu gagal ditampilkan.', null, 500);
