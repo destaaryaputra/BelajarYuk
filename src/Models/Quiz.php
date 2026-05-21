@@ -167,7 +167,7 @@ class Quiz {
         try {
             $query = "SELECT q.id, q.title, hk.score, hk.total_points, hk.percentage, hk.submitted_at 
                          FROM hasil_kuis hk
-                     JOIN kuiz q ON hk.quiz_id = q.id
+                     JOIN kuis q ON hk.quiz_id = q.id
                      WHERE hk.user_id = ?";
             
             $params = [$user_id];
@@ -182,20 +182,6 @@ class Quiz {
             $stmt = $this->db->prepare($query);
             $stmt->execute($params);
             
-            return $quiz_id ? $stmt->fetch(PDO::FETCH_ASSOC) : $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            // Log detailed error info to help debugging
-            error_log("[QuizModel] getUserQuizResults failed: " . $e->getMessage());
-            error_log("SQL: " . $query);
-            error_log("Params: " . json_encode($params));
-            return null;
-        }
-
-            $query .= " ORDER BY hk.submitted_at DESC";
-
-            $stmt = $this->db->prepare($query);
-            $stmt->execute($params);
-
             return $quiz_id ? $stmt->fetch(PDO::FETCH_ASSOC) : $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             error_log("Get user quiz results error: " . $e->getMessage());
