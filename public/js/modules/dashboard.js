@@ -66,6 +66,8 @@ export const Dashboard = {
         const userRank = userIndex !== -1 ? userIndex + 1 : '--';
         const userPoints = userIndex !== -1 ? leaderboardData[userIndex].total_points : (summary.total_points || 0);
 
+        const completionPercent = summary.total > 0 ? Math.round((summary.completed / summary.total) * 100) : 0;
+
         contentContainer.innerHTML = `
             <div class="dashboard-header mb-32">
                 <div>
@@ -80,11 +82,16 @@ export const Dashboard = {
             <div class="stats-grid mb-32">
                 <div class="stat-card accent-blue">
                     <div class="stat-card-row">
-                        <div>
+                        <div style="flex: 1;">
                             <h3>Pencapaian Modul</h3>
                             <div class="value"><span id="dash-materials-completed">0</span><span class="value-suffix"> dari ${summary.total || 0}</span></div>
+                            <div class="progress-bar-bg mt-8" style="height: 6px;">
+                                <div class="progress-bar-fill" style="width: ${completionPercent}%"></div>
+                            </div>
                         </div>
-                        <div class="stat-chip"><i data-lucide="book-check"></i></div>
+                        <div class="stat-chip" style="background: var(--primary-light); color: var(--primary);">
+                            <span style="font-size: 0.8rem; font-weight: 800;">${completionPercent}%</span>
+                        </div>
                     </div>
                 </div>
                 <div class="stat-card accent-orange">
@@ -93,10 +100,14 @@ export const Dashboard = {
                             <h3>Peringkat Global</h3>
                             <div class="value">
                                 <span>${userRank !== '--' ? '#' + userRank : '--'}</span>
-                                <span class="value-suffix"> (${userPoints} Poin)</span>
+                                <span class="value-suffix" style="font-size: 0.9rem; opacity: 0.7;"> (${userPoints} Poin)</span>
                             </div>
                         </div>
-                        <div class="stat-chip"><i data-lucide="trophy"></i></div>
+                        <div class="stat-chip">
+                            ${userRank === 1 ? '<i data-lucide="award" style="color: #f59e0b"></i>' : 
+                              (userRank === 2 ? '<i data-lucide="award" style="color: #94a3b8"></i>' : 
+                              (userRank === 3 ? '<i data-lucide="award" style="color: #b45309"></i>' : '<i data-lucide="trophy"></i>'))}
+                        </div>
                     </div>
                 </div>
                 <div class="stat-card accent-green">

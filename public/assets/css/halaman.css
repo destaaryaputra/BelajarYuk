@@ -142,19 +142,22 @@
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     overflow: hidden;
-    transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     box-shadow: var(--shadow-sm);
+    height: 100%;
 }
 
 .material-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-    border-color: color-mix(in srgb, var(--primary) 22%, var(--border));
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
 }
 
 .img-wrapper {
-    height: 170px;
+    height: 180px;
     background: var(--surface-muted);
+    overflow: hidden;
+    position: relative;
 }
 
 .img-wrapper img {
@@ -162,6 +165,11 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.material-card:hover .img-wrapper img {
+    transform: scale(1.1);
 }
 
 .material-card-content {

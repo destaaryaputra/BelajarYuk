@@ -41,9 +41,17 @@ export const Leaderboard = {
             const isMe = currentUser && item.id === currentUser.id;
             
             let rankClass = '';
-            if (rank === 1) rankClass = 'rank-gold';
-            else if (rank === 2) rankClass = 'rank-silver';
-            else if (rank === 3) rankClass = 'rank-bronze';
+            let rankDisplay = rank;
+            if (rank === 1) {
+                rankClass = 'rank-gold';
+                rankDisplay = '<i data-lucide="award"></i>';
+            } else if (rank === 2) {
+                rankClass = 'rank-silver';
+                rankDisplay = '<i data-lucide="award"></i>';
+            } else if (rank === 3) {
+                rankClass = 'rank-bronze';
+                rankDisplay = '<i data-lucide="award"></i>';
+            }
 
             const initials = (item.full_name || item.username || '?')[0].toUpperCase();
             const avatarHtml = item.avatar 
@@ -53,7 +61,7 @@ export const Leaderboard = {
             html += `
                 <tr class="${isMe ? 'is-me' : ''}">
                     <td>
-                        <div class="rank-badge ${rankClass}">${rank}</div>
+                        <div class="rank-badge ${rankClass}">${rankDisplay}</div>
                     </td>
                     <td>
                         <div class="user-cell">
