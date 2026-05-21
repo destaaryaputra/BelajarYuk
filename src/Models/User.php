@@ -159,7 +159,7 @@ class User {
      */
     public function getUserById(int $id): ?array {
         try {
-            $query = "SELECT id, username, email, full_name, avatar, bio, created_at FROM pengguna WHERE id = ?";
+            $query = "SELECT id, username, email, full_name, avatar, bio, created_at, streak_count FROM pengguna WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
 
