@@ -299,9 +299,10 @@ class Progress {
                         GROUP BY user_id
                       ) utp ON u.id = utp.user_id
                       LEFT JOIN (
-                        SELECT user_id, COUNT(*) as completed_count
-                        FROM progres_materi
-                        GROUP BY user_id
+SELECT user_id, COUNT(*) as completed_count
+                     FROM progres_materi
+                     WHERE completed_at IS NOT NULL
+                     GROUP BY user_id
                       ) ucm ON u.id = ucm.user_id
                       WHERE u.role = 'student' AND u.is_active = TRUE
                       ORDER BY total_points DESC, materials_completed DESC, u.created_at ASC
