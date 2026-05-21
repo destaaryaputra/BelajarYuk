@@ -15,7 +15,11 @@ class UploadService {
 
     public static function uploadThumbnail(array $file): array {
         try {
-            if (($file['size'] ?? 0) > 2 * 1024 * 1024) {
+            // Pastikan semua atribut file diperlukan ada
+            if (!isset($file['name'], $file['tmp_name'], $file['size'])) {
+                return ['success' => false, 'message' => 'File tidak lengkap.'];
+            }
+            if ($file['size'] > 2 * 1024 * 1024) {
                 return ['success' => false, 'message' => 'Waduh, file fotonya terlalu besar! Maksimal 2MB ya.'];
             }
 
@@ -42,7 +46,11 @@ class UploadService {
 
     public static function uploadAvatar(array $file): array {
         try {
-            if (($file['size'] ?? 0) > 1 * 1024 * 1024) {
+            // Validasi keberadaan kunci file
+            if (!isset($file['name'], $file['tmp_name'], $file['size'])) {
+                return ['success' => false, 'message' => 'File tidak lengkap.'];
+            }
+            if ($file['size'] > 1 * 1024 * 1024) {
                 return ['success' => false, 'message' => 'Foto profil terlalu besar! Maksimal 1MB ya.'];
             }
 
@@ -69,6 +77,10 @@ class UploadService {
 
     public static function uploadPdf(array $file): array {
         try {
+            // Validasi keberadaan kunci file
+            if (!isset($file['name'], $file['tmp_name'])) {
+                return ['success' => false, 'message' => 'File tidak lengkap.'];
+            }
             $mimeType = self::detectMimeType($file['tmp_name'] ?? '');
             if ($mimeType !== 'application/pdf') {
                 return ['success' => false, 'message' => 'File yang diunggah harus berupa dokumen PDF!'];

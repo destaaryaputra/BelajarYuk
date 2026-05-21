@@ -92,23 +92,11 @@ class Database {
                 http_response_code(500);
                 header('Content-Type: application/json');
             }
-            
-            // SUPER DEBUG: Tampilkan semua status variabel
+            // Return a generic error without leaking env or debug info
             exit(json_encode([
-                'success' => false, 
-                'message' => 'Gagal terhubung ke database Supabase.',
-                'debug_message' => $e->getMessage(),
-                'version' => 'SUPER-DIAGNOSTIC-V2',
-                'env_status' => [
-                    'DB_HOST' => $this->host ? 'LOADED' : 'MISSING',
-                    'DB_NAME' => $this->db ? "LOADED ('{$this->db}')" : 'MISSING',
-                    'DB_USER' => $this->user ? 'LOADED' : 'MISSING',
-                    'DB_PORT' => $this->port,
-                    'SSL_MODE' => 'require'
-                ],
-                'dsn_generated' => "pgsql:host={$this->host};port={$this->port};dbname={$this->db};sslmode=require",
-                'php_version' => PHP_VERSION,
-                'pdo_drivers' => PDO::getAvailableDrivers()
+                'success' => false,
+                'message' => 'Gagal terhubung ke database.',
+                // 'debug' => $e->getMessage() // Uncomment only in development
             ]));
         }
     }

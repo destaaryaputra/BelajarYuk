@@ -32,7 +32,12 @@ class AuthController {
         CSRFMiddleware::verify();
 
         try {
-            $data = json_decode(file_get_contents("php://input"), true);
+            $rawInput = file_get_contents("php://input");
+            $data = json_decode($rawInput, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Response::error('Payload JSON tidak valid.', null, 400);
+                return;
+            }
             $result = $this->authService->register($data);
             Response::success($result['message'], ['user_id' => $result['user_id']], 201);
         } catch (Exception $e) {
@@ -49,13 +54,21 @@ class AuthController {
         CSRFMiddleware::verify();
 
         try {
-            $data = json_decode(file_get_contents("php://input"), true);
+            $rawInput = file_get_contents("php://input");
+            $data = json_decode($rawInput, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Response::error('Payload JSON tidak valid.', null, 400);
+                return;
+            }
             $username = Security::sanitize($data['username'] ?? '');
             $password = $data['password'] ?? '';
 
             $result = $this->authService->login($username, $password);
             
-            // Simpan ke session (Session sudah di-start oleh router/index)
+            // Simpan ke session (pastikan session sudah dimulai)
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
             $_SESSION['auth_token'] = $result['token'];
             $_SESSION['user'] = $result['user'];
             
@@ -130,7 +143,12 @@ class AuthController {
 
         try {
             $user = AuthMiddleware::getAuthUser();
-            $data = json_decode(file_get_contents("php://input"), true);
+$rawInput = file_get_contents("php://input");
+            $data = json_decode($rawInput, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Response::error('Payload JSON tidak valid.', null, 400);
+                return;
+            }
             
             $updateData = [
                 'full_name' => Security::sanitize($data['full_name'] ?? ''),
@@ -170,6 +188,8 @@ class AuthController {
 
         $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
         $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 50;
+        // Batasi nilai limit agar tidak mengakibatkan beban memori berlebih
+        $limit = min($limit, 100);
 
         $users = $this->userModel->getAllUsers($page, $limit);
         $total = $this->userModel->getTotalUsersCount();
@@ -192,7 +212,12 @@ class AuthController {
             return;
         }
 
-        $data = json_decode(file_get_contents("php://input"), true);
+        $rawInput = file_get_contents("php://input");
+        $data = json_decode($rawInput, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Response::error('Payload JSON tidak valid.', null, 400);
+            return;
+        }
         $user_id = isset($data['user_id']) ? intval($data['user_id']) : null;
         $role = Security::sanitize($data['role'] ?? '');
 
@@ -221,7 +246,12 @@ class AuthController {
             return;
         }
 
-        $data = json_decode(file_get_contents("php://input"), true);
+        $rawInput = file_get_contents("php://input");
+        $data = json_decode($rawInput, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Response::error('Payload JSON tidak valid.', null, 400);
+            return;
+        }
         $user_id = isset($data['user_id']) ? intval($data['user_id']) : null;
 
         if (!$user_id) {
