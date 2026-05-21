@@ -575,7 +575,7 @@
     gap: 3px;            
     margin-bottom: 0; /* Integrated in toolbar */
     flex: 1;
-    max-width: 320px;
+    max-width: 100%;
 }
 
  .mobile-detail-tabs .tab-btn {
