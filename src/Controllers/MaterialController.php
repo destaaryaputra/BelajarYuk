@@ -70,11 +70,19 @@ class MaterialController {
         CSRFMiddleware::verify();
 
         try {
-            $data = json_decode(file_get_contents("php://input"), true);
+            $rawInput = file_get_contents("php://input");
+            $data = json_decode($rawInput, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Response::error('Payload JSON tidak valid.', null, 400);
+                return;
+            }
             $materialId = intval($data['material_id'] ?? 0);
             $subMaterialId = isset($data['sub_material_id']) ? intval($data['sub_material_id']) : null;
             
-            if (!$materialId) Response::error('Pilih materi dulu ya.', null, 400);
+            if (!$materialId) {
+                Response::error('Pilih materi dulu ya.', null, 400);
+                return;
+            }
 
             $user = AuthMiddleware::getAuthUser();
             $result = $this->materialService->markAsCompleted($user['id'], $materialId, $subMaterialId);
