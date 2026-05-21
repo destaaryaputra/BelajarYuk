@@ -316,7 +316,7 @@
         height: 32px;
     }
 
-    .discussion-section {
+    .discussion-section { /* tighter mobile layout */
         padding: 24px 16px !important;
         border-radius: 0 !important;
         border-left: none !important;
