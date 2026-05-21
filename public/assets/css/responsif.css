@@ -245,7 +245,7 @@
     }
 
     .toolbar-left {
-        gap: 8px;
+        gap: 4px; /* reduce spacing between back button and tabs */
     }
 
     .mobile-detail-tabs.mobile-only {
@@ -253,8 +253,9 @@
     }
 
     .mobile-detail-tabs .tab-btn {
-        padding: 6px 4px;
-        font-size: 0.78rem;
+        padding: 4px 4px; /* tighter button */
+        font-size: 0.76rem;
+        border-radius: 6px;
     }
 
     .toolbar-divider {
