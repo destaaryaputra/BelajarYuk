@@ -48,7 +48,6 @@ if (file_exists($envFile)) {
     }
 } else {
     // Di Vercel ini normal, karena env variables diset di dashboard
-    // error_log("INFO: .env file not found. Using system environment variables.");
 }
 
 // Environment
