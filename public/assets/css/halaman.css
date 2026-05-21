@@ -532,6 +532,7 @@
     gap: 12px;
     min-width: 0;
     flex: 1;
+    flex-wrap: nowrap; /* keep back button and tabs on same line */
 }
 
 .btn-back-material {
