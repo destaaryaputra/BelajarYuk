@@ -610,10 +610,12 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-.toolbar-info {
+ .toolbar-info {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    flex: 1 1 0; /* allow shrinking to stay on same line */
+    overflow: hidden;
 }
 
 .toolbar-label {
