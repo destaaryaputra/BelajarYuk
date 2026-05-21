@@ -2,7 +2,7 @@
  * Belajaryuk - Progress & Leaderboard Module
  */
 
-import { API, Config } from './api.js';
+import { API } from './api.js';
 import { UI } from './ui.js';
 
 export const Progress = {
