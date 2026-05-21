@@ -1042,14 +1042,27 @@ export const Admin = {
             this.charts.reports.destroy();
         }
 
-        const labels = perQuiz.slice(0, 10).map(row => row.quiz_title || 'Kuis');
-        const scores = perQuiz.slice(0, 10).map(row => Math.round(Number(row.avg_score || 0)));
-        const attempts = perQuiz.slice(0, 10).map(row => Number(row.attempts || 0));
+        // Sort by attempts DESC and take top 12 for better readability
+        const sortedData = [...perQuiz]
+            .filter(row => Number(row.attempts) > 0)
+            .sort((a, b) => Number(b.attempts) - Number(a.attempts))
+            .slice(0, 12);
+
+        const labels = sortedData.map(row => {
+            const title = row.quiz_title || 'Kuis';
+            return title.length > 20 ? title.substring(0, 17) + '...' : title;
+        });
+        const scores = sortedData.map(row => Math.round(Number(row.avg_score || 0)));
+        const attempts = sortedData.map(row => Number(row.attempts || 0));
 
         if (labels.length === 0) {
-            labels.push('Belum ada data');
-            scores.push(0);
-            attempts.push(0);
+            // Show empty state in canvas parent
+            const ctx = canvas.getContext('2d');
+            ctx.font = '14px Inter';
+            ctx.fillStyle = '#94a3b8';
+            ctx.textAlign = 'center';
+            ctx.fillText('Belum ada data aktivitas kuis.', canvas.width / 2, canvas.height / 2);
+            return;
         }
 
         this.charts.reports = new Chart(canvas, {
@@ -1061,21 +1074,26 @@ export const Admin = {
                         type: 'line',
                         label: 'Rata-rata Nilai (%)',
                         data: scores,
-                        borderColor: '#1f8a70',
-                        backgroundColor: 'rgba(31, 138, 112, 0.1)',
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         borderWidth: 3,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
                         pointRadius: 4,
+                        pointHoverRadius: 6,
                         fill: true,
-                        tension: 0.3,
+                        tension: 0.4,
                         yAxisID: 'y'
                     },
                     {
                         type: 'bar',
-                        label: 'Total Percobaan',
+                        label: 'Jumlah Percobaan',
                         data: attempts,
-                        backgroundColor: 'rgba(37, 99, 167, 0.6)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        hoverBackgroundColor: '#3b82f6',
                         borderRadius: 6,
-                        maxBarThickness: 30,
+                        maxBarThickness: 40,
                         yAxisID: 'y1'
                     }
                 ]
@@ -1083,7 +1101,10 @@ export const Admin = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 scales: {
                     y: {
                         type: 'linear',
@@ -1091,7 +1112,9 @@ export const Admin = {
                         position: 'left',
                         beginAtZero: true,
                         max: 100,
-                        title: { display: true, text: 'Nilai (%)', font: { size: 10 } }
+                        grid: { borderDash: [5, 5], color: '#e2e8f0' },
+                        ticks: { color: '#64748b', font: { size: 11 } },
+                        title: { display: true, text: 'Rata-rata Skor (%)', color: '#64748b', font: { weight: 'bold', size: 10 } }
                     },
                     y1: {
                         type: 'linear',
@@ -1099,13 +1122,34 @@ export const Admin = {
                         position: 'right',
                         beginAtZero: true,
                         grid: { drawOnChartArea: false },
-                        title: { display: true, text: 'Percobaan', font: { size: 10 } }
+                        ticks: { color: '#64748b', font: { size: 11 }, precision: 0 },
+                        title: { display: true, text: 'Total Percobaan', color: '#64748b', font: { weight: 'bold', size: 10 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#64748b', font: { size: 10 }, maxRotation: 45, minRotation: 45 }
                     }
                 },
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: { boxWidth: 12, font: { size: 11 } }
+                        align: 'end',
+                        labels: { usePointStyle: true, boxWidth: 8, font: { size: 11, weight: '500' }, padding: 20 }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 13, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        callbacks: {
+                            label: (context) => {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                label += context.parsed.y + (context.datasetIndex === 0 ? '%' : ' kali');
+                                return label;
+                            }
+                        }
                     }
                 }
             }
