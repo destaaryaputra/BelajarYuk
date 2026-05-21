@@ -478,11 +478,14 @@ export const MaterialDetail = {
         if (nextBtn && nextEpisode) {
             nextBtn.onclick = async () => {
                 UI.showLoading();
-                const proceed = await markCurrentComplete(true);
-                UI.hideLoading();
-                if (proceed) {
-                    this.selectItem(String(nextEpisode.id));
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                try {
+                    const proceed = await markCurrentComplete(true);
+                    if (proceed) {
+                        this.selectItem(String(nextEpisode.id));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                } finally {
+                    UI.hideLoading(); // always hide loading overlay
                 }
             };
         }
@@ -491,13 +494,16 @@ export const MaterialDetail = {
         if (finishToQuizBtn) {
             finishToQuizBtn.onclick = async () => {
                 UI.showLoading();
-                const proceed = await markCurrentComplete(true);
-                UI.hideLoading();
-                if (proceed) {
-                    localStorage.removeItem('active_sub_material_id'); // Clear sub_id for Final Quiz
-                    // Set active material ID explicitly to be sure
-                    localStorage.setItem('active_material_id', materialId);
-                    window.location.hash = 'quiz-page';
+                try {
+                    const proceed = await markCurrentComplete(true);
+                    if (proceed) {
+                        localStorage.removeItem('active_sub_material_id'); // Clear sub_id for Final Quiz
+                        // Set active material ID explicitly to be sure
+                        localStorage.setItem('active_material_id', materialId);
+                        window.location.hash = 'quiz-page';
+                    }
+                } finally {
+                    UI.hideLoading();
                 }
             };
         }
@@ -506,11 +512,14 @@ export const MaterialDetail = {
         if (finishBtn) {
             finishBtn.onclick = async () => {
                 UI.showLoading();
-                const proceed = await markCurrentComplete();
-                UI.hideLoading();
-                if (proceed) {
-                    this.renderSyllabus();
-                    this.renderContent();
+                try {
+                    const proceed = await markCurrentComplete();
+                    if (proceed) {
+                        this.renderSyllabus();
+                        this.renderContent();
+                    }
+                } finally {
+                    UI.hideLoading();
                 }
             };
         }

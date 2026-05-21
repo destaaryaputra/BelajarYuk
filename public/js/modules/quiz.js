@@ -70,6 +70,7 @@ export const Quiz = {
         } catch (error) {
             console.error('Quiz load error:', error);
             loading.innerHTML = `<p class="text-danger p-48">${error.message || 'Gagal memuat kuis.'}</p>`;
+            UI.hideLoading(); // Ensure loading overlay is removed on error
         }
     },
 
