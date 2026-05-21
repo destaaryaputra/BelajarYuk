@@ -28,7 +28,29 @@ export const Admin = {
         }
 
         this.setupFormListeners();
+        this.setupTheme();
         this.switchTab('dashboard');
+    },
+
+    setupTheme() {
+        const themeBtn = document.querySelector('.admin-topbar .theme-toggle-btn');
+        if (!themeBtn) return;
+
+        const updateIcon = (isDark) => {
+            themeBtn.innerHTML = isDark ? '<i data-lucide="sun"></i>' : '<i data-lucide="moon"></i>';
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        themeBtn.onclick = () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const nextDark = !isDark;
+            document.documentElement.setAttribute('data-theme', nextDark ? 'dark' : 'light');
+            localStorage.setItem('theme', nextDark ? 'dark' : 'light');
+            updateIcon(nextDark);
+        };
+
+        // Initial Icon State
+        updateIcon(document.documentElement.getAttribute('data-theme') === 'dark');
     },
 
     setupFormListeners() {

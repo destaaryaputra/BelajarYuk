@@ -136,7 +136,8 @@ body.admin-mode {
     font-weight: 700;
 }
 
-/* Neutral Style for Topbar Buttons (No Green Background) */
+/* Neutral Style for Admin Buttons (No Green Background) */
+.admin-sidebar .btn-icon-only,
 .admin-topbar .btn-icon-only {
     background: transparent !important;
     color: var(--text-muted) !important;
@@ -144,6 +145,7 @@ body.admin-mode {
     box-shadow: none !important;
 }
 
+.admin-sidebar .btn-icon-only:hover,
 .admin-topbar .btn-icon-only:hover {
     background: var(--surface-hover) !important;
     color: var(--text-main) !important;
