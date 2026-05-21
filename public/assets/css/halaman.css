@@ -514,6 +514,11 @@
     gap: 14px;
 }
 
+/* Hide discussion when syllabus tab is active */
+.learning-detail-page-shell[data-active-tab="syllabus"] #comments-section-container {
+    display: none;
+}
+
 .material-detail-toolbar {
     display: flex;
     align-items: center;
