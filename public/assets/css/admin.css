@@ -449,6 +449,36 @@ body.admin-mode {
     min-width: 600px;
 }
 
+.btn-label {
+    margin-left: 6px;
+    font-weight: 500;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+}
+
+.btn-small i, .btn-small svg {
+    width: 14px;
+    height: 14px;
+}
+
+@media (max-width: 1200px) {
+    .btn-label {
+        display: none;
+    }
+    .btn-small {
+        padding: 6px;
+        width: 34px;
+    }
+}
+
 @media (max-width: 480px) {
     .admin-primary-metrics {
         grid-template-columns: 1fr;

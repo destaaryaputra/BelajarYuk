@@ -344,16 +344,17 @@ export const Admin = {
                             <td><span class="badge badge-student">${UI.escapeHtml(m.category || 'Umum')}</span></td>
                             <td class="text-right">
                                 <div class="d-flex justify-end gap-8">
-                                    <button class="btn-outline btn-small" onclick="Admin.openQuizView(${m.id}, '${UI.escapeHtml(m.title)}')" title="Kelola Kuis"><i data-lucide="help-circle"></i></button>
-                                    <button class="btn-outline btn-small" onclick="Admin.openSubMaterialView(${m.id}, '${UI.escapeHtml(m.title)}')" title="Kelola Episode"><i data-lucide="layers"></i></button>
-                                    <button class="btn-outline btn-small" onclick="Admin.handleEditMaterial(${m.id})" title="Edit Materi"><i data-lucide="edit-3"></i></button>
-                                    <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteMaterial(${m.id})" title="Hapus Materi"><i data-lucide="trash-2"></i></button>
+                                    <button class="btn-outline btn-small" onclick="Admin.openQuizView(${m.id}, '${UI.escapeHtml(m.title)}')" title="Kelola Kuis"><i data-lucide="help-circle"></i> <span class="btn-label">Kuis</span></button>
+                                    <button class="btn-outline btn-small" onclick="Admin.openSubMaterialView(${m.id}, '${UI.escapeHtml(m.title)}')" title="Kelola Episode"><i data-lucide="layers"></i> <span class="btn-label">Episode</span></button>
+                                    <button class="btn-outline btn-small" onclick="Admin.handleEditMaterial(${m.id})" title="Edit Materi"><i data-lucide="edit-3"></i> <span class="btn-label">Edit</span></button>
+                                    <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteMaterial(${m.id})" title="Hapus Materi"><i data-lucide="trash-2"></i> <span class="btn-label">Hapus</span></button>
                                 </div>
                             </td>
                         </tr>`;
                 });
             }
             container.innerHTML = html + '</tbody></table></div>';
+            if (window.lucide) window.lucide.createIcons();
         } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
 
@@ -430,8 +431,8 @@ export const Admin = {
                 this.currentSubMaterials.forEach((s, i) => {
                     html += `<tr><td class="text-muted">${i+1}</td><td class="font-medium">${UI.escapeHtml(s.title)}</td><td class="text-right">
                         <div class="d-flex justify-end gap-8">
-                            <button class="btn-outline btn-small" onclick="Admin.handleEditSubMat(${s.id})" title="Edit Episode"><i data-lucide="edit-3"></i></button>
-                            <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteSubMat(${s.id}, ${materialId})" title="Hapus Episode"><i data-lucide="trash-2"></i></button>
+                            <button class="btn-outline btn-small" onclick="Admin.handleEditSubMat(${s.id})" title="Edit Episode"><i data-lucide="edit-3"></i><span class="btn-label">Edit</span></button>
+                            <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteSubMat(${s.id}, ${materialId})" title="Hapus Episode"><i data-lucide="trash-2"></i><span class="btn-label">Hapus</span></button>
                         </div>
                     </td></tr>`;
                 });
@@ -535,8 +536,8 @@ export const Admin = {
                         <td>${q.total_questions} Soal</td>
                         <td class="text-right">
                             <div class="d-flex justify-end gap-8">
-                                <button class="btn-outline btn-small" onclick="Admin.manageQuizQuestions(${q.id}, '${UI.escapeHtml(q.title)}')" title="Kelola Soal"><i data-lucide="list"></i></button>
-                                <button class="btn-outline btn-small" onclick="Admin.editQuizConfig(${q.id})" title="Pengaturan Kuis"><i data-lucide="settings"></i></button>
+                                <button class="btn-outline btn-small" onclick="Admin.manageQuizQuestions(${q.id}, '${UI.escapeHtml(q.title)}')" title="Kelola Soal"><i data-lucide="list"></i><span class="btn-label">Soal</span></button>
+                                <button class="btn-outline btn-small" onclick="Admin.editQuizConfig(${q.id})" title="Pengaturan Kuis"><i data-lucide="settings"></i><span class="btn-label">Setting</span></button>
                             </div>
                         </td>
                     </tr>
@@ -544,6 +545,7 @@ export const Admin = {
             });
 
             container.innerHTML = html + '</tbody></table></div>';
+            if (window.lucide) window.lucide.createIcons();
         } catch (error) {
             console.error(error);
             container.innerHTML = '<p class="text-danger">Gagal memuat daftar kuis.</p>';
@@ -679,7 +681,7 @@ export const Admin = {
             if (qs.length === 0) html += '<tr><td colspan="3" class="text-center p-24 text-muted">Belum ada soal. Klik Tambah Soal untuk memulai.</td></tr>';
             else {
                 qs.forEach((q, i) => {
-                    html += `<tr><td class="text-muted">${i+1}</td><td>${UI.escapeHtml(q.question_text)}</td><td class="text-right"><button class="btn-outline btn-text-danger btn-small" onclick="Admin.deleteQuestion(${q.id}, ${quizId})" title="Hapus Soal"><i data-lucide="trash-2"></i></button></td></tr>`;
+                    html += `<tr><td class="text-muted">${i+1}</td><td>${UI.escapeHtml(q.question_text)}</td><td class="text-right"><button class="btn-outline btn-text-danger btn-small" onclick="Admin.deleteQuestion(${q.id}, ${quizId})" title="Hapus Soal"><i data-lucide="trash-2"></i><span class="btn-label">Hapus</span></button></td></tr>`;
                 });
             }
             container.innerHTML = html + '</tbody></table></div>';
@@ -817,7 +819,7 @@ export const Admin = {
                         </td>
                         <td><span class="text-muted">${UI.escapeHtml(u.email)}</span></td>
                         <td class="text-right">
-                            <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteUser(${u.id})" title="Hapus Siswa"><i data-lucide="user-minus"></i></button>
+                            <button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteUser(${u.id})" title="Hapus Siswa"><i data-lucide="user-minus"></i><span class="btn-label">Hapus</span></button>
                         </td>
                     </tr>`;
             });
@@ -845,10 +847,11 @@ export const Admin = {
             else {
                 comments.forEach(c => {
                     html += `<tr><td class="font-bold">${UI.escapeHtml(c.username)}</td><td>${UI.escapeHtml(c.comment_text)}</td>
-                    <td class="text-right"><button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteComment(${c.id})" title="Hapus Komentar"><i data-lucide="trash-2"></i></button></td></tr>`;
+                    <td class="text-right"><button class="btn-outline btn-text-danger btn-small" onclick="Admin.handleDeleteComment(${c.id})" title="Hapus Komentar"><i data-lucide="trash-2"></i><span class="btn-label">Hapus</span></button></td></tr>`;
                 });
             }
             container.innerHTML = html + '</tbody></table></div></div>';
+            if (window.lucide) window.lucide.createIcons();
         } catch (error) { console.error(error); }
     },
 
