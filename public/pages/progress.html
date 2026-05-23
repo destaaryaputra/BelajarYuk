@@ -7,14 +7,21 @@
     <!-- Ringkasan Statistik -->
     <div id="progress-summary" class="mb-32"></div>
 
-    <div class="dashboard-layout-single">
-        <!-- Progres Per Materi (Detail) -->
-        <div id="material-progress-list" class="mb-24"></div>
+    <div class="progress-layout-modern">
+        <!-- Kolom Utama: Progres Materi -->
+        <div class="progress-main-content">
+            <div id="material-progress-list"></div>
+        </div>
 
-        <!-- Riwayat Kuis Terakhir -->
-        <div class="content-card">
-            <h3 class="mb-16">Riwayat Kuis Terakhir</h3>
-            <div id="quiz-performance"></div>
+        <!-- Kolom Samping: Riwayat Kuis -->
+        <div class="progress-side-content">
+            <div class="content-card">
+                <div class="d-flex align-center gap-12 mb-20">
+                    <div class="stat-chip accent-orange-bg"><i data-lucide="history"></i></div>
+                    <h3 class="m-0">Riwayat Kuis</h3>
+                </div>
+                <div id="quiz-performance"></div>
+            </div>
         </div>
     </div>
 </main>

@@ -12,10 +12,11 @@ export const Progress = {
 
         // 1. Loading States
         summaryContainer.innerHTML = '<div class="skeleton-box" style="height: 120px; width: 100%;"></div>';
-        const catsContainer = document.getElementById('category-progress');
         const materialsContainer = document.getElementById('material-progress-list');
-        if (catsContainer) catsContainer.innerHTML = '<div class="skeleton-box" style="height: 200px; width: 100%;"></div>';
-        if (materialsContainer) materialsContainer.innerHTML = '<div class="skeleton-box" style="height: 200px; width: 100%;"></div>';
+        const quizContainer = document.getElementById('quiz-performance');
+        
+        if (materialsContainer) materialsContainer.innerHTML = '<div class="skeleton-box" style="height: 300px; width: 100%;"></div>';
+        if (quizContainer) quizContainer.innerHTML = '<div class="skeleton-box" style="height: 300px; width: 100%;"></div>';
 
         try {
             // Fetch all data in parallel
@@ -25,12 +26,11 @@ export const Progress = {
                 API.getQuizPerformance()
             ]);
 
-            const progressData = detailedRes.data || {};
             this.renderSummary(summaryRes.data || {});
             this.renderQuizHistory(quizRes.data || []);
 
             if (materialsContainer) {
-                this.renderMaterials(progressData.materials || [], materialsContainer);
+                this.renderMaterials(detailedRes.data?.materials || [], materialsContainer);
             }
 
             if (window.lucide) window.lucide.createIcons();
@@ -48,23 +48,29 @@ export const Progress = {
 
         let html = `
             <div class="content-card">
-                <h3 class="mb-20"><i data-lucide="book-open" class="icon-md mr-8"></i> Progres Per Materi</h3>
-                <div class="material-progress-grid">
+                <div class="d-flex align-center gap-12 mb-24">
+                    <div class="stat-chip accent-blue-bg"><i data-lucide="book-open"></i></div>
+                    <h3 class="m-0">Progres Per Materi</h3>
+                </div>
+                <div class="material-progress-list-modern">
         `;
 
         materials.forEach(m => {
             const isDone = m.percentage >= 100;
+            const percentage = Math.round(m.percentage);
             html += `
-                <div class="material-progress-card">
-                    <div class="mpc-info">
-                        <div class="mpc-text">
-                            <span class="category-tag mb-8">${UI.escapeHtml(m.category)}</span>
+                <div class="mp-item-modern">
+                    <div class="mp-item-header">
+                        <div class="mp-item-main">
+                            <span class="category-tag mb-4">${UI.escapeHtml(m.category)}</span>
                             <h4>${UI.escapeHtml(m.title)}</h4>
                         </div>
-                        <div class="mpc-percentage ${isDone ? 'text-success' : ''}">${m.percentage}%</div>
+                        <div class="mp-item-percentage ${isDone ? 'text-success' : ''}">
+                            ${percentage}%
+                        </div>
                     </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${m.percentage}%"></div>
+                    <div class="progress-bar-bg-modern">
+                        <div class="progress-bar-fill-modern ${isDone ? 'is-done' : ''}" style="width: ${percentage}%"></div>
                     </div>
                 </div>
             `;
@@ -117,66 +123,40 @@ export const Progress = {
         if (window.lucide) window.lucide.createIcons();
     },
 
-    renderCategories(categories) {
-        const container = document.getElementById('category-progress');
-        if (!container) return;
-
-        if (categories.length === 0) {
-            container.innerHTML = '<p class="text-muted">Belum ada progres per kategori.</p>';
-            return;
-        }
-
-        let html = '<div class="category-progress-list">';
-        categories.forEach(cat => {
-            const total = cat.total || 0;
-            const completed = cat.completed || 0;
-            const percentage = Math.round(cat.percentage || 0);
-            
-            html += `
-                <div class="category-progress-item mb-16">
-                    <div class="d-flex justify-between mb-8">
-                        <div>
-                            <strong class="block">${UI.escapeHtml(cat.category)}</strong>
-                            <span class="text-muted small">${completed} dari ${total} modul selesai</span>
-                        </div>
-                        <span class="font-bold">${percentage}%</span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${percentage}%"></div>
-                    </div>
-                </div>
-            `;
-        });
-        container.innerHTML = html + '</div>';
-    },
-
     renderQuizHistory(results) {
         const container = document.getElementById('quiz-performance');
         if (!container) return;
 
         if (results.length === 0) {
-            container.innerHTML = '<p class="text-muted">Belum ada riwayat kuis.</p>';
+            container.innerHTML = '<div class="empty-state small"><p>Belum ada riwayat kuis.</p></div>';
             return;
         }
 
-        let html = '<div class="quiz-history-grid">';
+        let html = '<div class="quiz-history-list-modern">';
         results.forEach(res => {
             const attemptedAt = res.completed_at || res.submitted_at;
             const title = res.quiz_title || res.title || 'Kuis';
-            const scoreValue = Number(res.percentage ?? res.score ?? 0);
+            const scoreValue = Math.round(Number(res.percentage ?? res.score ?? 0));
             const date = attemptedAt
                 ? new Date(attemptedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
                 : '-';
             const isPassed = scoreValue >= Number(res.passing_score || 60);
             
             html += `
-                <div class="quiz-history-card">
-                    <div class="qhc-header">
-                        <span class="badge ${isPassed ? 'badge-success' : 'badge-danger'}">${isPassed ? 'Lulus' : 'Belum Lulus'}</span>
-                        <span class="qhc-date">${date}</span>
+                <div class="quiz-history-item-modern">
+                    <div class="qhi-status ${isPassed ? 'is-passed' : 'is-failed'}">
+                        <i data-lucide="${isPassed ? 'check-circle-2' : 'x-circle'}"></i>
                     </div>
-                    <h4>${UI.escapeHtml(title)}</h4>
-                    <div class="qhc-score">${Math.round(scoreValue)}%</div>
+                    <div class="qhi-content">
+                        <div class="qhi-top">
+                            <span class="qhi-label">${isPassed ? 'Lulus' : 'Belum Lulus'}</span>
+                            <span class="qhi-date">${date}</span>
+                        </div>
+                        <h4 class="qhi-title">${UI.escapeHtml(title)}</h4>
+                    </div>
+                    <div class="qhi-score-box ${isPassed ? 'text-success' : 'text-danger'}">
+                        ${scoreValue}%
+                    </div>
                 </div>
             `;
         });
