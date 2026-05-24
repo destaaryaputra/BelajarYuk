@@ -1,12 +1,21 @@
 /* --- Admin Role Layout --- */
+html:has(body.admin-mode),
 body.admin-mode {
-    background-color: var(--surface-muted);
-    overflow: hidden; /* Prevent body scroll in admin mode */
+    height: 100vh !important;
+    overflow: hidden !important;
+    position: fixed;
+    width: 100%;
 }
 
-#admin-page {
+#app:has(#admin-page.active) {
     height: 100vh;
     overflow: hidden;
+}
+
+#admin-page.active {
+    height: 100vh;
+    overflow: hidden;
+    display: block !important;
 }
 
 .admin-layout {
@@ -28,6 +37,7 @@ body.admin-mode {
     z-index: 2100;
     border-right: 1px solid var(--border);
     height: 100%;
+    position: relative; /* Revert from fixed, let flexbox handle it */
 }
 
 .sidebar-header {
@@ -52,7 +62,7 @@ body.admin-mode {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    overflow-y: auto;
+    overflow-y: auto; /* Internal scroll for long menus */
 }
 
 /* Consolidated Sidebar Button Styles */
@@ -124,7 +134,7 @@ body.admin-mode {
     flex-direction: column;
     min-width: 0;
     height: 100vh;
-    overflow-y: auto; /* Internal scrolling for content */
+    overflow-y: auto; /* THE ONLY SCROLLABLE AREA */
 }
 
 .admin-topbar {
@@ -293,6 +303,7 @@ body.admin-mode {
         border-right: none;
         border-left: 1px solid var(--border);
         box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+        z-index: 3000;
     }
 
     .admin-sidebar.is-active { right: 0; }
@@ -304,6 +315,12 @@ body.admin-mode {
         background: rgba(15, 23, 42, 0.4);
         backdrop-filter: blur(4px);
         z-index: 2050;
+    }
+
+    .admin-main {
+        margin-left: 0;
+        height: 100vh;
+        overflow-y: auto;
     }
 
     .admin-content { padding: 16px; }
