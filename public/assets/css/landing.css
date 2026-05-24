@@ -1,0 +1,517 @@
+/**
+ * Belajaryuk - Landing page styles
+ */
+
+#landing-page {
+    position: relative;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--primary-light) 18%, var(--bg-body)) 0%, var(--bg-body) 180px);
+    overflow: hidden;
+}
+
+.lp-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
+    width: 100%;
+}
+
+.lp-bg-decor {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.lp-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.35;
+}
+
+.blob-1 {
+    width: 360px;
+    height: 360px;
+    background: color-mix(in srgb, var(--primary) 30%, transparent);
+    top: -120px;
+    right: -60px;
+}
+
+.blob-2 {
+    width: 320px;
+    height: 320px;
+    background: color-mix(in srgb, var(--info) 25%, transparent);
+    bottom: 180px;
+    left: -120px;
+}
+
+.public-header {
+    height: 82px;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 110;
+    display: flex;
+    align-items: center;
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+}
+
+.nav-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-brand-logo span {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-actions > button {
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    letter-spacing: 0.01em;
+}
+
+.header-actions .btn-p {
+    padding: 0 18px;
+    border-color: color-mix(in srgb, var(--primary) 70%, #0b3d31 30%);
+    box-shadow: 0 10px 18px -14px color-mix(in srgb, var(--primary) 58%, transparent);
+}
+
+.header-actions .btn-p:hover {
+    box-shadow: 0 14px 22px -16px color-mix(in srgb, var(--primary) 72%, transparent);
+}
+
+#landing-page main {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-wrapper {
+    padding: 92px 0 100px;
+}
+
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 64px;
+    align-items: center;
+}
+
+.hero-pre-header {
+    margin-bottom: 14px;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--border));
+    background: color-mix(in srgb, var(--primary-light) 70%, white 30%);
+    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+}
+
+.badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--primary);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.hero-text h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 1.05;
+    font-weight: 900;
+    margin-bottom: 24px;
+    letter-spacing: -0.03em;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary), #10b981);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-text p {
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    line-height: 1.6;
+    max-width: 50ch;
+}
+
+.hero-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hero-preview {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.preview-card {
+    background: var(--surface);
+    border-radius: 22px;
+    padding: 10px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    max-width: 520px;
+    width: 100%;
+}
+
+.preview-nav {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 8px 10px;
+}
+
+.preview-content {
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+}
+
+.preview-image-wrapper {
+    border-radius: 14px;
+    overflow: hidden;
+    height: 340px;
+    position: relative;
+}
+
+.hero-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-overlay-glow {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 10%, rgba(15, 23, 42, 0.25) 100%);
+}
+
+.play-btn-pulse {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.55);
+    animation: playPulse 2.2s infinite;
+}
+
+@keyframes playPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.55);
+    }
+    70% {
+        box-shadow: 0 0 0 18px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.features-wrapper {
+    padding: 8px 0 54px;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.section-subtitle {
+    display: inline-block;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border));
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary-light) 72%, white 28%);
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.section-header h2 {
+    margin-bottom: 16px;
+    font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.section-header p {
+    margin: 0 auto;
+    max-width: 65ch;
+    line-height: 1.65;
+}
+
+.features-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.f-card {
+    padding: 26px 22px;
+    border-radius: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.f-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--primary) 24%, var(--border));
+    box-shadow: var(--shadow-md);
+}
+
+.f-icon {
+    width: 54px;
+    height: 54px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+}
+
+.f-card h3 {
+    font-size: 1.08rem;
+    margin-bottom: 8px;
+}
+
+.f-card p {
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.6;
+}
+
+.final-cta-wrapper {
+    padding: 14px 0 44px;
+}
+
+.cta-card {
+    background: linear-gradient(135deg, var(--primary) 0%, #10b981 100%);
+    border-radius: 24px;
+    padding: clamp(24px, 5vw, 56px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    color: white;
+    box-shadow: 0 24px 42px -22px rgba(16, 185, 129, 0.55);
+}
+
+.cta-content {
+    max-width: 640px;
+}
+
+.cta-content h2 {
+    color: white !important;
+    margin-bottom: 10px;
+    font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+}
+
+.cta-content p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 16px;
+}
+
+.cta-content .btn-p {
+    background: #ffffff;
+    color: #0f766e;
+}
+
+.cta-content .btn-p:hover {
+    background: #f4f8ff;
+}
+
+.cta-visual {
+    position: relative;
+    width: 164px;
+    height: 164px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+}
+
+.cta-blob {
+    position: absolute;
+    inset: 0;
+    border-radius: 38% 62% 58% 42% / 43% 40% 60% 57%;
+    background: rgba(255, 255, 255, 0.2);
+    animation: blobMove 7s ease-in-out infinite;
+}
+
+.cta-rocket-icon {
+    width: 68px;
+    height: 68px;
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes blobMove {
+    0%,
+    100% {
+        border-radius: 38% 62% 58% 42% / 43% 40% 60% 57%;
+        transform: rotate(0deg);
+    }
+    50% {
+        border-radius: 61% 39% 44% 56% / 36% 66% 34% 64%;
+        transform: rotate(12deg);
+    }
+}
+
+.minimal-footer {
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    margin-top: 8px;
+}
+
+.mf-inner {
+    min-height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mf-copy {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin: 0;
+}
+
+@media (max-width: 1024px) {
+    .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .hero-text {
+        text-align: center;
+    }
+
+    .hero-text p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-cta-group {
+        justify-content: center;
+    }
+
+    .hero-preview {
+        justify-content: center;
+    }
+
+    .features-grid-modern {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .public-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 72px;
+        background: var(--surface);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+    }
+
+    .nav-brand-logo span {
+        font-size: 1.14rem;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .header-actions .btn-small,
+    .header-actions .btn-ghost {
+        min-height: 35px;
+        padding: 0 12px;
+        font-size: 0.8rem;
+    }
+
+    .hero-wrapper {
+        padding: 100px 0 48px; /* Increased top padding to prevent fixed header from covering content */
+    }
+
+    .preview-image-wrapper {
+        height: 260px;
+    }
+
+    .play-btn-pulse {
+        width: 54px;
+        height: 54px;
+    }
+
+    .final-cta-wrapper {
+        padding-bottom: 34px;
+    }
+
+    .cta-visual {
+        width: 120px;
+        height: 120px;
+    }
+
+    .cta-rocket-icon {
+        width: 52px;
+        height: 52px;
+    }
+}
