@@ -192,11 +192,17 @@ export const UI = {
         return splash && !splash.classList.contains('hidden');
     },
 
-    showLoading() {
+    showLoading(message = 'Mohon tunggu...') {
         // Guard: Don't show loading if splash screen is still active to prevent "collision"
         if (this.isSplashVisible()) return;
         
-        document.getElementById('loading')?.classList.remove('d-none');
+        const loadingEl = document.getElementById('loading');
+        const loadingTextEl = document.getElementById('loading-text');
+        
+        if (loadingEl) {
+            if (loadingTextEl) loadingTextEl.textContent = message;
+            loadingEl.classList.remove('d-none');
+        }
     },
 
     hideLoading() {
