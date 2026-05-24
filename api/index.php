@@ -31,27 +31,11 @@ register_shutdown_function(function() {
 
 $root = dirname(__DIR__);
 
-// 2. Autoloader Cerdas (Mencari di semua variasi folder)
-spl_autoload_register(function ($class) use ($root) {
-    if (strpos($class, 'App\\') !== 0) return;
-    $rel = str_replace(['App\\', '\\'], ['', '/'], $class);
-    
-    $paths = [
-        $root . '/src/' . $rel . '.php',
-        $root . '/src/' . strtolower($rel) . '.php',
-        $root . '/src/' . ucfirst($rel) . '.php'
-    ];
-    
-    foreach ($paths as $path) {
-        if (file_exists($path)) {
-            require_once $path;
-            return;
-        }
-    }
-}, true, true);
+// 2. Load Dependencies & Config (Composer handles PSR-4 App\ autoloading)
+if (file_exists($root . '/vendor/autoload.php')) {
+    require_once $root . '/vendor/autoload.php';
+}
 
-// 3. Load Dependencies & Config
-if (file_exists($root . '/vendor/autoload.php')) require_once $root . '/vendor/autoload.php';
 $config = $root . '/src/Config/lingkungan.php';
 if (!file_exists($config)) $config = $root . '/src/config/lingkungan.php';
 if (file_exists($config)) require_once $config;

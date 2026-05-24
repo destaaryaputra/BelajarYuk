@@ -13,7 +13,9 @@ if (!file_exists($envFile)) {
     $envFile = dirname(__DIR__, 2) . '/.env';
 }
 
-if (file_exists($envFile)) {
+$appEnv = $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development';
+
+if ($appEnv !== 'production' && file_exists($envFile)) {
     $content = file_get_contents($envFile);
     $content = str_replace("\xEF\xBB\xBF", "", $content); // Remove BOM
     

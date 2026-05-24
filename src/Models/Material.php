@@ -243,8 +243,6 @@ class Material {
      */
     public function markSubMaterialCompleted(int $user_id, int $sub_material_id): array {
         try {
-            $this->createSubMaterialProgressTable();
-            
             // Get material_id first for sync
             $stmtM = $this->db->prepare("SELECT material_id FROM sub_materi WHERE id = ?");
             $stmtM->execute([$sub_material_id]);
@@ -275,7 +273,6 @@ class Material {
      */
     public function getCompletedSubMaterials(int $user_id, int $material_id): array {
         try {
-            $this->createSubMaterialProgressTable();
             $query = "SELECT sub_material_id FROM progres_sub_materi psm
                      JOIN sub_materi sm ON psm.sub_material_id = sm.id
                      WHERE psm.user_id = ? AND sm.material_id = ?";
@@ -286,17 +283,6 @@ class Material {
             error_log("Get completed sub-materials error: " . $e->getMessage());
             return [];
         }
-    }
-
-    private function createSubMaterialProgressTable(): void {
-        $query = "CREATE TABLE IF NOT EXISTS progres_sub_materi (
-            id SERIAL PRIMARY KEY,
-            user_id INT REFERENCES pengguna(id) ON DELETE CASCADE,
-            sub_material_id INT REFERENCES sub_materi(id) ON DELETE CASCADE,
-            completed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE (user_id, sub_material_id)
-        );";
-        $this->db->exec($query);
     }
 
     /**
@@ -382,9 +368,6 @@ class Material {
             $stmt->execute([$material_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) { 
-            if (strpos($e->getMessage(), 'komentar_materi') !== false) {
-                $this->createCommentTable();
-            }
             error_log("Get comments error: " . $e->getMessage());
             return []; 
         }
@@ -405,9 +388,6 @@ class Material {
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            if (strpos($e->getMessage(), 'komentar_materi') !== false) {
-                $this->createCommentTable();
-            }
             error_log("Get all comments error: " . $e->getMessage());
             return [];
         }
@@ -431,26 +411,8 @@ class Material {
             $stmt->execute([$material_id, $user_id, $comment_text]);
             return ['success' => true, 'message' => 'Komentar terkirim.'];
         } catch (Exception $e) { 
-            // Jika tabel hilang, buat otomatis lalu coba simpan lagi!
-            if (strpos($e->getMessage(), 'komentar_materi') !== false) {
-                $this->createCommentTable();
-                $stmt = $this->db->prepare($query);
-                $stmt->execute([$material_id, $user_id, $comment_text]);
-                return ['success' => true, 'message' => 'Komentar terkirim.'];
-            }
             error_log("Add comment error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal mengirim komentar.']; 
         }
-    }
-
-    private function createCommentTable(): void {
-        $query = "CREATE TABLE IF NOT EXISTS komentar_materi (
-            id SERIAL PRIMARY KEY,
-            material_id INT REFERENCES materi(id) ON DELETE CASCADE,
-            user_id INT REFERENCES pengguna(id) ON DELETE CASCADE,
-            comment_text TEXT NOT NULL,
-            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-        );";
-        $this->db->exec($query);
     }
 }
