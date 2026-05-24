@@ -24,10 +24,6 @@ class User {
      */
     public function updateStreak(int $user_id): void {
         try {
-            // Ensure columns exist (Safeguard)
-            $this->db->exec("ALTER TABLE pengguna ADD COLUMN IF NOT EXISTS streak_count INT DEFAULT 0");
-            $this->db->exec("ALTER TABLE pengguna ADD COLUMN IF NOT EXISTS last_active_date DATE");
-
             $query = "SELECT streak_count, last_active_date FROM pengguna WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$user_id]);

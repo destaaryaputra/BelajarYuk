@@ -18,8 +18,3 @@
     RewriteRule ^(.*)$ public/index.php [L]
 </IfModule>
 
-# Environment variables (for Apache)
-SetEnv APP_ENV development
-SetEnv APP_URL http://localhost/belajaryuk
-SetEnv JWT_SECRET dev-secret-key-change-in-production
-

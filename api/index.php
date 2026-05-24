@@ -60,8 +60,8 @@ if (isset($_SESSION['csrf_token'])) {
 
 // 5. Pengaturan CORS & Security
 // CORS headers dikelola di src/Config/lingkungan.php (allowlist).
-// Tambahkan header Origin (wildcard atau whitelist) agar browser mengizinkan request cross‑origin.
-header('Access-Control-Allow-Origin: *'); // Ganti * dengan whitelist bila diperlukan
+// Jangan override header Origin di sini dengan wildcard agar tetap aman.
+// header('Access-Control-Allow-Origin: *'); // DIHAPUS: Sudah ditangani di lingkungan.php
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token');
 
