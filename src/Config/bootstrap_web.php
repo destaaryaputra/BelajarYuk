@@ -20,10 +20,11 @@ if (empty($_SESSION['csrf_token'])) {
 
 // Set double-submit cookie for production stability
 if (!isset($_COOKIE['csrf_token']) || $_COOKIE['csrf_token'] !== $_SESSION['csrf_token']) {
+    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
     setcookie('csrf_token', $_SESSION['csrf_token'], [
         'expires' => time() + 3600,
         'path' => '/',
-        'secure' => true,
+        'secure' => $secure,
         'httponly' => false, // JS needs to read it or we just rely on headers
         'samesite' => 'Lax'
     ]);
