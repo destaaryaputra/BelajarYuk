@@ -373,7 +373,9 @@ export const MaterialDetail = {
                     <h1 class="display-title">${UI.escapeHtml(active.title || 'Materi')}</h1>
                 </div>
                 
-                ${mediaHtml}
+                <div id="media-player-slot">
+                    ${mediaHtml}
+                </div>
 
                 <div class="material-rich-content mb-32">
                     ${active.content || (active.isMain ? '<p class="text-muted">Selamat datang di modul ini! Silakan baca ringkasan di atas untuk mengetahui apa yang akan kita bahas.</p>' : '<p class="text-muted">Konten materi belum tersedia.</p>')}
@@ -397,7 +399,7 @@ export const MaterialDetail = {
             </article>
 
             ${showComments ? `
-                <div id="comments-section-container" class="mt-24">
+                <div id="comments-section-container-js" class="mt-24">
                     <div class="content-card"><p class="text-muted">Memuat diskusi...</p></div>
                 </div>
             ` : ''}
@@ -571,7 +573,7 @@ export const MaterialDetail = {
     },
 
     async loadComments(materialId) {
-        const commentContainer = document.getElementById('comments-section-container');
+        const commentContainer = document.getElementById('comments-section-container-js');
         if (!commentContainer) return;
 
         try {

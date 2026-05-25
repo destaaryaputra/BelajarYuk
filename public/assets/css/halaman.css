@@ -527,15 +527,30 @@
     display: none;
 }
 
-/* Desktop layout: show comments beside material and syllabus */
+/* Desktop layout: Unified Grid */
 @media (min-width: 1025px) {
     .learning-detail-layout {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        grid-template-areas: "video syllabus";
         gap: 24px;
+        align-items: start;
     }
-    #material-detail { flex: 2; }
-    #course-syllabus { flex: 1; max-height: none; }
-    #comments-section-container { flex: 1; }
+
+    #material-detail {
+        grid-area: video;
+        min-height: 500px;
+        max-width: 1000px;
+        width: 100%;
+    }
+
+    #course-syllabus {
+        grid-area: syllabus;
+        position: sticky;
+        top: 90px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
 }
 
 .material-detail-toolbar {
