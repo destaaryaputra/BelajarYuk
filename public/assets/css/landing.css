@@ -488,6 +488,12 @@
         font-size: 0.8rem;
     }
 
+    .header-actions .btn-p.btn-small {
+        min-width: 64px;
+        padding: 0 14px;
+        flex-shrink: 0;
+    }
+
     .hero-wrapper {
         padding: 100px 0 48px; /* Increased top padding to prevent fixed header from covering content */
     }

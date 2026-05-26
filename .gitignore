@@ -11,6 +11,10 @@ composer.lock
 .DS_Store
 Thumbs.db
 
+# Local audit artifacts
+.playwright-cli/
+output/
+
 # Project specific
 public/uploads/*
 !public/uploads/.gitkeep

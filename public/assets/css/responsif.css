@@ -469,6 +469,28 @@
         font-size: 14px;
     }
 
+    .search-bar {
+        flex-direction: column;
+        align-items: stretch;
+        flex-wrap: nowrap;
+    }
+
+    .search-input-wrapper,
+    .search-select-wrapper,
+    .custom-dropdown {
+        width: 100%;
+        flex: none;
+    }
+
+    .custom-dropdown-trigger span {
+        max-width: none;
+    }
+
+    .custom-dropdown-menu {
+        width: 100%;
+        min-width: 0;
+    }
+
     .content-card {
         padding: 20px 16px;
     }
