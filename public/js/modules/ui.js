@@ -3,6 +3,9 @@
  */
 
 export const UI = {
+    _scriptPromises: {},
+    _stylePromises: {},
+
     init() {
         // Global Event Delegation for Navigation
         document.addEventListener('click', (e) => {
@@ -365,6 +368,103 @@ export const UI = {
 
     getBasePath() {
         return window.location.pathname.replace(/\/(index|api)\.(php|html?)$/i, '').replace(/\/$/, '');
+    },
+
+    getAssetPath(path) {
+        const cleanPath = String(path || '').replace(/^\/+/, '');
+        const base = this.getBasePath();
+        return `${base}/${cleanPath}`;
+    },
+
+    getThumbnailUrl(thumbnail) {
+        const value = String(thumbnail || '').trim();
+        if (!value) return this.getAssetPath('assets/course-placeholder.svg');
+        if (/^(https?:)?\/\//i.test(value) || value.startsWith('data:') || value.startsWith('blob:')) {
+            return this.optimizeImageUrl(value, 720);
+        }
+        if (value.startsWith('/')) return value;
+        return this.getAssetPath(`uploads/thumbnails/${value}`);
+    },
+
+    getImageFallbackAttribute() {
+        return `onerror="this.onerror=null;this.src='${this.getAssetPath('assets/course-placeholder.svg')}'"`;
+    },
+
+    optimizeImageUrl(src, width = 720) {
+        try {
+            const url = new URL(src, window.location.origin);
+            if (url.hostname.includes('images.unsplash.com')) {
+                url.searchParams.set('auto', 'format');
+                url.searchParams.set('fit', 'crop');
+                url.searchParams.set('q', '65');
+                url.searchParams.set('w', String(width));
+                return url.toString();
+            }
+        } catch (error) {
+            return src;
+        }
+        return src;
+    },
+
+    resolveAssetUrls(root = document) {
+        root.querySelectorAll('[data-asset-src]').forEach(el => {
+            const assetPath = el.getAttribute('data-asset-src');
+            if (assetPath) el.setAttribute('src', this.getAssetPath(assetPath));
+        });
+
+        root.querySelectorAll('[data-asset-href]').forEach(el => {
+            const assetPath = el.getAttribute('data-asset-href');
+            if (assetPath) el.setAttribute('href', this.getAssetPath(assetPath));
+        });
+    },
+
+    loadScript(src, globalName = null) {
+        if (globalName && window[globalName]) {
+            return Promise.resolve(window[globalName]);
+        }
+
+        if (this._scriptPromises[src]) {
+            return this._scriptPromises[src];
+        }
+
+        this._scriptPromises[src] = new Promise((resolve, reject) => {
+            const existing = document.querySelector(`script[src="${src}"]`);
+            if (existing) {
+                existing.addEventListener('load', () => resolve(globalName ? window[globalName] : true), { once: true });
+                existing.addEventListener('error', reject, { once: true });
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.onload = () => resolve(globalName ? window[globalName] : true);
+            script.onerror = () => reject(new Error(`Gagal memuat script: ${src}`));
+            document.head.appendChild(script);
+        });
+
+        return this._scriptPromises[src];
+    },
+
+    loadStyle(href) {
+        if (document.querySelector(`link[href="${href}"]`)) {
+            return Promise.resolve(true);
+        }
+
+        if (this._stylePromises[href]) {
+            return this._stylePromises[href];
+        }
+
+        this._stylePromises[href] = new Promise((resolve, reject) => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.onload = () => resolve(true);
+            link.onerror = () => reject(new Error(`Gagal memuat stylesheet: ${href}`));
+            document.head.appendChild(link);
+        });
+
+        return this._stylePromises[href];
     },
 
     togglePasswordVisibility(btn) {

@@ -129,7 +129,7 @@ export const Admin = {
                 <div class="profile-header-main mb-32">
                     <div class="profile-avatar-wrapper">
                         <div class="profile-avatar-large" id="admin-avatar-container">
-                            ${avatarUrl ? `<img src="${UI.escapeHtml(avatarUrl)}" alt="Avatar">` : initials}
+                            ${avatarUrl ? `<img src="${UI.escapeHtml(avatarUrl)}" alt="Avatar" loading="lazy" decoding="async">` : initials}
                         </div>
                         <button type="button" class="btn-change-avatar" id="btn-admin-change-avatar" title="Ubah Foto Profil">
                             <i data-lucide="camera"></i>
@@ -236,7 +236,7 @@ export const Admin = {
             this.renderRecentMaterials(materials.slice(0, 5));
             await this.renderRecentComments();
             
-            this.renderCharts(students, materials);
+            await this.renderCharts(students, materials);
         } catch (error) { console.error(error); }
     },
 
@@ -358,10 +358,10 @@ export const Admin = {
         } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
 
-    toggleMaterialForm(show) {
+    async toggleMaterialForm(show) {
         document.getElementById('admin-list-view')?.classList.toggle('d-none', show);
         document.getElementById('admin-form-view')?.classList.toggle('d-none', !show);
-        if (show) this.initQuill();
+        if (show) await this.initQuill();
         else {
             document.getElementById('create-material-form')?.reset();
             document.getElementById('mat-id').value = '';
@@ -381,7 +381,7 @@ export const Admin = {
             document.getElementById('mat-duration').value = m.duration_minutes || 0;
             document.getElementById('mat-video').value = m.video_url || '';
             document.getElementById('mat-desc').value = m.description || '';
-            this.toggleMaterialForm(true);
+            await this.toggleMaterialForm(true);
             document.getElementById('admin-form-title').innerText = 'Edit Materi: ' + m.title;
             if (this.editors.matQuill) this.editors.matQuill.clipboard.dangerouslyPasteHTML(m.content || '');
         } catch (error) { UI.showNotification(error.message, 'error'); } finally { UI.hideLoading(); }
@@ -442,14 +442,19 @@ export const Admin = {
         } catch (error) { console.error(error); } finally { UI.hideLoading(); }
     },
 
-    handleEditSubMat(id) {
+    async toggleSubMaterialForm(show) {
+        document.getElementById('admin-submaterial-form-container')?.classList.toggle('d-none', !show);
+        if (show) await this.initQuill();
+    },
+
+    async handleEditSubMat(id) {
         const s = this.currentSubMaterials.find(x => x.id == id);
         if (!s) return;
         document.getElementById('admin-submaterial-form-container').classList.remove('d-none');
         document.getElementById('submat-id').value = s.id;
         document.getElementById('submat-title').value = s.title || '';
         document.getElementById('submat-video').value = s.video_url || '';
-        this.initQuill();
+        await this.initQuill();
         if (this.editors.submatQuill) this.editors.submatQuill.clipboard.dangerouslyPasteHTML(s.content || '');
     },
 
@@ -982,7 +987,7 @@ export const Admin = {
 
             html += '</tbody></table></div></div>';
             container.innerHTML = html;
-            this.renderReportsChart(perQuiz);
+            await this.renderReportsChart(perQuiz);
             if (window.lucide) window.lucide.createIcons();
         } catch (error) {
             console.error(error);
@@ -1036,14 +1041,25 @@ export const Admin = {
             document.getElementById('mat-title').value = d.title;
             document.getElementById('mat-category').value = d.category;
             document.getElementById('mat-desc').value = d.description;
-            this.initQuill();
+            await this.initQuill();
             if (this.editors.matQuill) this.editors.matQuill.clipboard.dangerouslyPasteHTML(d.content || '');
             UI.showNotification('Selesai!', 'success');
         } catch (error) { UI.showNotification('Gagal.', 'error'); } finally { UI.hideLoading(); }
     },
 
-    initQuill() {
-        if (typeof Quill === 'undefined') return;
+    async initQuill() {
+        if (typeof Quill === 'undefined') {
+            try {
+                await Promise.all([
+                    UI.loadStyle('https://cdn.quilljs.com/1.3.6/quill.snow.css'),
+                    UI.loadScript('https://cdn.quilljs.com/1.3.6/quill.min.js', 'Quill')
+                ]);
+            } catch (error) {
+                console.error('Quill load error:', error);
+                UI.showNotification('Editor konten gagal dimuat.', 'error');
+                return;
+            }
+        }
         const options = { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['link', 'code-block'], [{ 'list': 'ordered'}, { 'list': 'bullet' }]] } };
         if (document.getElementById('mat-content-editor') && !this.editors.matQuill) this.editors.matQuill = new Quill('#mat-content-editor', options);
         if (document.getElementById('submat-content-editor') && !this.editors.submatQuill) this.editors.submatQuill = new Quill('#submat-content-editor', options);
@@ -1085,8 +1101,12 @@ export const Admin = {
         }
     },
 
-    renderReportsChart(perQuiz) {
-        if (typeof Chart === 'undefined') return;
+    async renderReportsChart(perQuiz) {
+        const ChartCtor = await UI.loadScript('https://cdn.jsdelivr.net/npm/chart.js', 'Chart').catch(error => {
+            console.error('Chart.js load error:', error);
+            return null;
+        });
+        if (!ChartCtor) return;
         const canvas = document.getElementById('adminReportsChart');
         if (!canvas) return;
 
@@ -1117,7 +1137,7 @@ export const Admin = {
             return;
         }
 
-        this.charts.reports = new Chart(canvas, {
+        this.charts.reports = new ChartCtor(canvas, {
             type: 'bar',
             data: {
                 labels,
@@ -1250,15 +1270,19 @@ export const Admin = {
         return { labels, monthlyCounts, cumulativeCounts };
     },
 
-    renderCharts(students, materials) {
-        if (typeof Chart === 'undefined') return;
+    async renderCharts(students, materials) {
+        const ChartCtor = await UI.loadScript('https://cdn.jsdelivr.net/npm/chart.js', 'Chart').catch(error => {
+            console.error('Chart.js load error:', error);
+            return null;
+        });
+        if (!ChartCtor) return;
         
         // 1. Registration Growth Chart
         const ctxReg = document.getElementById('adminRegistrationChart');
         if (ctxReg) {
             if (this.charts.registration) this.charts.registration.destroy();
             const trend = this.buildRegistrationTrend(students, 6);
-            this.charts.registration = new Chart(ctxReg, {
+            this.charts.registration = new ChartCtor(ctxReg, {
                 type: 'bar',
                 data: {
                     labels: trend.labels,
@@ -1330,7 +1354,7 @@ export const Admin = {
             if (Object.keys(cats).length === 0) {
                 cats['Belum ada materi'] = 1;
             }
-            this.charts.category = new Chart(ctxCat, {
+            this.charts.category = new ChartCtor(ctxCat, {
                 type: 'doughnut',
                 data: {
                     labels: Object.keys(cats),
@@ -1379,7 +1403,7 @@ window.handleDeleteMaterial = (id) => Admin.handleDeleteMaterial(id);
 window.handleEditMaterial = (id) => Admin.handleEditMaterial(id);
 window.openSubMaterialView = (id, title) => Admin.openSubMaterialView(id, title);
 window.handleSaveSubMaterial = (e) => Admin.handleSaveSubMaterial(e);
-window.toggleSubMaterialForm = (show) => document.getElementById('admin-submaterial-form-container').classList.toggle('d-none', !show);
+window.toggleSubMaterialForm = (show) => Admin.toggleSubMaterialForm(show);
 window.toggleSubMaterialView = (show) => {
     document.getElementById('admin-submaterial-view').classList.toggle('d-none', !show);
     document.getElementById('admin-list-view').classList.toggle('d-none', show);

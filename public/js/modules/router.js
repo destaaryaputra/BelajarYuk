@@ -55,7 +55,8 @@ export const Router = {
 
             // 2. Load page content if not cached
             if (!this.cache[pageId]) {
-                const response = await fetch(`${this.routes[pageId]}?v=${new Date().getTime()}`);
+                const version = window.BELAJARYUK_ASSET_VERSION || 'dev';
+                const response = await fetch(`${this.routes[pageId]}?v=${encodeURIComponent(version)}`);
                 if (!response.ok) throw new Error(`Failed to fetch page: ${pageId}`);
                 this.cache[pageId] = await response.text();
             }
@@ -64,6 +65,7 @@ export const Router = {
             const container = document.getElementById(pageId);
             if (container) {
                 container.innerHTML = this.cache[pageId];
+                UI.resolveAssetUrls(container);
                 container.classList.remove('d-none');
                 container.classList.add('active'); // Senior Fix: Add active class for display: block
                 

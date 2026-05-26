@@ -44,7 +44,7 @@ export const Profile = {
             <div class="profile-header-main mb-32">
                 <div class="profile-avatar-wrapper">
                     <div class="profile-avatar-large" id="profile-avatar-container">
-                        ${avatarUrl ? `<img src="${UI.escapeHtml(avatarUrl)}" alt="Avatar" id="profile-avatar-img">` : initials}
+                        ${avatarUrl ? `<img src="${UI.escapeHtml(avatarUrl)}" alt="Avatar" id="profile-avatar-img" loading="lazy" decoding="async">` : initials}
                     </div>
                     <button type="button" class="btn-change-avatar" id="btn-change-avatar" title="Ubah Foto Profil">
                         <i data-lucide="camera"></i>

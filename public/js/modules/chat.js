@@ -162,6 +162,7 @@ export const AIChat = {
         this.loaded = true;
 
         try {
+            await UI.loadScript('https://cdn.jsdelivr.net/npm/marked/marked.min.js', 'marked').catch(() => null);
             const response = await API.getAIHistory(12);
             const history = response.data || [];
             if (!Array.isArray(history) || history.length === 0) return;
@@ -226,6 +227,7 @@ export const AIChat = {
             document.getElementById(typingId)?.remove();
 
             const aiReply = response?.data?.reply || 'AI sedang sibuk.';
+            await UI.loadScript('https://cdn.jsdelivr.net/npm/marked/marked.min.js', 'marked').catch(() => null);
             this.history.push({ role: 'assistant', content: aiReply });
             this.trimHistory();
             this.appendMessage(aiReply, 'ai');

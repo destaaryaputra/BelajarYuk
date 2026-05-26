@@ -211,8 +211,14 @@ export const Quiz = {
 
         if (window.lucide) window.lucide.createIcons();
         
-        if (isPassed && typeof confetti === 'function') {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 10007 });
+        if (isPassed) {
+            UI.loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js', 'confetti')
+                .then(confettiFn => {
+                    if (typeof confettiFn === 'function') {
+                        confettiFn({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 10007 });
+                    }
+                })
+                .catch(() => {});
         }
     }
 };

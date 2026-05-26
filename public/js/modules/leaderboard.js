@@ -55,7 +55,7 @@ export const Leaderboard = {
 
             const initials = (item.full_name || item.username || '?')[0].toUpperCase();
             const avatarHtml = item.avatar 
-                ? `<img src="${UI.escapeHtml(item.avatar)}" alt="Avatar" class="user-avatar-small">`
+                ? `<img src="${UI.escapeHtml(item.avatar)}" alt="Avatar" class="user-avatar-small" loading="lazy" decoding="async">`
                 : `<div class="user-avatar-small">${initials}</div>`;
 
             html += `

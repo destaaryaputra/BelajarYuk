@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Belajaryuk course placeholder</title>
+  <desc id="desc">A lightweight local illustration for course thumbnails.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#eef7f2"/>
+      <stop offset="0.52" stop-color="#e8f0ff"/>
+      <stop offset="1" stop-color="#fff7e6"/>
+    </linearGradient>
+    <linearGradient id="book" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#1f8a70"/>
+      <stop offset="1" stop-color="#2563a7"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#1f2933" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="960" height="540" rx="34" fill="url(#bg)"/>
+  <circle cx="160" cy="128" r="58" fill="#f6b84b" opacity="0.2"/>
+  <circle cx="790" cy="414" r="82" fill="#1f8a70" opacity="0.14"/>
+  <path d="M236 356c72-116 160-174 264-174s178 53 224 160" fill="none" stroke="#cbd5e1" stroke-width="32" stroke-linecap="round" opacity="0.58"/>
+  <g filter="url(#shadow)">
+    <rect x="296" y="150" width="368" height="248" rx="28" fill="#ffffff"/>
+    <path d="M480 180c-45-24-92-30-142-18v196c50-12 97-6 142 18 45-24 92-30 142-18V162c-50-12-97-6-142 18z" fill="url(#book)"/>
+    <path d="M480 180v196" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.65"/>
+    <path d="M354 218h82M354 250h70M354 282h88M524 218h82M524 250h70M524 282h88" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity="0.8"/>
+  </g>
+  <g fill="#1f2933" opacity="0.72">
+    <rect x="338" y="426" width="244" height="18" rx="9"/>
+    <rect x="338" y="456" width="156" height="14" rx="7" opacity="0.42"/>
+  </g>
+</svg>

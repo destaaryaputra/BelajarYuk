@@ -8,10 +8,13 @@ import { UI } from './ui.js';
 export const Materials = {
     allMaterials: [],
     activeCategory: 'all',
+    pageSize: 24,
+    visibleLimit: 24,
 
     async load() {
         const listContainer = document.getElementById('materials-list');
         if (!listContainer) return;
+        this.visibleLimit = this.pageSize;
 
         // 1. Show Skeletons
         listContainer.innerHTML = Array(6).fill(0).map(() => `
@@ -76,7 +79,10 @@ export const Materials = {
     setupListeners() {
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
-            searchInput.oninput = () => this.filter();
+            searchInput.oninput = () => {
+                this.visibleLimit = this.pageSize;
+                this.filter();
+            };
         }
 
         const trigger = document.getElementById('categoryDropdownTrigger');
@@ -134,6 +140,7 @@ export const Materials = {
 
     setCategory(category) {
         this.activeCategory = category;
+        this.visibleLimit = this.pageSize;
         const labelEl = document.getElementById('current-category-label');
         if (labelEl) labelEl.innerText = (category === 'all') ? 'Semua Kategori' : category;
 
@@ -169,22 +176,18 @@ export const Materials = {
             return;
         }
 
-        const getThumb = (thumb) => {
-            if (!thumb) return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80';
-            if (thumb.startsWith('http') || thumb.startsWith('/')) return thumb;
-            return '/public/uploads/thumbnails/' + thumb;
-        };
-
         const diffMap = { 'beginner': 'Pemula', 'intermediate': 'Menengah', 'advanced': 'Mahir' };
+        const visibleMaterials = materials.slice(0, this.visibleLimit);
 
-        container.innerHTML = materials.map((m, index) => {
+        container.innerHTML = visibleMaterials.map((m, index) => {
             const difficulty = diffMap[m.difficulty] || 'Pemula';
             const isCompleted = (m.progress_percentage || 0) >= 100;
+            const thumbUrl = UI.escapeHtml(UI.getThumbnailUrl(m.thumbnail));
 
             return `
                 <div class="material-card reveal-on-scroll is-visible" style="transition-delay: ${index * 0.05}s">
                     <div class="img-wrapper" data-id="${m.id}">
-                        <img src="${getThumb(m.thumbnail)}" alt="${UI.escapeHtml(m.title)}" loading="lazy">
+                        <img src="${thumbUrl}" alt="${UI.escapeHtml(m.title)}" loading="lazy" decoding="async" width="640" height="360" ${UI.getImageFallbackAttribute()}>
                         ${isCompleted ? '<div class="card-completed-badge"><i data-lucide="check-circle-2"></i> Selesai</div>' : ''}
                     </div>
                     <div class="material-card-content">
@@ -202,10 +205,21 @@ export const Materials = {
                     </div>
                 </div>
             `;
-        }).join('');
+        }).join('') + (materials.length > this.visibleLimit ? `
+            <div class="load-more-row" style="grid-column: 1 / -1; display: flex; justify-content: center;">
+                <button type="button" class="btn-outline" id="load-more-materials">
+                    Muat ${Math.min(this.pageSize, materials.length - this.visibleLimit)} Materi Lagi
+                </button>
+            </div>
+        ` : '');
 
         container.querySelectorAll('[data-id]').forEach(el => {
             el.onclick = () => this.viewMaterial(el.getAttribute('data-id'));
+        });
+
+        document.getElementById('load-more-materials')?.addEventListener('click', () => {
+            this.visibleLimit += this.pageSize;
+            this.renderList(materials);
         });
         
         if (window.lucide) window.lucide.createIcons();

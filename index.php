@@ -20,6 +20,34 @@ if (!empty($base_path)) {
 }
 $path = preg_replace('/\?.*/', '', $path); // Remove query string
 
+// Serve public static assets from clean URLs, matching Vercel routing
+$public_aliases = ['assets', 'js', 'pages', 'components', 'uploads'];
+$first_segment = trim(explode('/', trim($path, '/'))[0] ?? '', '/');
+if (in_array($first_segment, $public_aliases, true)) {
+    $file = __DIR__ . '/public' . $path;
+    if (file_exists($file) && is_file($file)) {
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $mime_types = [
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'json' => 'application/json',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'svg' => 'image/svg+xml',
+            'html' => 'text/html',
+        ];
+
+        if (isset($mime_types[$ext])) {
+            header('Content-Type: ' . $mime_types[$ext]);
+        }
+        readfile($file);
+        exit;
+    }
+}
+
 // Route API requests to api/index.php
 if (strpos($path, '/api/') === 0) {
     $_GET['_api_request'] = $path;

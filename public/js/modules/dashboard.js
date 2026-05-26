@@ -178,10 +178,8 @@ export const Dashboard = {
 
         const featured = materials[0];
         const others = materials.slice(1);
-        const defaultThumb = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80';
-        const getThumb = (thumb) => thumb ? (thumb.startsWith('http') || thumb.startsWith('/') ? thumb : '/public/uploads/thumbnails/' + thumb) : defaultThumb;
-        
         const diffMap = { 'beginner': 'Pemula', 'intermediate': 'Menengah', 'advanced': 'Mahir' };
+        const featuredThumb = UI.escapeHtml(UI.getThumbnailUrl(featured.thumbnail));
         
         let html = `
             <div class="featured-course-card mb-32 clickable-card" data-material-id="${featured.id}">
@@ -192,7 +190,7 @@ export const Dashboard = {
                     <div><span class="featured-cta">Mulai Modul Ini</span></div>
                 </div>
                 <div class="featured-course-media">
-                    <img src="${getThumb(featured.thumbnail)}" alt="${UI.escapeHtml(featured.title)}">
+                    <img src="${featuredThumb}" alt="${UI.escapeHtml(featured.title)}" loading="lazy" decoding="async" width="800" height="450" ${UI.getImageFallbackAttribute()}>
                 </div>
             </div>
         `;
@@ -201,10 +199,11 @@ export const Dashboard = {
             html += `<h2 class="section-title-compact mb-16">Materi Menarik Lainnya</h2>`;
             html += `<div class="dashboard-material-grid">`;
             others.forEach(m => {
+                const thumbUrl = UI.escapeHtml(UI.getThumbnailUrl(m.thumbnail));
                 html += `
                     <div class="material-card clickable-card" data-material-id="${m.id}">
                         <div class="img-wrapper">
-                            <img src="${getThumb(m.thumbnail)}" alt="${UI.escapeHtml(m.title)}">
+                            <img src="${thumbUrl}" alt="${UI.escapeHtml(m.title)}" loading="lazy" decoding="async" width="640" height="360" ${UI.getImageFallbackAttribute()}>
                         </div>
                         <div class="material-card-content">
                             <span class="category-tag">${UI.escapeHtml(m.category || 'Umum')} • ${diffMap[m.difficulty] || 'Pemula'}</span>

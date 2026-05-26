@@ -5,6 +5,9 @@
     # Allow real files and directories
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Serve public assets from clean URLs, matching Vercel routing
+    RewriteRule ^(assets|js|pages|components|uploads)/(.*)$ public/$1/$2 [L]
     
     # Route API requests to api/index.php
     RewriteRule ^api/(.*)$ api/index.php [QSA,L]
@@ -18,3 +21,18 @@
     RewriteRule ^(.*)$ public/index.php [L]
 </IfModule>
 
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|svg|png|jpg|jpeg|webp|gif)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>

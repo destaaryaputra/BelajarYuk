@@ -547,8 +547,9 @@ export const MaterialDetail = {
         if (showComments) this.loadComments(materialId);
     },
 
-    fireSuccessConfetti() {
-        if (typeof confetti !== 'function') return;
+    async fireSuccessConfetti() {
+        const confettiFn = await UI.loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js', 'confetti').catch(() => null);
+        if (typeof confettiFn !== 'function') return;
         
         const duration = 3 * 1000;
         const animationEnd = Date.now() + duration;
@@ -565,8 +566,8 @@ export const MaterialDetail = {
 
             const particleCount = 50 * (timeLeft / duration);
             // since particles fall down, start a bit higher than random
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            confettiFn(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+            confettiFn(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
         }, 250);
 
         UI.showNotification('🎉 Selamat! Kamu telah menyelesaikan modul ini!', 'success');
