@@ -5,7 +5,7 @@
 .env.production.local
 
 # PHP
-composer.lock
+vendor/
 
 # OS
 .DS_Store
