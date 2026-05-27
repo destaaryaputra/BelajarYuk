@@ -172,8 +172,8 @@ export const UI = {
     hideSplash() {
         const splash = document.getElementById('splash-screen');
         if (!splash) return;
-        const fadeDelay = 180;
-        const removeDelay = 980;
+        const fadeDelay = 60;
+        const removeDelay = 420;
         
         // 1. Trigger the cinematic Zoom & Blur animation
         splash.classList.add('zoom-blur');

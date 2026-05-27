@@ -10,6 +10,9 @@ export const Materials = {
     activeCategory: 'all',
     pageSize: 24,
     visibleLimit: 24,
+    fetchLimit: 200,
+    searchTimer: null,
+    documentClickHandler: null,
 
     async load() {
         const listContainer = document.getElementById('materials-list');
@@ -29,26 +32,15 @@ export const Materials = {
         `).join('');
 
         try {
-            // Senior UX: Fetch materials and user progress in parallel
-            const [matsRes, catsRes, progressRes] = await Promise.all([
-                API.getMaterials(1, 200).catch(() => ({ data: { materials: [] } })),
-                API.get('/materials/categories').catch(() => ({ data: [] })),
-                API.getProgressByCategories().catch(() => ({ data: { materials: [] } }))
-            ]);
+            const matsPromise = API.getMaterials(1, this.fetchLimit).catch(() => ({ data: { materials: [] } }));
+            const catsPromise = API.get('/materials/categories').catch(() => ({ data: [] }));
+            const progressPromise = API.getProgressByCategories().catch(() => ({ data: { materials: [] } }));
 
+            const matsRes = await matsPromise;
             const rawMaterials = matsRes.data?.materials || matsRes.data || [];
             this.allMaterials = Array.isArray(rawMaterials) ? rawMaterials : [];
-            
-            // Map progress to materials
-            const userDetailedProgress = progressRes.data?.materials || [];
-            this.allMaterials = this.allMaterials.map(m => {
-                const prog = userDetailedProgress.find(p => p.id == m.id);
-                return { ...m, progress_percentage: prog ? prog.percentage : 0 };
-            });
 
-            const dbCategories = Array.isArray(catsRes.data) ? catsRes.data : (Array.isArray(catsRes) ? catsRes : []);
-
-            this.renderCategoryOptions(dbCategories);
+            this.renderCategoryOptions([]);
             this.setupListeners();
 
             if (this.allMaterials.length === 0) {
@@ -61,14 +53,32 @@ export const Materials = {
                 return;
             }
 
-            // Check if there's a pending deep link from dashboard
             const pendingId = localStorage.getItem('pending_material_id');
             if (pendingId) {
                 localStorage.removeItem('pending_material_id');
                 this.viewMaterial(pendingId);
+                return;
             } else {
                 this.filter();
             }
+
+            Promise.all([catsPromise, progressPromise])
+                .then(([catsRes, progressRes]) => {
+                    if (!document.getElementById('materials-list')) return;
+
+                    const userDetailedProgress = progressRes.data?.materials || [];
+                    this.allMaterials = this.allMaterials.map(m => {
+                        const prog = userDetailedProgress.find(p => p.id == m.id);
+                        return { ...m, progress_percentage: prog ? prog.percentage : 0 };
+                    });
+
+                    const dbCategories = Array.isArray(catsRes.data) ? catsRes.data : (Array.isArray(catsRes) ? catsRes : []);
+                    this.renderCategoryOptions(dbCategories);
+                    this.filter();
+                })
+                .catch(error => {
+                    console.warn('Materials metadata load warning:', error);
+                });
 
         } catch (error) {
             console.error('Materials load error:', error);
@@ -80,8 +90,11 @@ export const Materials = {
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.oninput = () => {
-                this.visibleLimit = this.pageSize;
-                this.filter();
+                clearTimeout(this.searchTimer);
+                this.searchTimer = setTimeout(() => {
+                    this.visibleLimit = this.pageSize;
+                    this.filter();
+                }, 120);
             };
         }
 
@@ -94,13 +107,15 @@ export const Materials = {
             };
         }
 
-        // Global click to close dropdown
-        document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('categoryDropdown');
-            if (dropdown && !dropdown.contains(e.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
+        if (!this.documentClickHandler) {
+            this.documentClickHandler = (e) => {
+                const dropdown = document.getElementById('categoryDropdown');
+                if (dropdown && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            };
+            document.addEventListener('click', this.documentClickHandler);
+        }
     },
 
     renderCategoryOptions(categories) {

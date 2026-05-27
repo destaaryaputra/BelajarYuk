@@ -13,6 +13,21 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .page,
+    .page * {
+        min-width: 0;
+    }
+
+    .content-card,
+    .stat-card,
+    .material-card,
+    .featured-course-card,
+    .auth-card,
+    .search-bar,
+    .modal-card {
+        max-width: 100%;
+    }
+
     .featured-course-card {
         grid-template-columns: 1fr;
         display: flex !important;
@@ -128,6 +143,7 @@
     .dashboard-header h1 {
         font-size: 1.8rem;
         margin-top: 4px;
+        overflow-wrap: anywhere;
     }
 
     .stats-grid {
@@ -139,6 +155,14 @@
     .stat-card {
         padding: 16px;
         border-radius: 16px;
+    }
+
+    .stat-card-row {
+        min-width: 0;
+    }
+
+    .stat-card-row > div {
+        min-width: 0;
     }
 
     .stat-card h3 {
@@ -208,6 +232,7 @@
         font-size: 0.94rem;
         margin: 0 0 4px;
         line-height: 1.3;
+        overflow-wrap: anywhere;
     }
 
     .material-card-content p,
@@ -417,6 +442,7 @@
         border-radius: 0;
         border-left: none;
         border-right: none;
+        max-width: calc(100% + 32px);
     }
 
     .admin-table {
@@ -460,6 +486,30 @@
         width: 92%;
         margin: 0 auto;
         padding: 24px 20px;
+    }
+
+    .featured-course-copy,
+    .mp-item-main,
+    .qhi-content,
+    .user-info-cell {
+        min-width: 0;
+    }
+
+    .mp-item-header,
+    .quiz-history-item-modern,
+    .qhi-top,
+    .leaderboard-header-info .d-flex {
+        min-width: 0;
+    }
+
+    .stat-card .value,
+    .value-suffix,
+    .mp-item-main h4,
+    .qhi-title,
+    .user-name,
+    .user-username {
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 }
 
@@ -535,6 +585,30 @@
     .action-buttons button,
     .input-with-btn button {
         width: 100%;
+    }
+
+    .stat-card-row,
+    .mp-item-header,
+    .qhi-top {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .quiz-history-item-modern {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .qhi-score-box {
+        margin-left: auto;
+    }
+
+    .category-tag,
+    .meta-tag,
+    .badge {
+        max-width: 100%;
+        white-space: normal;
     }
 }
 

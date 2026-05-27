@@ -89,10 +89,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         console.error('❌ Failed to load initial route:', err);
     } finally {
-        // 6. Hide splash screen after initial route is loaded
-        // We use a small delay to let the initial page render before fading out
-        setTimeout(() => {
-            UI.hideSplash();
-        }, 600);
+        UI.hideSplash();
+        Router.preloadRoutes([
+            'login-page',
+            'register-page',
+            'dashboard-page',
+            'materials-page',
+            'progress-page',
+            'leaderboard-page'
+        ]);
     }
 });

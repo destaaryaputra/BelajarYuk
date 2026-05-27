@@ -8,33 +8,36 @@ import { UI } from './ui.js';
 export const AIChat = {
     history: [],
     loaded: false,
+    componentPromise: null,
     systemPrompt: "Nama kamu adalah Yuki, Asisten AI Belajaryuk. Jawab dalam bahasa Indonesia yang jelas, ramah, ringkas, dan membantu siswa belajar. Selalu perkenalkan diri sebagai Yuki jika ditanya.",
 
     init() {
         this.updateVisibility();
         window.addEventListener('hashchange', () => this.updateVisibility());
-        
-        // Inject component if needed
-        const widget = document.getElementById('ai-chat-widget');
-        if (widget && widget.innerHTML === '') {
-            this.loadComponent();
-        }
     },
 
     async loadComponent() {
-        try {
-            const base = UI.getBasePath();
-            const response = await fetch(`${base}/components/ai-chat.html`);
-            const html = await response.text();
-            const widget = document.getElementById('ai-chat-widget');
-            if (widget) {
-                widget.innerHTML = html;
-                if (window.lucide) window.lucide.createIcons();
-                this.setupListeners();
+        if (this.componentPromise) return this.componentPromise;
+
+        this.componentPromise = (async () => {
+            try {
+                const base = UI.getBasePath();
+                const response = await fetch(`${base}/components/ai-chat.html`);
+                if (!response.ok) throw new Error('Failed to load AI chat component');
+                const html = await response.text();
+                const widget = document.getElementById('ai-chat-widget');
+                if (widget) {
+                    widget.innerHTML = html;
+                    if (window.lucide) window.lucide.createIcons();
+                    this.setupListeners();
+                }
+            } catch (error) {
+                console.error('Failed to load AI Chat component:', error);
+                this.componentPromise = null;
             }
-        } catch (error) {
-            console.error('Failed to load AI Chat component:', error);
-        }
+        })();
+
+        return this.componentPromise;
     },
 
     setupListeners() {
@@ -88,13 +91,21 @@ export const AIChat = {
         const widget = document.getElementById('ai-chat-widget');
         if (!widget) return;
 
+        const shouldShow = this.shouldShow();
+        widget.classList.toggle('d-none', !shouldShow);
+
+        if (shouldShow && widget.innerHTML === '') {
+            this.loadComponent();
+        }
+    },
+
+    shouldShow() {
         const hash = window.location.hash.replace('#', '') || 'landing-page';
         const isPublicPage = ['landing-page', 'login-page', 'register-page'].includes(hash);
         const isAdminPage = hash === 'admin-page';
         const isLoggedIn = !!localStorage.getItem(Config.STORAGE_KEYS.AUTH_TOKEN);
 
-        const shouldShow = isLoggedIn && !isPublicPage && !isAdminPage;
-        widget.classList.toggle('d-none', !shouldShow);
+        return isLoggedIn && !isPublicPage && !isAdminPage;
     },
 
     toggle(fromPopState = false) {

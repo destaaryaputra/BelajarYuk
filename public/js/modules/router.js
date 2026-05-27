@@ -23,6 +23,8 @@ export const Router = {
     },
 
     cache: {},
+    pendingFetches: {},
+    pendingPageId: null,
 
     init() {
         window.addEventListener('hashchange', () => this.handleRoute());
@@ -44,30 +46,36 @@ export const Router = {
             return;
         }
 
-        UI.showLoading();
+        this.pendingPageId = pageId;
+        const shouldDelayLoading = !this.cache[pageId] && !UI.isSplashVisible();
+        let loadingTimer = null;
+        let didShowLoading = false;
+
+        if (shouldDelayLoading) {
+            loadingTimer = setTimeout(() => {
+                didShowLoading = true;
+                UI.showLoading();
+            }, 160);
+        }
 
         try {
-            // 1. Hide all pages
+            const html = await this.fetchPage(pageId);
+
+            if (this.pendingPageId !== pageId) {
+                return;
+            }
+
             document.querySelectorAll('.page').forEach(p => {
                 p.classList.add('d-none');
                 p.classList.remove('active');
             });
 
-            // 2. Load page content if not cached
-            if (!this.cache[pageId]) {
-                const version = window.BELAJARYUK_ASSET_VERSION || 'dev';
-                const response = await fetch(`${this.routes[pageId]}?v=${encodeURIComponent(version)}`);
-                if (!response.ok) throw new Error(`Failed to fetch page: ${pageId}`);
-                this.cache[pageId] = await response.text();
-            }
-
-            // 3. Inject content
             const container = document.getElementById(pageId);
             if (container) {
-                container.innerHTML = this.cache[pageId];
+                container.innerHTML = html;
                 UI.resolveAssetUrls(container);
                 container.classList.remove('d-none');
-                container.classList.add('active'); // Senior Fix: Add active class for display: block
+                container.classList.add('active');
                 
                 // Re-initialize icons for new content
                 if (window.lucide) window.lucide.createIcons();
@@ -80,7 +88,52 @@ export const Router = {
             console.error('Navigation error:', error);
             UI.showNotification('Gagal memuat halaman.', 'error');
         } finally {
-            UI.hideLoading();
+            if (loadingTimer) clearTimeout(loadingTimer);
+            if (didShowLoading) UI.hideLoading();
+        }
+    },
+
+    fetchPage(pageId) {
+        if (this.cache[pageId]) {
+            return Promise.resolve(this.cache[pageId]);
+        }
+
+        if (this.pendingFetches[pageId]) {
+            return this.pendingFetches[pageId];
+        }
+
+        const version = window.BELAJARYUK_ASSET_VERSION || 'dev';
+        const route = `${this.routes[pageId]}?v=${encodeURIComponent(version)}`;
+
+        this.pendingFetches[pageId] = fetch(route)
+            .then(response => {
+                if (!response.ok) throw new Error(`Failed to fetch page: ${pageId}`);
+                return response.text();
+            })
+            .then(html => {
+                this.cache[pageId] = html;
+                return html;
+            })
+            .finally(() => {
+                delete this.pendingFetches[pageId];
+            });
+
+        return this.pendingFetches[pageId];
+    },
+
+    preloadRoutes(pageIds = []) {
+        const preload = () => {
+            pageIds.forEach(pageId => {
+                if (this.routes[pageId] && !this.cache[pageId]) {
+                    this.fetchPage(pageId).catch(() => null);
+                }
+            });
+        };
+
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(preload, { timeout: 2000 });
+        } else {
+            setTimeout(preload, 500);
         }
     }
 };

@@ -156,7 +156,7 @@ body.admin-mode {
     font-size: 1.25rem;
     font-weight: 800;
     color: var(--text-main);
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
 }
 
 .nav-actions {

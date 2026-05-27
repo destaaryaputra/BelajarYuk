@@ -67,7 +67,7 @@
     justify-content: center;
     align-items: center;
     z-index: 10000;
-    transition: opacity 0.68s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.68s;
+    transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.32s;
     overflow: hidden;
     will-change: opacity;
 }
@@ -80,7 +80,7 @@
 
 /* Master zoom effect when hiding */
 .splash-screen.zoom-blur .splash-logo {
-    animation: splashZoomBlur 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: splashZoomBlur 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes splashZoomBlur {
@@ -104,7 +104,7 @@
     font-weight: 800;
     color: var(--text-main);
     margin-top: 24px;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     animation: fadeInSlideUp 0.8s ease-out 0.4s forwards;
     background: linear-gradient(135deg, var(--primary) 0%, #176f5a 100%);
     -webkit-background-clip: text;
