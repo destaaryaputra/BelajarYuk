@@ -24,7 +24,7 @@ class MaterialController {
     public function getAllMaterials(): void {
         try {
             $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-            $limit = isset($_GET['limit']) ? max(1, min(100, intval($_GET['limit']))) : 10;
+            $limit = isset($_GET['limit']) ? max(1, min(200, intval($_GET['limit']))) : 10;
             $category = isset($_GET['category']) ? Security::sanitize($_GET['category']) : null;
 
             $result = $this->materialService->getPaginatedMaterials($page, $limit, $category);

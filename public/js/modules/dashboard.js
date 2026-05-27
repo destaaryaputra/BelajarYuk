@@ -63,8 +63,8 @@ export const Dashboard = {
         const summary = data.summary || {};
         const leaderboardData = data.leaderboard || [];
         const userIndex = leaderboardData.findIndex(u => u.id == user.id);
-        const userRank = userIndex !== -1 ? userIndex + 1 : '--';
-        const userPoints = userIndex !== -1 ? leaderboardData[userIndex].total_points : (summary.total_points || 0);
+        const userRank = summary.rank || (userIndex !== -1 ? userIndex + 1 : null);
+        const userPoints = summary.total_points || (userIndex !== -1 ? leaderboardData[userIndex].total_points : 0);
 
         const completionPercent = summary.total > 0 ? Math.round((summary.completed / summary.total) * 100) : 0;
 
@@ -99,7 +99,7 @@ export const Dashboard = {
                         <div>
                             <h3>Peringkat Global</h3>
                             <div class="value">
-                                <span>${userRank !== '--' ? '#' + userRank : '--'}</span>
+                                <span>${userRank ? '#' + userRank : '--'}</span>
                                 <span class="value-suffix" style="font-size: 0.9rem; opacity: 0.7;"> (${userPoints} Poin)</span>
                             </div>
                         </div>

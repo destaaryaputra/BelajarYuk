@@ -19,6 +19,12 @@ class Progress {
         $this->db = Database::getInstance();
     }
 
+    public static function clearUserProgressCache(int $user_id): void {
+        if (function_exists('apcu_delete')) {
+            apcu_delete("progress_summary_{$user_id}");
+        }
+    }
+
     /**
      * Sync material progress percentage manually
      */
@@ -58,6 +64,8 @@ class Progress {
                 'mid' => $material_id, 
                 'pct' => $percentage
             ]);
+
+            self::clearUserProgressCache($user_id);
         } catch (Exception $e) {
             error_log("Sync material progress error: " . $e->getMessage());
         }
@@ -88,16 +96,16 @@ class Progress {
                 $sum_percentages += $m['percentage'];
             }
 
-            // Quiz specific stats - BASED ON BEST ATTEMPTS for consistency
+            // Quiz stats use the best earned score per quiz so dashboard, profile, and leaderboard match.
             $queryQuiz = "SELECT 
-                            COUNT(DISTINCT quiz_id)::int as quizzes_completed,
-                            COALESCE(AVG(max_percentage), 0)::float as average_quiz_score,
-                            COALESCE(SUM(max_score), 0)::int as total_points
+                            COUNT(*)::int as quizzes_completed,
+                            COALESCE(AVG(percentage), 0)::float as average_quiz_score,
+                            COALESCE(SUM(score), 0)::int as total_points
                           FROM (
-                            SELECT quiz_id, MAX(percentage) as max_percentage, MAX(score) as max_score 
-                            FROM hasil_kuis 
+                            SELECT DISTINCT ON (quiz_id) quiz_id, percentage, score
+                            FROM hasil_kuis
                             WHERE user_id = :uid 
-                            GROUP BY quiz_id
+                            ORDER BY quiz_id, score DESC, percentage DESC, submitted_at DESC
                           ) t";
 
             $stmt = $this->db->prepare($queryQuiz);
@@ -250,10 +258,39 @@ class Progress {
                         m.category,
                         m.thumbnail,
                         pm.completed_at,
-                        pm.progress_percentage
+                        progress_live.live_percentage as progress_percentage
                       FROM progres_materi pm
                       JOIN materi m ON pm.material_id = m.id
-                      WHERE pm.user_id = :uid AND m.status = 'active' AND pm.progress_percentage >= 100
+                      LEFT JOIN (
+                        SELECT
+                            m2.id as material_id,
+                            pm2.user_id,
+                            LEAST(
+                                100,
+                                ROUND(
+                                    (
+                                        COALESCE(ps.completed_episodes, 0)
+                                        + CASE WHEN pm2.completed_at IS NOT NULL THEN 1 ELSE 0 END
+                                    )::numeric
+                                    / NULLIF(COALESCE(ts.total_episodes, 0) + 1, 0)
+                                    * 100
+                                )
+                            ) as live_percentage
+                        FROM progres_materi pm2
+                        JOIN materi m2 ON m2.id = pm2.material_id AND m2.status = 'active'
+                        LEFT JOIN (
+                            SELECT material_id, COUNT(*)::int as total_episodes
+                            FROM sub_materi
+                            GROUP BY material_id
+                        ) ts ON ts.material_id = m2.id
+                        LEFT JOIN (
+                            SELECT sm.material_id, psm.user_id, COUNT(*)::int as completed_episodes
+                            FROM progres_sub_materi psm
+                            JOIN sub_materi sm ON sm.id = psm.sub_material_id
+                            GROUP BY sm.material_id, psm.user_id
+                        ) ps ON ps.material_id = m2.id AND ps.user_id = pm2.user_id
+                      ) progress_live ON progress_live.material_id = m.id AND progress_live.user_id = pm.user_id
+                      WHERE pm.user_id = :uid AND m.status = 'active' AND COALESCE(progress_live.live_percentage, 0) >= 100
                       ORDER BY COALESCE(pm.completed_at, pm.last_accessed_at) DESC
                       LIMIT :limit";
 
@@ -305,16 +342,44 @@ class Progress {
                       LEFT JOIN (
                         SELECT user_id, SUM(max_points) as total_points
                         FROM (
-                            SELECT user_id, quiz_id, MAX(total_points) as max_points
+                            SELECT DISTINCT ON (user_id, quiz_id) user_id, quiz_id, score as max_points
                             FROM hasil_kuis
-                            GROUP BY user_id, quiz_id
+                            ORDER BY user_id, quiz_id, score DESC, percentage DESC, submitted_at DESC
                         ) t
                         GROUP BY user_id
                       ) utp ON u.id = utp.user_id
                       LEFT JOIN (
                         SELECT user_id, COUNT(*) as completed_count
-                        FROM progres_materi
-                        WHERE progress_percentage >= 100
+                        FROM (
+                            SELECT
+                                m.id as material_id,
+                                pm.user_id,
+                                LEAST(
+                                    100,
+                                    ROUND(
+                                        (
+                                            COALESCE(ps.completed_episodes, 0)
+                                            + CASE WHEN pm.completed_at IS NOT NULL THEN 1 ELSE 0 END
+                                        )::numeric
+                                        / NULLIF(COALESCE(ts.total_episodes, 0) + 1, 0)
+                                        * 100
+                                    )
+                                ) as live_percentage
+                            FROM progres_materi pm
+                            JOIN materi m ON m.id = pm.material_id AND m.status = 'active'
+                            LEFT JOIN (
+                                SELECT material_id, COUNT(*)::int as total_episodes
+                                FROM sub_materi
+                                GROUP BY material_id
+                            ) ts ON ts.material_id = m.id
+                            LEFT JOIN (
+                                SELECT sm.material_id, psm.user_id, COUNT(*)::int as completed_episodes
+                                FROM progres_sub_materi psm
+                                JOIN sub_materi sm ON sm.id = psm.sub_material_id
+                                GROUP BY sm.material_id, psm.user_id
+                            ) ps ON ps.material_id = m.id AND ps.user_id = pm.user_id
+                        ) progress_live
+                        WHERE live_percentage >= 100
                         GROUP BY user_id
                       ) ucm ON u.id = ucm.user_id
 
@@ -330,6 +395,78 @@ class Progress {
         } catch (Exception $e) {
             error_log("Get leaderboard error: " . $e->getMessage());
             return [];
+        }
+    }
+
+    public function getUserRank(int $user_id): ?array {
+        try {
+            $query = "SELECT ranked.rank, ranked.total_points, ranked.materials_completed
+                      FROM (
+                        SELECT
+                            u.id,
+                            COALESCE(utp.total_points, 0) as total_points,
+                            COALESCE(ucm.completed_count, 0) as materials_completed,
+                            RANK() OVER (
+                                ORDER BY COALESCE(utp.total_points, 0) DESC,
+                                         COALESCE(ucm.completed_count, 0) DESC,
+                                         u.created_at ASC
+                            ) as rank
+                        FROM pengguna u
+                        LEFT JOIN (
+                            SELECT user_id, SUM(max_points) as total_points
+                            FROM (
+                                SELECT DISTINCT ON (user_id, quiz_id) user_id, quiz_id, score as max_points
+                                FROM hasil_kuis
+                                ORDER BY user_id, quiz_id, score DESC, percentage DESC, submitted_at DESC
+                            ) t
+                            GROUP BY user_id
+                        ) utp ON u.id = utp.user_id
+                        LEFT JOIN (
+                            SELECT user_id, COUNT(*) as completed_count
+                            FROM (
+                                SELECT
+                                    m.id as material_id,
+                                    pm.user_id,
+                                    LEAST(
+                                        100,
+                                        ROUND(
+                                            (
+                                                COALESCE(ps.completed_episodes, 0)
+                                                + CASE WHEN pm.completed_at IS NOT NULL THEN 1 ELSE 0 END
+                                            )::numeric
+                                            / NULLIF(COALESCE(ts.total_episodes, 0) + 1, 0)
+                                            * 100
+                                        )
+                                    ) as live_percentage
+                                FROM progres_materi pm
+                                JOIN materi m ON m.id = pm.material_id AND m.status = 'active'
+                                LEFT JOIN (
+                                    SELECT material_id, COUNT(*)::int as total_episodes
+                                    FROM sub_materi
+                                    GROUP BY material_id
+                                ) ts ON ts.material_id = m.id
+                                LEFT JOIN (
+                                    SELECT sm.material_id, psm.user_id, COUNT(*)::int as completed_episodes
+                                    FROM progres_sub_materi psm
+                                    JOIN sub_materi sm ON sm.id = psm.sub_material_id
+                                    GROUP BY sm.material_id, psm.user_id
+                                ) ps ON ps.material_id = m.id AND ps.user_id = pm.user_id
+                            ) progress_live
+                            WHERE live_percentage >= 100
+                            GROUP BY user_id
+                        ) ucm ON u.id = ucm.user_id
+                        WHERE u.role = 'student' AND u.is_active = TRUE
+                      ) ranked
+                      WHERE ranked.id = :uid";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->execute(['uid' => $user_id]);
+            $rank = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $rank ?: null;
+        } catch (Exception $e) {
+            error_log("Get user rank error: " . $e->getMessage());
+            return null;
         }
     }
 

@@ -156,8 +156,17 @@ class User {
     public function getUserById(int $id): ?array {
         try {
             $query = "SELECT u.id, u.username, u.email, u.full_name, u.avatar, u.bio, u.created_at, u.streak_count,
-                        COALESCE((SELECT SUM(score) FROM hasil_kuis WHERE user_id = u.id), 0) as total_points
+                        COALESCE(quiz_points.total_points, 0) as total_points
                      FROM pengguna u 
+                     LEFT JOIN (
+                        SELECT user_id, SUM(max_points) as total_points
+                        FROM (
+                            SELECT DISTINCT ON (user_id, quiz_id) user_id, quiz_id, score as max_points
+                            FROM hasil_kuis
+                            ORDER BY user_id, quiz_id, score DESC, percentage DESC, submitted_at DESC
+                        ) best_quiz
+                        GROUP BY user_id
+                     ) quiz_points ON quiz_points.user_id = u.id
                      WHERE u.id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);

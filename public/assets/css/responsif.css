@@ -13,6 +13,10 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .profile-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .page,
     .page * {
         min-width: 0;
@@ -546,6 +550,10 @@
     }
 
     .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-stats-grid {
         grid-template-columns: 1fr;
     }
 

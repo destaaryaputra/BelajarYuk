@@ -241,6 +241,15 @@ export const MaterialDetail = {
         return url;
     },
 
+    getDocumentUrl(documentUrl) {
+        const value = String(documentUrl || '').trim();
+        if (!value) return '';
+        if (/^(https?:)?\/\//i.test(value)) return value;
+        if (value.startsWith('/')) return value;
+        const path = value.startsWith('documents/') ? `uploads/${value}` : `uploads/documents/${value}`;
+        return UI.getAssetPath(path);
+    },
+
     async renderComments(materialId) {
         try {
             const commentsRes = await API.getComments(materialId);
@@ -348,15 +357,16 @@ export const MaterialDetail = {
         }
 
         if (active.document_url) {
+            const documentUrl = UI.escapeHtml(this.getDocumentUrl(active.document_url));
             mediaHtml += `
                 <div class="pdf-container mb-24">
                     <div class="pdf-header">
                         <span class="pdf-title"><i data-lucide="file-text"></i> Dokumen PDF</span>
-                        <a href="/public/uploads/documents/${UI.escapeHtml(active.document_url)}" target="_blank" class="btn-text-info btn-small" download>
+                        <a href="${documentUrl}" target="_blank" class="btn-text-info btn-small" download>
                             <i data-lucide="download"></i> Download
                         </a>
                     </div>
-                    <iframe class="pdf-iframe" src="/public/uploads/documents/${UI.escapeHtml(active.document_url)}" title="Dokumen materi" loading="lazy"></iframe>
+                    <iframe class="pdf-iframe" src="${documentUrl}" title="Dokumen materi" loading="lazy"></iframe>
                 </div>
             `;
         }

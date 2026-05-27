@@ -11,6 +11,8 @@ return [
     'POST /auth/logout' => ['App\\Controllers\\AuthController', 'logout'],
     'GET /auth/current-user' => ['App\\Controllers\\AuthController', 'getCurrentUser'],
     'PUT /auth/profile' => ['App\\Controllers\\AuthController', 'updateProfile'],
+    'POST /auth/profile' => ['App\\Controllers\\AuthController', 'updateProfile'],
+    'POST /auth/profile/update' => ['App\\Controllers\\AuthController', 'updateProfile'],
     'POST /auth/avatar' => ['App\\Controllers\\AuthController', 'updateAvatar'],
     'GET /auth/users' => ['App\\Controllers\\AuthController', 'getAllUsers'],
     'POST /auth/users/update-role' => ['App\\Controllers\\AuthController', 'updateUserRole'],

@@ -102,6 +102,7 @@ class Quiz {
             $questions = $this->getQuestionsByQuizId($quiz_id);
             $score = 0;
             $total_points = 0;
+            $correct_answers = 0;
 
             foreach ($questions as $question) {
                 $total_points += $question['points'];
@@ -112,6 +113,7 @@ class Quiz {
 
                     if ($user_answer === $correct_answer) {
                         $score += $question['points'];
+                        $correct_answers++;
                     }
 
                     // Save user's answer
@@ -129,11 +131,16 @@ class Quiz {
             $stmt = $this->db->prepare($query);
             $stmt->execute([$user_id, $quiz_id, $score, $total_points, $percentage]);
 
+            \App\Models\Progress::clearUserProgressCache($user_id);
+
             return [
                 'success' => true,
                 'message' => 'Kuis berhasil disubmit.',
                 'score' => $score,
                 'total_points' => $total_points,
+                'earned_points' => $score,
+                'max_points' => $total_points,
+                'correct_answers' => $correct_answers,
                 'percentage' => round($percentage, 2)
             ];
         } catch (Exception $e) {

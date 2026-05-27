@@ -38,6 +38,7 @@ class ProgressController {
             $summary = $this->progressModel->getUserProgressSummary($user['id']) ?: [];
             $streakData = $this->progressModel->getLearningStreak($user['id']) ?: [];
             $lastMaterial = $this->progressModel->getLastViewedMaterial($user['id']);
+            $rankData = $this->progressModel->getUserRank($user['id']) ?: [];
             
             $materialModel = new Material();
             $recentMaterials = $materialModel->getAllMaterials(1, 4) ?: [];
@@ -50,6 +51,9 @@ class ProgressController {
                     'total' => intval($summary['total_materials'] ?? 0),
                     'avg_score' => isset($summary['average_quiz_score']) ? round($summary['average_quiz_score']) : 0,
                     'total_points' => intval($summary['total_points'] ?? 0),
+                    'rank' => isset($rankData['rank']) ? intval($rankData['rank']) : null,
+                    'materials_completed' => intval($summary['materials_completed'] ?? 0),
+                    'total_materials' => intval($summary['total_materials'] ?? 0),
                     'streak' => intval($streakData['active_days'] ?? 0),
                     'last_material' => $lastMaterial
                 ],
@@ -75,12 +79,16 @@ class ProgressController {
             $summary = $this->progressModel->getUserProgressSummary($user['id']) ?: [];
             $streakData = $this->progressModel->getLearningStreak($user['id']) ?: [];
             $lastMaterial = $this->progressModel->getLastViewedMaterial($user['id']);
+            $rankData = $this->progressModel->getUserRank($user['id']) ?: [];
 
             $formattedSummary = [
                 'completed' => intval($summary['materials_completed'] ?? 0),
                 'total' => intval($summary['total_materials'] ?? 0),
                 'avg_score' => isset($summary['average_quiz_score']) ? round($summary['average_quiz_score']) : 0,
                 'total_points' => intval($summary['total_points'] ?? 0),
+                'rank' => isset($rankData['rank']) ? intval($rankData['rank']) : null,
+                'materials_completed' => intval($summary['materials_completed'] ?? 0),
+                'total_materials' => intval($summary['total_materials'] ?? 0),
                 'streak' => intval($streakData['active_days'] ?? 0),
                 'last_material' => $lastMaterial
             ];
@@ -106,9 +114,9 @@ class ProgressController {
             $categories = array_map(function($cat) {
                 return [
                     'category' => $cat['category'],
-                    'total' => intval($cat['total_materials']),
-                    'completed' => intval($cat['completed_materials']),
-                    'percentage' => floatval($cat['completion_percentage'])
+                    'total' => intval($cat['total_materials'] ?? $cat['total'] ?? 0),
+                    'completed' => intval($cat['completed_materials'] ?? $cat['completed'] ?? 0),
+                    'percentage' => floatval($cat['completion_percentage'] ?? $cat['percentage'] ?? 0)
                 ];
             }, $progressRaw);
 

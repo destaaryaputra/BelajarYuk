@@ -101,6 +101,7 @@ class AuthController {
         // Refetch to get updated streak_count
         $freshUser = $this->userModel->getUserById($user['id']);
         $freshUser['role'] = $user['role'];
+        $freshUser = $this->attachProgressStats($freshUser, intval($user['id']));
         
         Response::success('Data pengguna berhasil dimuat', $freshUser);
     }
@@ -165,6 +166,7 @@ $rawInput = file_get_contents("php://input");
             if ($result['success']) {
                 $updatedUser = $this->userModel->getUserById($user['id']);
                 $updatedUser['role'] = $user['role'];
+                $updatedUser = $this->attachProgressStats($updatedUser, intval($user['id']));
                 
                 // Update Session
                 $_SESSION['user'] = $updatedUser;
@@ -267,5 +269,22 @@ $rawInput = file_get_contents("php://input");
         $result = $this->userModel->deleteUser($user_id);
         if ($result['success']) Response::success($result['message']);
         else Response::error($result['message'], null, 500);
+    }
+
+    private function attachProgressStats(?array $user, int $userId): ?array {
+        if (!$user) return $user;
+
+        $progressModel = new \App\Models\Progress();
+        $summary = $progressModel->getUserProgressSummary($userId) ?: [];
+        $rank = $progressModel->getUserRank($userId) ?: [];
+
+        $user['total_points'] = intval($summary['total_points'] ?? $user['total_points'] ?? 0);
+        $user['materials_completed'] = intval($summary['materials_completed'] ?? 0);
+        $user['total_materials'] = intval($summary['total_materials'] ?? 0);
+        $user['avg_score'] = isset($summary['average_quiz_score']) ? round($summary['average_quiz_score']) : 0;
+        $user['completion_percentage'] = intval($summary['completion_percentage'] ?? 0);
+        $user['rank'] = isset($rank['rank']) ? intval($rank['rank']) : null;
+
+        return $user;
     }
 }

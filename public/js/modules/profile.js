@@ -38,7 +38,11 @@ export const Profile = {
         if (!container) return;
 
         const initials = (user.full_name || user.username || '?')[0].toUpperCase();
-        const avatarUrl = user.avatar ? (user.avatar.startsWith('http') ? user.avatar : `/public/uploads/${user.avatar}`) : null;
+        const avatarUrl = user.avatar ? (user.avatar.startsWith('http') ? user.avatar : UI.getAssetPath(`uploads/${user.avatar}`)) : null;
+        const completed = Number(user.materials_completed || 0);
+        const totalMaterials = Number(user.total_materials || 0);
+        const totalPoints = Number(user.total_points || 0);
+        const rank = user.rank ? `#${user.rank}` : '--';
         
         container.innerHTML = `
             <div class="profile-header-main mb-32">
@@ -58,7 +62,7 @@ export const Profile = {
             </div>
 
             <!-- Creative Initiative: Stats Grid in Profile -->
-            <div class="stats-grid mb-32">
+            <div class="stats-grid profile-stats-grid mb-32">
                 <div class="stat-card accent-orange">
                     <div class="stat-card-row">
                         <div>
@@ -68,13 +72,31 @@ export const Profile = {
                         <div class="stat-chip"><i data-lucide="zap"></i></div>
                     </div>
                 </div>
+                <div class="stat-card accent-green">
+                    <div class="stat-card-row">
+                        <div>
+                            <h3>Modul Selesai</h3>
+                            <div class="value">${completed} <span class="value-suffix">dari ${totalMaterials}</span></div>
+                        </div>
+                        <div class="stat-chip"><i data-lucide="book-check"></i></div>
+                    </div>
+                </div>
                 <div class="stat-card accent-blue">
                     <div class="stat-card-row">
                         <div>
                             <h3>Akumulasi Poin</h3>
-                            <div class="value">${user.total_points || 0}</div>
+                            <div class="value">${totalPoints}</div>
                         </div>
                         <div class="stat-chip"><i data-lucide="award"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card accent-orange">
+                    <div class="stat-card-row">
+                        <div>
+                            <h3>Peringkat Global</h3>
+                            <div class="value">${rank}</div>
+                        </div>
+                        <div class="stat-chip"><i data-lucide="trophy"></i></div>
                     </div>
                 </div>
             </div>
@@ -198,7 +220,7 @@ export const Profile = {
 
                 UI.showLoading();
                 try {
-                    const response = await API.post('/auth/profile/update', data);
+                    const response = await API.put('/auth/profile', data);
                     UI.showNotification(response.message, 'success');
                     this.load();
                 } catch (error) {

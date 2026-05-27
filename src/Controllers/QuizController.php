@@ -124,6 +124,9 @@ class QuizController {
                 Response::success($result['message'], [
                     'score' => $result['score'],
                     'total_points' => $result['total_points'],
+                    'earned_points' => $result['earned_points'],
+                    'max_points' => $result['max_points'],
+                    'correct_answers' => $result['correct_answers'],
                     'percentage' => $result['percentage']
                 ]);
             } else {

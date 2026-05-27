@@ -39,6 +39,10 @@
     gap: 16px;
 }
 
+.profile-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 /* Premium Stat Cards Redesign */
 .stat-card {
     background: var(--surface);

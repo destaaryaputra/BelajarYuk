@@ -169,14 +169,15 @@ export const Quiz = {
         document.getElementById('result-title').textContent = isPassed ? 'Selamat! Kamu Lulus' : 'Yah, Belum Lulus';
         
         // Update correct answers text
-        const correctCount = data.correct_answers || 0;
+        const correctCount = data.correct_answers ?? Math.round((percentage / 100) * this.state.questions.length);
         const totalQs = this.state.questions.length;
         document.getElementById('result-score-text').textContent = `Kamu menjawab ${correctCount} dari ${totalQs} soal dengan benar.`;
 
         document.getElementById('result-icon-box').className = `result-icon-box mb-24 ${isPassed ? '' : 'fail'}`;
         document.getElementById('result-icon-box').innerHTML = `<i data-lucide="${isPassed ? 'award' : 'alert-circle'}" class="icon-xl"></i>`;
         
-        document.getElementById('result-points').textContent = `+ ${data.total_points || 0}`;
+        const earnedPoints = data.earned_points ?? data.score ?? 0;
+        document.getElementById('result-points').textContent = `+ ${earnedPoints}`;
         const finishBtn = document.getElementById('btn-finish-quiz');
         finishBtn.textContent = isPassed ? 'Lanjut Belajar' : 'Kembali ke Materi';
 
