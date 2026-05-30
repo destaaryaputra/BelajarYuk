@@ -38,7 +38,7 @@ export const Profile = {
         if (!container) return;
 
         const initials = (user.full_name || user.username || '?')[0].toUpperCase();
-        const avatarUrl = user.avatar ? (user.avatar.startsWith('http') ? user.avatar : UI.getAssetPath(`uploads/${user.avatar}`)) : null;
+        const avatarUrl = UI.getAvatarUrl(user.avatar);
         const completed = Number(user.materials_completed || 0);
         const totalMaterials = Number(user.total_materials || 0);
         const totalPoints = Number(user.total_points || 0);

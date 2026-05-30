@@ -54,7 +54,7 @@ export const Leaderboard = {
             }
 
             const initials = (item.full_name || item.username || '?')[0].toUpperCase();
-            const avatarUrl = item.avatar ? (item.avatar.startsWith('http') ? item.avatar : UI.getAssetPath(`uploads/${item.avatar}`)) : '';
+            const avatarUrl = UI.getAvatarUrl(item.avatar);
             const avatarHtml = item.avatar 
                 ? `<img src="${UI.escapeHtml(avatarUrl)}" alt="Avatar" class="user-avatar-small" loading="lazy" decoding="async">`
                 : `<div class="user-avatar-small">${initials}</div>`;

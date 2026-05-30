@@ -9,13 +9,15 @@ CREATE TABLE IF NOT EXISTS pengguna (
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
-    avatar VARCHAR(255) NULL,
+    avatar TEXT NULL,
     bio TEXT NULL,
     role TEXT CHECK (role IN ('student', 'admin')) DEFAULT 'student',
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE pengguna ALTER COLUMN avatar TYPE TEXT;
 
 -- 2. Tabel Materi (Data Kursus/Materi Utama)
 CREATE TABLE IF NOT EXISTS materi (

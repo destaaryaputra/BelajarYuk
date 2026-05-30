@@ -140,6 +140,8 @@ class User {
      */
     public function updateAvatar(int $user_id, string $avatar_filename): array {
         try {
+            $this->ensureAvatarColumnSupportsLargeValues($avatar_filename);
+
             $query = "UPDATE pengguna SET avatar = ? WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$avatar_filename, $user_id]);
@@ -147,6 +149,18 @@ class User {
         } catch (Exception $e) {
             error_log("Update avatar error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal memperbarui foto profil.'];
+        }
+    }
+
+    private function ensureAvatarColumnSupportsLargeValues(string $avatar): void {
+        if (strlen($avatar) <= 255) {
+            return;
+        }
+
+        try {
+            $this->db->exec("ALTER TABLE pengguna ALTER COLUMN avatar TYPE TEXT");
+        } catch (Exception $e) {
+            error_log("Ensure avatar column type error: " . $e->getMessage());
         }
     }
 

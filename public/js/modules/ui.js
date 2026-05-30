@@ -400,6 +400,16 @@ export const UI = {
         return this.getAssetPath(`uploads/thumbnails/${value}`);
     },
 
+    getAvatarUrl(avatar) {
+        const value = String(avatar || '').trim();
+        if (!value) return '';
+        if (/^(https?:)?\/\//i.test(value) || value.startsWith('data:') || value.startsWith('blob:')) {
+            return value;
+        }
+        if (value.startsWith('/')) return value;
+        return this.getAssetPath(`uploads/${value}`);
+    },
+
     getImageFallbackAttribute() {
         return `onerror="this.onerror=null;this.src='${this.getAssetPath('assets/course-placeholder.svg')}'"`;
     },
@@ -491,7 +501,7 @@ export const UI = {
             throw new Error('Foto terlalu besar. Pilih foto maksimal 8MB.');
         }
 
-        const targetBytes = 900 * 1024;
+        const targetBytes = 220 * 1024;
         if (file.size <= targetBytes) {
             return file;
         }
@@ -514,7 +524,7 @@ export const UI = {
                 img.src = objectUrl;
             });
 
-            const maxSide = 640;
+            const maxSide = 512;
             const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
             const canvas = document.createElement('canvas');
             canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));

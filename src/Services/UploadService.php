@@ -1,7 +1,6 @@
 <?php
 namespace App\Services;
 
-use App\Utils\Security;
 use Exception;
 
 class UploadService {
@@ -92,7 +91,7 @@ class UploadService {
             }
 
             $filename = 'avatars/av_' . bin2hex(random_bytes(8)) . '.' . $extension;
-            return self::uploadToSupabase($file['tmp_name'], $filename, $mimeType);
+            return self::uploadAvatarToStorage($file['tmp_name'], $filename, $mimeType);
 
         } catch (Exception $e) {
             error_log('Avatar upload error: ' . $e->getMessage());
@@ -112,6 +111,21 @@ class UploadService {
             default:
                 return 'Gagal membaca file foto profil.';
         }
+    }
+
+    private static function uploadAvatarToStorage(string $filePath, string $storagePath, string $mimeType): array {
+        $config = self::getSupabaseConfig();
+
+        if ($config['url'] && $config['key']) {
+            $result = self::uploadToSupabase($filePath, $storagePath, $mimeType);
+            if ($result['success']) {
+                return $result;
+            }
+
+            error_log('Avatar Supabase upload failed, falling back to database data URL.');
+        }
+
+        return self::uploadToDataUrl($filePath, $mimeType);
     }
 
     public static function uploadPdf(array $file): array {
@@ -204,6 +218,18 @@ class UploadService {
         }
 
         return ['success' => true, 'filename' => $relativePath];
+    }
+
+    private static function uploadToDataUrl(string $filePath, string $mimeType): array {
+        $fileData = file_get_contents($filePath);
+        if ($fileData === false || $fileData === '') {
+            return ['success' => false, 'message' => 'Gagal membaca file foto profil.'];
+        }
+
+        return [
+            'success' => true,
+            'filename' => 'data:' . $mimeType . ';base64,' . base64_encode($fileData)
+        ];
     }
 
     private static function detectMimeType(string $path): string {

@@ -123,7 +123,7 @@ export const Admin = {
             const user = response.data || {};
             
             const initials = (user.full_name || user.username || '?')[0].toUpperCase();
-            const avatarUrl = user.avatar ? (user.avatar.startsWith('http') ? user.avatar : UI.getAssetPath(`uploads/${user.avatar}`)) : null;
+            const avatarUrl = UI.getAvatarUrl(user.avatar);
 
             container.innerHTML = `
                 <div class="profile-header-main mb-32">
