@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Config\Database;
 use PDO;
 use Exception;
-use DateTime;
 
 /**
  * Progress Model
@@ -19,14 +18,37 @@ class Progress {
         $this->db = Database::getInstance();
     }
 
+    private static function fetchCache(string $key): ?array {
+        if (!\function_exists('apcu_fetch')) {
+            return null;
+        }
+
+        $success = false;
+        $fetch = 'apcu_fetch';
+        $cached = $fetch($key, $success);
+        return ($success && \is_array($cached)) ? $cached : null;
+    }
+
+    private static function storeCache(string $key, array $value, int $ttl = 30): void {
+        if (\function_exists('apcu_store')) {
+            $store = 'apcu_store';
+            $store($key, $value, $ttl);
+        }
+    }
+
+    private static function deleteCache(string $key): void {
+        if (\function_exists('apcu_delete')) {
+            $delete = 'apcu_delete';
+            $delete($key);
+        }
+    }
+
     public static function clearUserProgressCache(int $user_id): void {
-        if (function_exists('apcu_delete')) {
-            apcu_delete("progress_summary_{$user_id}");
-            apcu_delete("progress_detail_{$user_id}");
-            apcu_delete("user_rank_{$user_id}");
-            foreach ([5, 10, 50] as $limit) {
-                apcu_delete("leaderboard_{$limit}");
-            }
+        self::deleteCache("progress_summary_{$user_id}");
+        self::deleteCache("progress_detail_{$user_id}");
+        self::deleteCache("user_rank_{$user_id}");
+        foreach ([5, 10, 50] as $limit) {
+            self::deleteCache("leaderboard_{$limit}");
         }
     }
 
@@ -82,12 +104,11 @@ class Progress {
     public function getUserProgressSummary(int $user_id): ?array {
         // Simple APCu cache (30 seconds) to reduce DB load on frequent dashboard loads
         $cacheKey = "progress_summary_{$user_id}";
-        if (function_exists('apcu_fetch')) {
-            $cached = apcu_fetch($cacheKey, $success);
-            if ($success && is_array($cached)) {
-                return $cached;
-            }
+        $cached = self::fetchCache($cacheKey);
+        if ($cached !== null) {
+            return $cached;
         }
+
         try {
             // New Sync Logic: Get all detailed material progress first
             $materials = $this->getDetailedMaterialProgress($user_id);
@@ -129,9 +150,7 @@ class Progress {
                 'completion_percentage' => round($completion_percentage, 0)
             ];
             // Store in APCu cache for 30 seconds to reduce DB load on frequent dashboard calls
-            if (function_exists('apcu_store')) {
-                apcu_store($cacheKey, $summaryData, 30);
-            }
+            self::storeCache($cacheKey, $summaryData);
             return $summaryData;
         } catch (Exception $e) {
             error_log("Get user progress summary error: " . $e->getMessage());
@@ -144,11 +163,9 @@ class Progress {
      */
     public function getDetailedMaterialProgress(int $user_id): array {
         $cacheKey = "progress_detail_{$user_id}";
-        if (function_exists('apcu_fetch')) {
-            $cached = apcu_fetch($cacheKey, $success);
-            if ($success && is_array($cached)) {
-                return $cached;
-            }
+        $cached = self::fetchCache($cacheKey);
+        if ($cached !== null) {
+            return $cached;
         }
 
         try {
@@ -202,9 +219,7 @@ class Progress {
                 ];
             }, $materials);
 
-            if (function_exists('apcu_store')) {
-                apcu_store($cacheKey, $result, 30);
-            }
+            self::storeCache($cacheKey, $result);
 
             return $result;
         } catch (Exception $e) {
@@ -361,11 +376,9 @@ class Progress {
     public function getLeaderboard(int $limit = 10): array {
         $limit = max(1, min(50, $limit));
         $cacheKey = "leaderboard_{$limit}";
-        if (function_exists('apcu_fetch')) {
-            $cached = apcu_fetch($cacheKey, $success);
-            if ($success && is_array($cached)) {
-                return $cached;
-            }
+        $cached = self::fetchCache($cacheKey);
+        if ($cached !== null) {
+            return $cached;
         }
 
         try {
@@ -430,9 +443,7 @@ class Progress {
             $stmt->execute();
 
             $result = $stmt->fetchAll();
-            if (function_exists('apcu_store')) {
-                apcu_store($cacheKey, $result, 30);
-            }
+            self::storeCache($cacheKey, $result);
 
             return $result;
         } catch (Exception $e) {
@@ -443,11 +454,9 @@ class Progress {
 
     public function getUserRank(int $user_id): ?array {
         $cacheKey = "user_rank_{$user_id}";
-        if (function_exists('apcu_fetch')) {
-            $cached = apcu_fetch($cacheKey, $success);
-            if ($success && is_array($cached)) {
-                return $cached;
-            }
+        $cached = self::fetchCache($cacheKey);
+        if ($cached !== null) {
+            return $cached;
         }
 
         try {
@@ -515,8 +524,8 @@ class Progress {
             $rank = $stmt->fetch(PDO::FETCH_ASSOC);
 
             $result = $rank ?: null;
-            if ($result && function_exists('apcu_store')) {
-                apcu_store($cacheKey, $result, 30);
+            if ($result) {
+                self::storeCache($cacheKey, $result);
             }
 
             return $result;
