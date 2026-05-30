@@ -100,7 +100,11 @@ class UploadService {
         $config = self::getSupabaseConfig();
         
         if (!$config['url'] || !$config['key']) {
-            error_log("CRITICAL: Supabase Storage configuration missing!");
+            if (!defined('ENV') || ENV !== 'production') {
+                return self::uploadToLocal($filePath, $storagePath);
+            }
+
+            error_log('CRITICAL: Supabase Storage configuration missing!');
             return ['success' => false, 'message' => 'Konfigurasi penyimpanan cloud belum siap.'];
         }
 
@@ -130,6 +134,37 @@ class UploadService {
 
         error_log("Supabase Storage Error ($httpCode): " . $response);
         return ['success' => false, 'message' => 'Gagal mengunggah file ke cloud storage.'];
+    }
+
+    private static function uploadToLocal(string $filePath, string $storagePath): array {
+        $relativePath = str_replace('\\', '/', ltrim($storagePath, '/'));
+
+        if ($relativePath === '' || strpos($relativePath, '..') !== false) {
+            return ['success' => false, 'message' => 'Path penyimpanan tidak valid.'];
+        }
+
+        $uploadRoot = defined('UPLOADS_PATH')
+            ? UPLOADS_PATH
+            : dirname(__DIR__, 2) . '/public/uploads';
+
+        $targetPath = rtrim($uploadRoot, '/\\') . '/' . $relativePath;
+        $targetDir = dirname($targetPath);
+
+        if (!is_dir($targetDir) && !mkdir($targetDir, 0755, true)) {
+            error_log('Local upload error: failed to create directory ' . $targetDir);
+            return ['success' => false, 'message' => 'Folder penyimpanan lokal belum siap.'];
+        }
+
+        $stored = is_uploaded_file($filePath)
+            ? move_uploaded_file($filePath, $targetPath)
+            : copy($filePath, $targetPath);
+
+        if (!$stored) {
+            error_log('Local upload error: failed to store file at ' . $targetPath);
+            return ['success' => false, 'message' => 'Gagal menyimpan file secara lokal.'];
+        }
+
+        return ['success' => true, 'filename' => $relativePath];
     }
 
     private static function detectMimeType(string $path): string {
