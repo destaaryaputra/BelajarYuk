@@ -2,6 +2,10 @@
  * Belajaryuk - UI Utilities
  */
 
+const SPLASH_MIN_VISIBLE_MS = 3000;
+const SPLASH_FADE_DELAY_MS = 160;
+const SPLASH_REMOVE_DELAY_MS = 820;
+
 export const UI = {
     _scriptPromises: {},
     _stylePromises: {},
@@ -172,21 +176,31 @@ export const UI = {
     hideSplash() {
         const splash = document.getElementById('splash-screen');
         if (!splash) return;
-        const fadeDelay = 60;
-        const removeDelay = 420;
-        
-        // 1. Trigger the cinematic Zoom & Blur animation
-        splash.classList.add('zoom-blur');
+        if (splash.dataset.hiding === 'true') return;
 
-        // 2. Fade out the entire overlay slightly after the zoom starts
-        setTimeout(() => {
-            splash.classList.add('hidden');
-        }, fadeDelay);
+        splash.dataset.hiding = 'true';
 
-        // 3. Completely remove from DOM after all animations finish
-        setTimeout(() => {
-            splash.remove();
-        }, removeDelay);
+        const elapsed = typeof performance !== 'undefined' && typeof performance.now === 'function'
+            ? performance.now()
+            : SPLASH_MIN_VISIBLE_MS;
+        const remaining = Math.max(0, SPLASH_MIN_VISIBLE_MS - elapsed);
+
+        const startHide = () => {
+            // 1. Trigger the cinematic Zoom & Blur animation
+            splash.classList.add('zoom-blur');
+
+            // 2. Fade out the entire overlay slightly after the zoom starts
+            setTimeout(() => {
+                splash.classList.add('hidden');
+            }, SPLASH_FADE_DELAY_MS);
+
+            // 3. Completely remove from DOM after all animations finish
+            setTimeout(() => {
+                splash.remove();
+            }, SPLASH_REMOVE_DELAY_MS);
+        };
+
+        setTimeout(startHide, remaining);
  
     },
 
