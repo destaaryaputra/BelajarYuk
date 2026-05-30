@@ -301,7 +301,7 @@ class Quiz {
     /**
      * Get user's quiz results
      */
-    public function getUserQuizResults(int $user_id, ?int $quiz_id = null): array|null|false {
+    public function getUserQuizResults(int $user_id, ?int $quiz_id = null): ?array {
         try {
             $query = "SELECT q.id, q.title, hk.score, hk.total_points, hk.percentage, hk.submitted_at 
                          FROM hasil_kuis hk
@@ -320,7 +320,12 @@ class Quiz {
             $stmt = $this->db->prepare($query);
             $stmt->execute($params);
             
-            return $quiz_id ? $stmt->fetch(PDO::FETCH_ASSOC) : $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if ($quiz_id) {
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                return $result ?: null;
+            }
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             error_log("Get user quiz results error: " . $e->getMessage());
             return null;
