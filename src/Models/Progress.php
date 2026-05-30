@@ -22,6 +22,11 @@ class Progress {
     public static function clearUserProgressCache(int $user_id): void {
         if (function_exists('apcu_delete')) {
             apcu_delete("progress_summary_{$user_id}");
+            apcu_delete("progress_detail_{$user_id}");
+            apcu_delete("user_rank_{$user_id}");
+            foreach ([5, 10, 50] as $limit) {
+                apcu_delete("leaderboard_{$limit}");
+            }
         }
     }
 
@@ -138,16 +143,34 @@ class Progress {
      * Get detailed progress for each material for a specific user
      */
     public function getDetailedMaterialProgress(int $user_id): array {
+        $cacheKey = "progress_detail_{$user_id}";
+        if (function_exists('apcu_fetch')) {
+            $cached = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($cached)) {
+                return $cached;
+            }
+        }
+
         try {
-            // Logic: Count total sub_materials vs completed sub_materials for each active material
             $query = "SELECT 
                         m.id, m.title, m.category, m.thumbnail,
-                        (SELECT COUNT(*)::int FROM sub_materi WHERE material_id = m.id) as total_episodes,
-                        (SELECT COUNT(*)::int FROM progres_sub_materi psm 
-                         JOIN sub_materi sm ON psm.sub_material_id = sm.id 
-                         WHERE sm.material_id = m.id AND psm.user_id = :uid) as completed_episodes,
-                        EXISTS(SELECT 1 FROM progres_materi WHERE user_id = :uid2 AND material_id = m.id AND completed_at IS NOT NULL) as main_completed
+                        COALESCE(te.total_episodes, 0) AS total_episodes,
+                        COALESCE(ce.completed_episodes, 0) AS completed_episodes,
+                        (pm.completed_at IS NOT NULL) AS main_completed
                      FROM materi m
+                     LEFT JOIN (
+                        SELECT material_id, COUNT(*)::int AS total_episodes
+                        FROM sub_materi
+                        GROUP BY material_id
+                     ) te ON te.material_id = m.id
+                     LEFT JOIN (
+                        SELECT sm.material_id, COUNT(*)::int AS completed_episodes
+                        FROM progres_sub_materi psm
+                        JOIN sub_materi sm ON psm.sub_material_id = sm.id
+                        WHERE psm.user_id = :uid
+                        GROUP BY sm.material_id
+                     ) ce ON ce.material_id = m.id
+                     LEFT JOIN progres_materi pm ON pm.material_id = m.id AND pm.user_id = :uid2
                      WHERE m.status = 'active'
                      ORDER BY m.category, m.title";
 
@@ -155,7 +178,7 @@ class Progress {
             $stmt->execute(['uid' => $user_id, 'uid2' => $user_id]);
             $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            return array_map(function($m) {
+            $result = array_map(function($m) {
                 $total = (int) $m['total_episodes'];
                 $completed = (int) $m['completed_episodes'];
                 $mainDone = (bool) $m['main_completed'];
@@ -178,6 +201,12 @@ class Progress {
                     'is_fully_completed' => ($percentage >= 100)
                 ];
             }, $materials);
+
+            if (function_exists('apcu_store')) {
+                apcu_store($cacheKey, $result, 30);
+            }
+
+            return $result;
         } catch (Exception $e) {
             error_log("Get detailed material progress error: " . $e->getMessage());
             return [];
@@ -330,6 +359,15 @@ class Progress {
      * Papan Peringkat (Leaderboard) - Refactored for stability
      */
     public function getLeaderboard(int $limit = 10): array {
+        $limit = max(1, min(50, $limit));
+        $cacheKey = "leaderboard_{$limit}";
+        if (function_exists('apcu_fetch')) {
+            $cached = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($cached)) {
+                return $cached;
+            }
+        }
+
         try {
             $query = "SELECT 
                         u.id,
@@ -391,7 +429,12 @@ class Progress {
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
 
-            return $stmt->fetchAll();
+            $result = $stmt->fetchAll();
+            if (function_exists('apcu_store')) {
+                apcu_store($cacheKey, $result, 30);
+            }
+
+            return $result;
         } catch (Exception $e) {
             error_log("Get leaderboard error: " . $e->getMessage());
             return [];
@@ -399,6 +442,14 @@ class Progress {
     }
 
     public function getUserRank(int $user_id): ?array {
+        $cacheKey = "user_rank_{$user_id}";
+        if (function_exists('apcu_fetch')) {
+            $cached = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($cached)) {
+                return $cached;
+            }
+        }
+
         try {
             $query = "SELECT ranked.rank, ranked.total_points, ranked.materials_completed
                       FROM (
@@ -463,7 +514,12 @@ class Progress {
             $stmt->execute(['uid' => $user_id]);
             $rank = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            return $rank ?: null;
+            $result = $rank ?: null;
+            if ($result && function_exists('apcu_store')) {
+                apcu_store($cacheKey, $result, 30);
+            }
+
+            return $result;
         } catch (Exception $e) {
             error_log("Get user rank error: " . $e->getMessage());
             return null;

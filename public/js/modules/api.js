@@ -23,10 +23,42 @@ class APIService {
     constructor(baseURL) {
         this.baseURL = baseURL;
         this.token = localStorage.getItem(Config.STORAGE_KEYS.AUTH_TOKEN);
+        this.cache = new Map();
+        this.pendingGets = new Map();
+        this.cacheTtls = [
+            ['/progress/dashboard', 45000],
+            ['/progress/summary', 45000],
+            ['/progress/categories', 45000],
+            ['/progress/quiz-performance', 30000],
+            ['/progress/leaderboard', 30000],
+            ['/materials/detail', 45000],
+            ['/materials/categories', 120000],
+            ['/materials', 60000],
+            ['/auth/current-user', 45000],
+            ['/quiz/results', 15000]
+        ];
     }
 
     getCsrfToken() {
         return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    }
+
+    getCacheTtl(endpoint, override) {
+        if (override === false || override === 0) return 0;
+        if (typeof override === 'number') return Math.max(0, override);
+
+        const path = endpoint.split('?')[0];
+        const rule = this.cacheTtls.find(([prefix]) => path === prefix || path.startsWith(`${prefix}/`));
+        return rule ? rule[1] : 0;
+    }
+
+    getCacheKey(endpoint) {
+        return `${this.token || 'guest'}:${endpoint}`;
+    }
+
+    clearCache() {
+        this.cache.clear();
+        this.pendingGets.clear();
     }
 
     async request(endpoint, options = {}) {
@@ -38,6 +70,21 @@ class APIService {
         }
 
         const method = options.method || 'GET';
+        const cacheTtl = method === 'GET' ? this.getCacheTtl(endpoint, options.cacheTtl) : 0;
+        const cacheKey = cacheTtl > 0 ? this.getCacheKey(endpoint) : null;
+
+        if (cacheKey) {
+            const cached = this.cache.get(cacheKey);
+            if (cached && cached.expiresAt > Date.now()) {
+                return cached.data;
+            }
+            this.cache.delete(cacheKey);
+
+            if (this.pendingGets.has(cacheKey)) {
+                return this.pendingGets.get(cacheKey);
+            }
+        }
+
         const csrfToken = this.getCsrfToken();
         if (method !== 'GET' && csrfToken) {
             headers['X-CSRF-Token'] = csrfToken;
@@ -52,7 +99,8 @@ class APIService {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), Config.REQUEST_TIMEOUT);
 
-        try {
+        const requestPromise = (async () => {
+            try {
             const response = await fetch(url, {
                 method,
                 headers,
@@ -82,6 +130,15 @@ class APIService {
                 throw new Error(data.message || 'API Request failed');
             }
 
+            if (cacheKey) {
+                this.cache.set(cacheKey, {
+                    data,
+                    expiresAt: Date.now() + cacheTtl
+                });
+            } else if (method !== 'GET') {
+                this.clearCache();
+            }
+
             return data;
         } catch (error) {
             let finalError = error instanceof Error ? error : new Error(String(error));
@@ -90,6 +147,16 @@ class APIService {
             }
             throw finalError;
         }
+        })();
+
+        if (cacheKey) {
+            this.pendingGets.set(cacheKey, requestPromise);
+            return requestPromise.finally(() => {
+                this.pendingGets.delete(cacheKey);
+            });
+        }
+
+        return requestPromise;
     }
 
     async get(endpoint, options = {}) { return this.request(endpoint, { ...options, method: 'GET' }); }
@@ -98,11 +165,13 @@ class APIService {
     async delete(endpoint, options = {}) { return this.request(endpoint, { ...options, method: 'DELETE' }); }
 
     setToken(token) {
+        this.clearCache();
         this.token = token;
         localStorage.setItem(Config.STORAGE_KEYS.AUTH_TOKEN, token);
     }
 
     clearAuth() {
+        this.clearCache();
         this.token = null;
         localStorage.removeItem(Config.STORAGE_KEYS.AUTH_TOKEN);
         localStorage.removeItem(Config.STORAGE_KEYS.USER_DATA);
