@@ -169,10 +169,12 @@ export const Admin = {
                 btnChange.onclick = () => inputAvatar.click();
                 inputAvatar.onchange = async () => {
                     if (!inputAvatar.files || !inputAvatar.files[0]) return;
-                    const formData = new FormData();
-                    formData.append('avatar', inputAvatar.files[0]);
                     UI.showLoading();
                     try {
+                        const file = await UI.prepareAvatarFile(inputAvatar.files[0]);
+                        const formData = new FormData();
+                        formData.append('avatar', file, file.name);
+
                         const res = await API.post('/auth/avatar', formData);
                         UI.showNotification(res.message, 'success');
                         this.loadProfile();
@@ -182,6 +184,7 @@ export const Admin = {
                     } catch (e) {
                         UI.showNotification(e.message || 'Gagal mengunggah foto.', 'error');
                     } finally {
+                        inputAvatar.value = '';
                         UI.hideLoading();
                     }
                 };

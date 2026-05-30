@@ -481,6 +481,82 @@ export const UI = {
         return this._stylePromises[href];
     },
 
+    async prepareAvatarFile(file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!file || !allowedTypes.includes(file.type)) {
+            throw new Error('Format file tidak didukung. Gunakan JPG, PNG, atau WEBP.');
+        }
+
+        if (file.size > 8 * 1024 * 1024) {
+            throw new Error('Foto terlalu besar. Pilih foto maksimal 8MB.');
+        }
+
+        const targetBytes = 900 * 1024;
+        if (file.size <= targetBytes) {
+            return file;
+        }
+
+        return this.compressAvatarImage(file, targetBytes);
+    },
+
+    async compressAvatarImage(file, targetBytes) {
+        if (typeof document === 'undefined' || typeof Image === 'undefined') {
+            throw new Error('Browser tidak mendukung kompresi gambar.');
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+
+        try {
+            const image = await new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Foto tidak bisa dibaca.'));
+                img.src = objectUrl;
+            });
+
+            const maxSide = 640;
+            const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+            canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+            const context = canvas.getContext('2d');
+            if (!context) throw new Error('Browser tidak bisa memproses foto.');
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+            const outputTypes = ['image/webp', 'image/jpeg'];
+            const qualities = [0.88, 0.78, 0.68, 0.58, 0.48, 0.4];
+            let bestBlob = null;
+            let bestType = 'image/jpeg';
+
+            for (const type of outputTypes) {
+                for (const quality of qualities) {
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, type, quality));
+                    if (!blob) continue;
+
+                    if (!bestBlob || blob.size < bestBlob.size) {
+                        bestBlob = blob;
+                        bestType = blob.type || type;
+                    }
+
+                    if (blob.size <= targetBytes) {
+                        const extension = bestType === 'image/webp' ? 'webp' : 'jpg';
+                        return new File([blob], `avatar.${extension}`, { type: bestType });
+                    }
+                }
+            }
+
+            if (!bestBlob || bestBlob.size > 1024 * 1024) {
+                throw new Error('Foto masih terlalu besar setelah dikompres. Coba pilih foto lain.');
+            }
+
+            const extension = bestType === 'image/webp' ? 'webp' : 'jpg';
+            return new File([bestBlob], `avatar.${extension}`, { type: bestType });
+        } finally {
+            URL.revokeObjectURL(objectUrl);
+        }
+    },
+
     togglePasswordVisibility(btn) {
         const wrapper = btn.closest('.password-input-wrapper');
         if (!wrapper) return;

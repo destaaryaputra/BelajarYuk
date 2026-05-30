@@ -7,10 +7,32 @@ use Exception;
 class UploadService {
     private static function getSupabaseConfig(): array {
         return [
-            'url' => getenv('SUPABASE_URL'),
-            'key' => getenv('SUPABASE_KEY'),
-            'bucket' => getenv('SUPABASE_STORAGE_BUCKET') ?: 'belajaryuk'
+            'url' => self::getEnvValue(['SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL', 'VITE_SUPABASE_URL']),
+            'key' => self::getEnvValue([
+                'SUPABASE_KEY',
+                'SUPABASE_SERVICE_ROLE_KEY',
+                'SUPABASE_ANON_KEY',
+                'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+                'VITE_SUPABASE_ANON_KEY'
+            ]),
+            'bucket' => self::getEnvValue(['SUPABASE_STORAGE_BUCKET', 'SUPABASE_BUCKET'], 'belajaryuk')
         ];
+    }
+
+    private static function getEnvValue(array $names, string $default = ''): string {
+        foreach ($names as $name) {
+            $value = getenv($name);
+            if ($value === false || trim((string) $value) === '') {
+                $value = $_ENV[$name] ?? $_SERVER[$name] ?? '';
+            }
+
+            $value = trim((string) $value);
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return $default;
     }
 
     public static function uploadThumbnail(array $file): array {
@@ -50,6 +72,9 @@ class UploadService {
             if (!isset($file['name'], $file['tmp_name'], $file['size'])) {
                 return ['success' => false, 'message' => 'File tidak lengkap.'];
             }
+            if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+                return ['success' => false, 'message' => self::getUploadErrorMessage((int) $file['error'])];
+            }
             if ($file['size'] > 1 * 1024 * 1024) {
                 return ['success' => false, 'message' => 'Foto profil terlalu besar! Maksimal 1MB ya.'];
             }
@@ -72,6 +97,20 @@ class UploadService {
         } catch (Exception $e) {
             error_log('Avatar upload error: ' . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal memproses foto profil.'];
+        }
+    }
+
+    private static function getUploadErrorMessage(int $errorCode): string {
+        switch ($errorCode) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'Foto profil terlalu besar untuk diunggah.';
+            case UPLOAD_ERR_PARTIAL:
+                return 'Upload foto terputus. Coba unggah ulang.';
+            case UPLOAD_ERR_NO_FILE:
+                return 'Pilih file foto profil dulu ya.';
+            default:
+                return 'Gagal membaca file foto profil.';
         }
     }
 

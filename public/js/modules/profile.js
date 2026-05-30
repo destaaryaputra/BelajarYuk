@@ -181,18 +181,19 @@ export const Profile = {
             inputAvatar.onchange = async () => {
                 if (!inputAvatar.files || !inputAvatar.files[0]) return;
                 
-                const file = inputAvatar.files[0];
-                const formData = new FormData();
-                formData.append('avatar', file);
-
                 UI.showLoading();
                 try {
+                    const file = await UI.prepareAvatarFile(inputAvatar.files[0]);
+                    const formData = new FormData();
+                    formData.append('avatar', file, file.name);
+
                     const response = await API.post('/auth/avatar', formData);
                     UI.showNotification(response.message, 'success');
                     this.load(); // Refresh to show new avatar
                 } catch (error) {
                     UI.showNotification(error.message || 'Gagal mengunggah foto.', 'error');
                 } finally {
+                    inputAvatar.value = '';
                     UI.hideLoading();
                 }
             };
