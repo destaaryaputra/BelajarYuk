@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Config\Database;
+use App\Services\QuizQuestionBank;
 use PDO;
 use Exception;
 
@@ -67,6 +68,8 @@ class Quiz {
      */
     public function getQuestionsByQuizId(int $quiz_id): array {
         try {
+            $this->syncCuratedQuestions($quiz_id);
+
             $query = "SELECT id, quiz_id, question_text, question_type, options, correct_answer, COALESCE(points,0) AS points 
                      FROM pertanyaan 
                      WHERE quiz_id = ? AND status = 'active' 
@@ -91,6 +94,134 @@ class Quiz {
             error_log("Get questions error: " . $e->getMessage());
             return [];
         }
+    }
+
+    public function syncCuratedQuestionsForQuiz(int $quiz_id): void {
+        $this->syncCuratedQuestions($quiz_id);
+    }
+
+    private function syncCuratedQuestions(int $quiz_id): void {
+        try {
+            $quizStmt = $this->db->prepare("
+                SELECT
+                    q.id,
+                    q.quiz_type,
+                    q.title,
+                    q.material_id,
+                    q.sub_material_id,
+                    m.title AS material_title,
+                    m.content AS material_content,
+                    sm.title AS sub_material_title,
+                    sm.content AS sub_material_content
+                FROM kuis q
+                LEFT JOIN materi m ON m.id = q.material_id
+                LEFT JOIN sub_materi sm ON sm.id = q.sub_material_id
+                WHERE q.id = ?
+            ");
+            $quizStmt->execute([$quiz_id]);
+            $quiz = $quizStmt->fetch(PDO::FETCH_ASSOC);
+            if (!$quiz) {
+                return;
+            }
+
+            $curatedQuestions = QuizQuestionBank::questionsFor($quiz);
+            if (empty($curatedQuestions)) {
+                return;
+            }
+
+            $existingStmt = $this->db->prepare("
+                SELECT id, question_text, options, correct_answer, COALESCE(points, 0) AS points, status
+                FROM pertanyaan
+                WHERE quiz_id = ?
+                ORDER BY order_number ASC, id ASC
+            ");
+            $existingStmt->execute([$quiz_id]);
+            $existingQuestions = $existingStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($this->questionsAlreadySynced($existingQuestions, $curatedQuestions)) {
+                return;
+            }
+
+            $updateStmt = $this->db->prepare("
+                UPDATE pertanyaan
+                SET question_text = ?,
+                    question_type = 'multiple_choice',
+                    options = ?,
+                    correct_answer = ?,
+                    points = ?,
+                    order_number = ?,
+                    status = 'active'
+                WHERE id = ?
+            ");
+            $insertStmt = $this->db->prepare("
+                INSERT INTO pertanyaan (quiz_id, question_text, question_type, options, correct_answer, points, order_number, status)
+                VALUES (?, ?, 'multiple_choice', ?, ?, ?, ?, 'active')
+            ");
+
+            foreach ($curatedQuestions as $index => $question) {
+                $optionsJson = json_encode($question['options'], JSON_UNESCAPED_UNICODE);
+                $points = intval($question['points'] ?? 10);
+                $order = $index + 1;
+
+                if (isset($existingQuestions[$index])) {
+                    $updateStmt->execute([
+                        $question['question_text'],
+                        $optionsJson,
+                        $question['correct_answer'],
+                        $points,
+                        $order,
+                        $existingQuestions[$index]['id']
+                    ]);
+                } else {
+                    $insertStmt->execute([
+                        $quiz_id,
+                        $question['question_text'],
+                        $optionsJson,
+                        $question['correct_answer'],
+                        $points,
+                        $order
+                    ]);
+                }
+            }
+
+            if (count($existingQuestions) > count($curatedQuestions)) {
+                $extraIds = array_slice(array_column($existingQuestions, 'id'), count($curatedQuestions));
+                $placeholders = implode(',', array_fill(0, count($extraIds), '?'));
+                $this->db->prepare("UPDATE pertanyaan SET status = 'deleted' WHERE id IN ($placeholders)")->execute($extraIds);
+            }
+
+            $this->db->prepare("UPDATE kuis SET total_questions = ? WHERE id = ?")->execute([count($curatedQuestions), $quiz_id]);
+        } catch (Exception $e) {
+            error_log('Sync curated quiz questions error: ' . $e->getMessage());
+        }
+    }
+
+    private function questionsAlreadySynced(array $existingQuestions, array $curatedQuestions): bool {
+        $activeExisting = array_values(array_filter($existingQuestions, function(array $question) {
+            return ($question['status'] ?? 'active') === 'active';
+        }));
+
+        if (count($activeExisting) !== count($curatedQuestions)) {
+            return false;
+        }
+
+        foreach ($curatedQuestions as $index => $curated) {
+            $existing = $activeExisting[$index] ?? null;
+            if (!$existing) {
+                return false;
+            }
+
+            $existingOptions = is_string($existing['options']) ? json_decode($existing['options'], true) : $existing['options'];
+            if (
+                ($existing['question_text'] ?? '') !== $curated['question_text'] ||
+                ($existing['correct_answer'] ?? '') !== $curated['correct_answer'] ||
+                array_values($existingOptions ?: []) !== array_values($curated['options'])
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
